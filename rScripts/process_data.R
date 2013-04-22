@@ -5,6 +5,7 @@ library(lubridate)
 projects.raw <- dget(file="./rawData/projectsRaw.R")
 users.raw <- dget(file="./rawData/usersRaw.R")
 dateOfExtraction <- dget("./rawData/dateOfExtraction.R")
+customFields.raw <- dget(file="./rawData/customFields.R")
 
 #Extract active users (internal + external)
 #
@@ -40,29 +41,60 @@ suffix.external.table <- sort(table(suffix.external),decreasing=TRUE)
 suffix.external.df <- as.data.frame.table(suffix.external.table)
 
 
-#Prepare extracting information from description column
-p.desc <- as.character(projects.raw$description)
-reg.match <- regmatches(p.desc,regexec('.*(_.*?_).*',p.desc))
+#In the LabCase database this is the relevant id - custom fields mapping:
+#13: Customer
+#14: Country
+#15: Business Line
 
-#Retrieve _[...]_ string
-desc.cut <- sapply(reg.match,function(x)x[2]) 
-desc.cut2 <- gsub('_','',desc.cut)
-desc.split <- strsplit(desc.cut2,',')
+#Add customer info to projects.raw
+customer.info <- droplevels(subset(customFields.raw, cf_id==13, select=c(id, cf_value)))
+names(customer.info)[names(customer.info)=='cf_value'] <- 'customer'
+projects.raw <- merge(projects.raw, customer.info, by=c('id'), all.x=TRUE)
 
-#Get customer info
-customers <- sapply(desc.split,function(x)x[1])
-#Get country info
-countries <- sapply(desc.split,function(x)x[2])
-#Get department info
-departments <- sapply(desc.split,function(x)x[3])
+#Add country info to projects.raw
+country.info <- droplevels(subset(customFields.raw, cf_id==14, select=c(id, cf_value)))
+names(country.info)[names(country.info)=='cf_value'] <- 'country'
+projects.raw <- merge(projects.raw, country.info, by=c('id'), all.x=TRUE)
+
+
+#Add business line info to projects.raw
+businessline.info <- droplevels(subset(customFields.raw, cf_id==15, select=c(id,cf_value)))
+names(businessline.info)[names(businessline.info)=='cf_value'] <- 'business_line'
+projects.raw <- merge(projects.raw, businessline.info, by=c('id'), all.x=TRUE)
+
+
+
+
+# #Prepare extracting information from description column
+# p.desc <- as.character(projects.raw$description)
+# reg.match <- regmatches(p.desc,regexec('.*(_.*?_).*',p.desc))
+# 
+# #Retrieve _[...]_ string
+# desc.cut <- sapply(reg.match,function(x)x[2]) 
+# desc.cut2 <- gsub('_','',desc.cut)
+# desc.split <- strsplit(desc.cut2,',')
+# 
+# #Get customer info
+# customers <- sapply(desc.split,function(x)x[1])
+# #Get country info
+# countries <- sapply(desc.split,function(x)x[2])
+# #Get department info
+# departments <- sapply(desc.split,function(x)x[3])
+
+
 
 #Create new data frame for further analysis
-projects <- data.frame(id=projects.raw$id,name=projects.raw$name,
-                       description=projects.raw$description,
-                       customers,countries=toupper(countries),
-                       departments,created_on=projects.raw$created_on,
-                       updated_on=projects.raw$updated_on,
-                       last_update=projects.raw$last_update)
+projects <- data.frame(id = projects.raw$id,
+                       name = projects.raw$name,
+                       description = projects.raw$description,
+                       customers = projects.raw$customer,
+                       countries = toupper(projects.raw$country),
+                       departments = projects.raw$business_line,
+                       created_on = projects.raw$created_on,
+                       updated_on = projects.raw$updated_on)
+
+
+
 
 #Create project frequency table grouped by country
 #
@@ -76,8 +108,8 @@ department.df <- as.data.frame.table(department.table)
 
 #Get number of of active projects of current quarter
 #
-#numbOfActiveProjectsCurQuart <- length(projects$updated_on[year(projects$updated_on)==year(dateOfExtraction) & quarter(projects$updated_on)==quarter(dateOfExtraction)])
-numbOfActiveProjectsCurQuart <- length(projects$last_update[year(projects$last_update)==year(dateOfExtraction) & quarter(projects$last_update)==quarter(dateOfExtraction)])
+numbOfActiveProjectsCurQuart <- length(projects$updated_on[year(projects$updated_on)==year(dateOfExtraction) & quarter(projects$updated_on)==quarter(dateOfExtraction)])
+
 
 
 #Create project creation table grouped by year
@@ -114,11 +146,7 @@ weeklyProjCreation.df <- as.data.frame.table(weeklyProjCreation.table)
 #
 #Create interval for the last 12 months
 interval <- new_interval(dateOfExtraction - 31556952, dateOfExtraction)
-#activeProjects <- projects$updated_on[projects$updated_on %within% interval]
-
-#TODO
-#
-activeProjects <- projects$last_update[projects$last_update %within% interval]
+activeProjects <- projects$updated_on[projects$updated_on %within% interval]
 activeProjects <- interaction(quarters(activeProjects),year(activeProjects),drop=TRUE)
 #cut first factor level away so that only 4 quarters remain
 activeProjects <- factor(activeProjects[activeProjects != levels(activeProjects)[1]])
