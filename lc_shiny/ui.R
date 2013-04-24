@@ -52,6 +52,9 @@ specified by the input.')
       tabPanel('User distribution',
                plotOutput('userSAGPlot', width = "75%", height = "300px"),
                plotOutput('userExternalPlot', width = "75%", height = "300px")
+               ),
+      tabPanel('Disk space usage',
+               plotOutput('diskspaceUsagePlot')
                )
     ) 
   )

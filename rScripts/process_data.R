@@ -85,13 +85,15 @@ projects.raw <- merge(projects.raw, businessline.info, by=c('id'), all.x=TRUE)
 
 #Create new data frame for further analysis
 projects <- data.frame(id = projects.raw$id,
+                       identifier = projects.raw$identifier,
                        name = projects.raw$name,
                        description = projects.raw$description,
                        customers = projects.raw$customer,
                        countries = toupper(projects.raw$country),
                        departments = projects.raw$business_line,
                        created_on = projects.raw$created_on,
-                       updated_on = projects.raw$updated_on)
+                       updated_on = projects.raw$updated_on,
+                       project_size = projects.raw$project_size)
 
 
 
@@ -152,12 +154,30 @@ activeProjects <- interaction(quarters(activeProjects),year(activeProjects),drop
 activeProjects <- factor(activeProjects[activeProjects != levels(activeProjects)[1]])
 activeProjects.df <- as.data.frame.table(table(activeProjects))
 
+
+##Disk space usage
+#
+#
+
+
 #Dump all necessary data
 #
-dump(c('dateOfExtraction', 'users', 'projects', 'suffix.sag', 'suffix.external',
-       'suffix.sag.df', 'suffix.external.df', 'country.df', 'department.df', 
-       'numbOfActiveProjectsCurQuart', 'year.df', 'quarter.df', 'activeProjects', 
-      'weeklyProjCreation.df', 'activeProjects.df'), file='./processedData/processedDataDump.R')
+dump(c('dateOfExtraction', 
+       'users', 
+       'projects', 
+       'suffix.sag', 
+       'suffix.external',
+       'suffix.sag.df', 
+       'suffix.external.df', 
+       'country.df', 
+       'department.df', 
+       'numbOfActiveProjectsCurQuart', 
+       'year.df', 
+       'quarter.df', 
+       'activeProjects', 
+       'weeklyProjCreation.df', 
+       'activeProjects.df'), 
+     file='./processedData/processedDataDump.R')
 
 
 

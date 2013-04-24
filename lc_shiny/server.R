@@ -46,7 +46,7 @@ shinyServer(function(input,output){
   output$countryPlot <- renderPlot({
     
     # Subset according to reactive value and exclude NAs
-    country.df <- subset(country.df,Freq >= input$numbOfProjects & Var1 != '<NA>')
+    country.df <- subset(country.df,Freq >= input$numbOfProjects )#& Var1 != '<NA>')
     # Do a reorder so that the order in the barchart is flipped
     country.df <- transform(country.df,Var1 = reorder(Var1,Freq))
     
@@ -64,7 +64,7 @@ shinyServer(function(input,output){
   output$departmentPlot <- renderPlot({
     
     #Subset according to reactive value and exclude NAs
-    department.df <- subset(department.df,Freq >= input$numbOfProjects & Var1 != '<NA>')
+    department.df <- subset(department.df,Freq >= input$numbOfProjects)# & Var1 != '<NA>')
     #Do a reorder so that the order in the barchart is flipped
     department.df <- transform(department.df,Var1 = reorder(Var1,Freq))
     
@@ -175,6 +175,20 @@ shinyServer(function(input,output){
       theme(plot.title=element_text(size=rel(1.3)), axis.title=element_text(size=14), axis.text=element_text(size=12)) +
       ggtitle('Project activity in the last 12 months\n per quarter')
     print(g)
+  })
+  
+  
+  # Create disk space usage plot
+  #
+  output$diskspaceUsagePlot <- renderPlot({
+    usage <- subset(projects, project_size > 2000, select=c(identifier, project_size))
+    g <- ggplot(usage, aes(x=identifier, y=project_size)) + 
+      geom_bar(stat = 'identity', fill='#3182BD') +
+      xlab('Project identifier') + ylab('Alfresco disk space usage in GB') +
+      coord_flip() + ggtitle('LabCase projets consuming more than 2GB of Alfresco disk space')
     
+    
+    
+    print(g)
   })
 })
