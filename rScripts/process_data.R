@@ -112,8 +112,6 @@ department.df <- as.data.frame.table(department.table)
 #
 numbOfActiveProjectsCurQuart <- length(projects$updated_on[year(projects$updated_on)==year(dateOfExtraction) & quarter(projects$updated_on)==quarter(dateOfExtraction)])
 
-
-
 #Create project creation table grouped by year
 #
 year.table <- table(year(projects$created_on),useNA='ifany')
@@ -155,11 +153,6 @@ activeProjects <- factor(activeProjects[activeProjects != levels(activeProjects)
 activeProjects.df <- as.data.frame.table(table(activeProjects))
 
 
-##Disk space usage
-#
-#
-
-
 #Dump all necessary data
 #
 dump(c('dateOfExtraction', 
@@ -178,7 +171,3 @@ dump(c('dateOfExtraction',
        'weeklyProjCreation.df', 
        'activeProjects.df'), 
      file='./processedData/processedDataDump.R')
-
-
-
-
