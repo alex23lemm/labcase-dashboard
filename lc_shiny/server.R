@@ -2,7 +2,6 @@ library(shiny)
 library(ggplot2)
 library(RColorBrewer)
 library(lubridate)
-library(outliers)
 
 
 #Shiny server functionality
@@ -14,17 +13,17 @@ shinyServer(function(input,output){
   source('../processedData/processedDataDump.R')
 
   output$date <- renderText({
-    paste('Data as of', dateOfExtraction,sep=" ")
+    paste('Data as of', dateOfExtraction, sep=" ")
   })
   
   output$numbOfProjectsOverall <- renderText({
-    paste('Total number of projects:', dim(projects)[1],sep=" ")
+    paste('Total number of projects:', dim(projects)[1], sep=" ")
   })
   
   output$numbOfActiveProjectsCurQuart <- renderText({
     paste('Number of active projects in', 
           quarters(dateOfExtraction), year(dateOfExtraction), ':', 
-          numbOfActiveProjectsCurQuart,sep=" ")   
+          numbOfActiveProjectsCurQuart, sep=" ")   
   })
   
   output$numbOfUsers <- renderText({
@@ -42,7 +41,7 @@ shinyServer(function(input,output){
  
   output$distributionCaption <- renderText({
     paste('Departments/Countries with',
-          input$numbOfProjects,'or more LabCase projects',sep=' ')
+          input$numbOfProjects,'or more LabCase projects', sep=' ')
   })
   
   # Create country ~ projects barchart
@@ -50,9 +49,9 @@ shinyServer(function(input,output){
   output$countryPlot <- renderPlot({
     
     # Subset according to reactive value and exclude NAs
-    country.df <- subset(country.df,Freq >= input$numbOfProjects )#& Var1 != '<NA>')
+    country.df <- subset(country.df, Freq >= input$numbOfProjects )#& Var1 != '<NA>')
     # Do a reorder so that the order in the barchart is flipped
-    country.df <- transform(country.df,Var1 = reorder(Var1,Freq))
+    country.df <- transform(country.df, Var1 = reorder(Var1,Freq))
     
     g <- ggplot(country.df, aes(x=Var1, y=Freq)) + 
       geom_bar(stat='identity', fill='#3182BD') +
@@ -75,7 +74,7 @@ shinyServer(function(input,output){
     #Subset according to reactive value and exclude NAs
     department.df <- subset(department.df,Freq >= input$numbOfProjects)# & Var1 != '<NA>')
     #Do a reorder so that the order in the barchart is flipped
-    department.df <- transform(department.df,Var1 = reorder(Var1,Freq))
+    department.df <- transform(department.df,Var1 = reorder(Var1, Freq))
     
     g <- ggplot(department.df, aes(x=Var1, y=Freq)) +
       geom_bar(stat='identity', fill='#3182BD') +
@@ -241,15 +240,33 @@ shinyServer(function(input,output){
     summary(projects$project_size, na.rm=T)
   })
   
-  # Alfresco disk spage usage boxplot
-  #
-  output$diskSpaceUsageBoxPlot <- renderPlot({
-    boxplot(projects$project_size, horizontal=T, outline=F,
-            font.main = 1,
-            main = 'Boxplot of project disk space usage (Outliers removed)',            
-            xlab = 'Alfresco disk space usage in MB'
-            )
-  })
+#   # Alfresco disk spage usage boxplot
+#   #
+#   output$diskSpaceUsageBoxPlot <- renderPlot({
+#     
+#     #compute lower and upper whiskers in order to exclude outliers later
+#     #without re-calculating the stats based on the reduced sample
+#     stats <- boxplot.stats(projects$project_size)$stats[c(1, 5)]
+#     
+#     #ps <- projects$project_size[!is.na(projects$project_size)]
+#     
+#     
+#     g <- ggplot(projects, aes(x=1, y=project_size)) +
+#       geom_boxplot() +
+#       ylab('Alfresco disk space usage (MB)') +
+#       scale_x_continuous(breaks=NULL) +
+#       coord_cartesian(ylim = stats*1.05) +
+#       theme(axis.title.x = element_blank()) +
+#       stat_summary(fun.y='mean', geom='point', shape=23, size=3, fill='white')
+#     print(g)
+#     
+# #     boxplot(projects$project_size, horizontal=T, outline=F,
+# #             font.main = 1,
+# #             main = 'Boxplot of project disk space usage (Outliers removed)',            
+# #             xlab = 'Alfresco disk space usage in MB'
+# #             )
+#     
+#   })
   
   
   # Create disk space usage plot
@@ -267,7 +284,7 @@ shinyServer(function(input,output){
       geom_text(aes(label=project_size), hjust=-0.1, size=4) +
       ylim(0, max(usage$project_size) * 1.02) +
       xlab('Project identifier') + 
-      ylab('Alfresco disk space usage in MB') +
+      ylab('Alfresco disk space usage (MB)') +
       coord_flip() + ggtitle('Projects (including subprojects) consuming more than 1GB of Alfresco disk space') + 
       theme(plot.title = element_text(size=rel(1.3)), 
             axis.title = element_text(size=14),

@@ -42,14 +42,16 @@ specified by the input.')
                     plotOutput('projectWeekProgessPlot', width = "90%", height = "340px"),
                     plotOutput('projectProgressPlot', width = "80%", height = "320px")
                     ),
-                div(class='span6',plotOutput('projectQuarterProgressPlot', width = "80%", height = "320px"))
+                div(class='span6',
+                    plotOutput('projectQuarterProgressPlot', width = "80%", height = "320px"))
                ),
       tabPanel('Project activity',
                div(class='span6', 
                    p(textOutput('numbOfActiveProjects')),
                    textOutput('numbOfInactiveProjects')
                    ),
-               div(class='span6', plotOutput('projectActivityPlot', width = '80%', height = '320px'))
+               div(class='span6', 
+                   plotOutput('projectActivityPlot', width = '80%', height = '320px'))
                ),
       tabPanel('User distribution',
                plotOutput('userSAGPlot', width = "75%", height = "300px"),
@@ -59,9 +61,8 @@ specified by the input.')
                 p(textOutput('totalDiskSpaceUsage')),
                 helpText('Alfresco disk space usage summary information (in MB):'),
                 verbatimTextOutput('diskSpaceUsageSummary'),
-                plotOutput('diskSpaceUsageBoxPlot', width = "75%", height = "300px"),
-                p(plotOutput('diskspaceUsagePlot', width = "85%", height = "340px")
-               ))
+                plotOutput('diskspaceUsagePlot', width = "85%", height = "340px")
+      )
     ) 
   )
 ))
