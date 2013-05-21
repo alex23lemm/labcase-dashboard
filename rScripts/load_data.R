@@ -4,13 +4,13 @@ library(RCurl)
 library(XML)
 
 # Connect to database and retrieve projects table
-connect <- odbcConnect('LabCase',uid='',pwd='')
+connect <- odbcConnect('LabCase', uid='', pwd='')
 
 query <- 'SELECT * FROM projects'
-projects.raw <- sqlQuery(connect,query=query)
+projects.raw <- sqlQuery(connect, query=query)
 
 query <- 'SELECT * FROM users'
-users.raw <- sqlQuery(connect,query=query)
+users.raw <- sqlQuery(connect, query=query)
 
 #In the LabCase database this is the relevant id - custom fields mapping:
 #13: Customer
