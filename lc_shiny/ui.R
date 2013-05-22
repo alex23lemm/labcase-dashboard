@@ -33,17 +33,17 @@ specified by the input.')
       tabPanel('Project distribution',
                helpText(textOutput('distributionCaption')),
                #class='span6',
-               plotOutput('departmentPlot',width = "75%", height = "300px"),
+               plotOutput('departmentPlot', width="75%", height="300px"),
                #class='span6',
-               plotOutput('countryPlot',width = "75%", height = "300px")
+               plotOutput('countryPlot', width="75%", height="300px")
                ),
       tabPanel('Project growth',
                 div(class='span6', 
-                    plotOutput('projectWeekProgessPlot', width = "90%", height = "340px"),
-                    plotOutput('projectProgressPlot', width = "80%", height = "320px")
+                    plotOutput('projectWeekProgessPlot', width="90%", height="340px"),
+                    plotOutput('projectProgressPlot', width="80%", height="320px")
                     ),
                 div(class='span6',
-                    plotOutput('projectQuarterProgressPlot', width = "80%", height = "320px"))
+                    plotOutput('projectQuarterProgressPlot', width="80%", height="320px"))
                ),
       tabPanel('Project activity',
                div(class='span6', 
@@ -51,18 +51,22 @@ specified by the input.')
                    textOutput('numbOfInactiveProjects')
                    ),
                div(class='span6', 
-                   plotOutput('projectActivityPlot', width = '80%', height = '320px'))
+                   plotOutput('projectActivityPlot', width='80%', height='320px'))
                ),
       tabPanel('User distribution',
-               plotOutput('userSAGPlot', width = "75%", height = "300px"),
-               plotOutput('userExternalPlot', width = "75%", height = "300px")
+               plotOutput('userSAGPlot', width="75%", height="300px"),
+               plotOutput('userExternalPlot', width="75%", height="300px")
                ),
       tabPanel('Disk space usage',
                 p(textOutput('totalDiskSpaceUsage')),
                 helpText('Alfresco disk space usage summary information (in MB):'),
                 verbatimTextOutput('diskSpaceUsageSummary'),
-                plotOutput('diskspaceUsagePlot', width = "85%", height = "340px")
-      )
+                plotOutput('diskspaceUsagePlot', width="85%", height="340px")
+               ),
+      tabPanel('Project templates',
+               textOutput('numbOfTemplates'),
+               plotOutput('templateUsagePlot', width="75%", height="300px")
+               )
     ) 
   )
 ))

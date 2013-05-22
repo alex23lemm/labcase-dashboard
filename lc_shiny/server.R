@@ -198,12 +198,12 @@ shinyServer(function(input,output){
   
   output$numbOfActiveProjects <- renderText({
     paste('Number of projects active in the last 12 months:', 
-          length(activeProjects) ,sep=' ')
+          length(activeProjects), sep=' ')
   })
   
   output$numbOfInactiveProjects <- renderText({
     paste('Number of projects inactive since 12 months:', 
-          dim(projects)[1] - length(activeProjects) ,sep=' ')
+          dim(projects)[1] - length(activeProjects), sep=' ')
   })
   
   # Create project activity plot for last 4 quarters
@@ -280,13 +280,42 @@ shinyServer(function(input,output){
     usage <- transform(usage, identifier = reorder(identifier, project_size))
     
     g <- ggplot(usage, aes(x=identifier, y=project_size)) + 
-      geom_bar(stat = 'identity', fill='#3182BD') +
+      geom_bar(stat='identity', fill='#3182BD') +
       geom_text(aes(label=project_size), hjust=-0.1, size=4) +
       ylim(0, max(usage$project_size) * 1.02) +
       xlab('Project identifier') + 
       ylab('Alfresco disk space usage (MB)') +
-      coord_flip() + ggtitle('Projects (including subprojects) consuming more than 1GB of Alfresco disk space') + 
+      coord_flip() + 
+      ggtitle('Projects (including subprojects) consuming more than 1GB of Alfresco disk space') + 
       theme(plot.title = element_text(size=rel(1.3)), 
+            axis.title = element_text(size=14),
+            axis.text = element_text(size=11))
+    print(g)
+  })
+  
+  # Template
+  #
+  output$numbOfTemplates <- renderText({
+    paste('Number of available templates: ', dim(templateUsage.df)[1], sep='')
+  })
+  
+  
+  #Create template usage plot
+  #
+  output$templateUsagePlot <- renderPlot({
+    
+    #Do a reorder so that the order in the barchart is flipped
+    templateUsage.df <- transform(templateUsage.df, name=reorder(name, freq))
+    
+    g <- ggplot(templateUsage.df, aes(x=name, y=freq)) +
+      geom_bar(stat='identity', fill='#3182BD') + 
+      geom_text(aes(label=freq), hjust=-0.1, size=4) +
+      ylim(0, max(templateUsage.df$freq) * 1.02) +
+      xlab('Template name') + 
+      ylab('Number of instances') + 
+      coord_flip() + 
+      ggtitle('Number of instantiated projects per template') +
+      theme(plot.title = element_text(size=rel(1.3)),
             axis.title = element_text(size=14),
             axis.text = element_text(size=11))
     print(g)

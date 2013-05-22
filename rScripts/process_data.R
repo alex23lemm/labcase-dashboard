@@ -152,6 +152,7 @@ templates <- subset(projects, template == 1, select=c(id, identifier, name))
 countedTemplateInstances <- count(projects, vars ='template_project_id')
 templateUsage.df <- merge(templates, countedTemplateInstances, 
                           by.x='id', by.y='template_project_id', all.x=TRUE)
+#Replace NA values with 0
 templateUsage.df$freq[is.na(templateUsage.df$freq)] <- 0
 
 
