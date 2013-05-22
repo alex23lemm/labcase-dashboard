@@ -1,4 +1,5 @@
 library(lubridate)
+library(plyr)
 
 
 #Load raw data into memory
@@ -42,9 +43,17 @@ suffix.external.df <- as.data.frame.table(suffix.external.table)
 
 
 #In the LabCase database this is the relevant id - custom fields mapping:
+#12: Use as template
 #13: Customer
 #14: Country
 #15: Business Line
+
+#Add template info to projects.raw
+template.info <- droplevels(subset(customFields.raw, cf_id==12,
+                        select=c(id, cf_value)))
+names(template.info)[names(template.info)=='cf_value'] <- 'template'
+projects.raw <- merge(projects.raw, template.info, by=('id'), all.x=TRUE)
+
 
 #Add customer info to projects.raw
 customer.info <- droplevels(subset(customFields.raw, cf_id==13, 
@@ -75,9 +84,9 @@ projects <- data.frame(id = projects.raw$id,
                        departments = projects.raw$business_line,
                        created_on = projects.raw$created_on,
                        updated_on = projects.raw$updated_on,
-                       project_size = projects.raw$project_size)
-
-
+                       project_size = projects.raw$project_size,
+                       template = projects.raw$template,
+                       template_project_id = projects.raw$template_project_id)
 
 
 #Create project frequency table grouped by country
@@ -137,6 +146,15 @@ activeProjects <- factor(activeProjects[activeProjects != levels(activeProjects)
 activeProjects.df <- as.data.frame.table(table(activeProjects))
 
 
+##Create project template usage distribution table
+#
+templates <- subset(projects, template == 1, select=c(id, identifier, name))
+countedTemplateInstances <- count(projects, vars ='template_project_id')
+templateUsage.df <- merge(templates, countedTemplateInstances, 
+                          by.x='id', by.y='template_project_id', all.x=TRUE)
+templateUsage.df$freq[is.na(templateUsage.df$freq)] <- 0
+
+
 #Dump all necessary data
 #
 dump(c('dateOfExtraction', 
@@ -153,5 +171,6 @@ dump(c('dateOfExtraction',
        'quarter.df', 
        'activeProjects', 
        'weeklyProjCreation.df', 
-       'activeProjects.df'), 
+       'activeProjects.df',
+       'templateUsage.df'), 
      file='./processedData/processedDataDump.R')

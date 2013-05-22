@@ -13,6 +13,7 @@ query <- 'SELECT * FROM users'
 users.raw <- sqlQuery(connect, query=query)
 
 #In the LabCase database this is the relevant id - custom fields mapping:
+#12: Use as template
 #13: Customer
 #14: Country
 #15: Business Line
@@ -23,7 +24,7 @@ query <- 'SELECT p.id, c.custom_field_id AS cf_id, c.value AS cf_value
             ON
             p.id = c.customized_id
             WHERE 
-            c.custom_field_id IN (13,14,15) AND c.customized_type = \"Project\"'
+            c.custom_field_id IN (12,13,14,15) AND c.customized_type = \"Project\"'
 customFields.raw <- sqlQuery(connect, query=query)
 
 close(connect)
