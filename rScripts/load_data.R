@@ -2,11 +2,14 @@ library(RODBC)
 library(lubridate)
 library(RCurl)
 library(XML)
+library(yaml)
+
+config <- yaml.load_file('config.yml')
 
 error <- FALSE
 
 # Connect to database and retrieve projects table
-connect <- try(odbcConnect('LabCase', uid='', pwd=''), silent=TRUE)
+connect <- try(odbcConnect('LabCase', uid=config$odbc$uid, pwd=config$odbc$pwd), silent=TRUE)
 
 if(connect == -1 || class(connect) == 'try-error')
   error <- TRUE
