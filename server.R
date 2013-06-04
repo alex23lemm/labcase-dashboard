@@ -58,7 +58,7 @@ shinyServer(function(input,output){
       geom_text(aes(label=Freq), hjust=-0.1, size=4) +
       ylim(0, max(country.df$Freq) * 1.02) +
       xlab('Countries') + 
-      ylab('Number of Projects') + 
+      ylab('Number of projects') + 
       theme(plot.title = element_text(size=rel(1.3)),
             axis.title = element_text(size=14),
             axis.text = element_text(size=10)) +
@@ -81,7 +81,7 @@ shinyServer(function(input,output){
       geom_text(aes(label=Freq), hjust=-0.1, color='black', size=4) +
       ylim(0, max(department.df$Freq) * 1.02) +
       xlab('Departments') + 
-      ylab('Number of Projects') + 
+      ylab('Number of projects') + 
       theme(plot.title = element_text(size=rel(1.3)),
             axis.title = element_text(size=14),
             axis.text = element_text(size=10)) +
@@ -151,50 +151,6 @@ shinyServer(function(input,output){
    
   })
   
-  # Create internal user distribution plot
-  #
-  output$userSAGPlot <- renderPlot({
-    
-    # Do a reorder so that the order in the barchart is flipped
-    suffix.sag.df <- transform(suffix.sag.df,
-                               suffix.sag = reorder(suffix.sag,Freq))
-    
-    g <- ggplot(suffix.sag.df, aes(x=suffix.sag, y=Freq)) + 
-      geom_bar(stat='identity', fill='#3182BD') +
-      geom_text(aes(label=Freq), hjust=-0.2,color='black',size=4) +
-      ylim(0, max(suffix.sag.df$Freq) * 1.02) +
-      xlab('SAG unit') + 
-      ylab('Number of users') + 
-      theme(plot.title = element_text(size=rel(1.3)),
-            axis.title = element_text(size=14),
-            axis.text = element_text(size=11)) +
-      coord_flip() + 
-      ggtitle('Number of active SAG users per unit')
-    print(g)
-    
-  })
-  
-  # Create external user distribution plot
-  #
-  output$userExternalPlot <- renderPlot({
-    
-    # Do a reorder so that the order in the barchart is flipped
-    suffix.external.df <- subset(suffix.external.df, Freq >3)
-    suffix.external.df <- transform(suffix.external.df,
-                                    suffix.external = reorder(suffix.external,Freq))
-    
-    g <- ggplot(suffix.external.df, aes(x=suffix.external, y=Freq)) + 
-      geom_bar(stat='identity',fill='#3182BD') +
-      geom_text(aes(label=Freq),hjust=-0.2,color='black',size=3) +
-      xlab('Customers') +
-      ylab('Number of users') + 
-      theme(plot.title = element_text(size=rel(1.3)),
-            axis.title = element_text(size=14),
-            axis.text = element_text(size=11)) +
-      coord_flip() + 
-      ggtitle('Customers with more than 3 active users')
-    print(g)
-  })
   
   output$numbOfActiveProjects <- renderText({
     paste('Number of projects active in the last 12 months:', 
@@ -226,7 +182,54 @@ shinyServer(function(input,output){
   })
   
   
-  # Total number of projects
+  
+  # Create internal user distribution plot
+  #
+  output$userSAGPlot <- renderPlot({
+    
+    # Do a reorder so that the order in the barchart is flipped
+    suffix.sag.df <- transform(suffix.sag.df,
+                               suffix.sag = reorder(suffix.sag,Freq))
+    
+    g <- ggplot(suffix.sag.df, aes(x=suffix.sag, y=Freq)) + 
+      geom_bar(stat='identity', fill='#3182BD') +
+      geom_text(aes(label=Freq), hjust=-0.2,color='black',size=4) +
+      ylim(0, max(suffix.sag.df$Freq) * 1.02) +
+      xlab('SAG unit') + 
+      ylab('Number of users') + 
+      theme(plot.title = element_text(size=rel(1.3)),
+            axis.title = element_text(size=14),
+            axis.text = element_text(size=11)) +
+      coord_flip() + 
+      ggtitle('Number of active SAG users per unit')
+    print(g)
+    
+  })
+  
+  # Create external user distribution plot
+  #
+  output$userExternalPlot <- renderPlot({
+    
+    # Do a reorder so that the order in the barchart is flipped
+    suffix.external.df <- subset(suffix.external.df, Freq > 2)
+    suffix.external.df <- transform(suffix.external.df,
+                                    suffix.external = reorder(suffix.external,Freq))
+    
+    g <- ggplot(suffix.external.df, aes(x=suffix.external, y=Freq)) + 
+      geom_bar(stat='identity',fill='#3182BD') +
+      geom_text(aes(label=Freq),hjust=-0.2,color='black',size=3) +
+      xlab('Customers') +
+      ylab('Number of users') + 
+      theme(plot.title = element_text(size=rel(1.3)),
+            axis.title = element_text(size=14),
+            axis.text = element_text(size=11)) +
+      coord_flip() + 
+      ggtitle('Customers with more than 2 active users')
+    print(g)
+  })
+  
+  
+  # Total Alfresco disk space usage
   #
   output$totalDiskSpaceUsage <- renderText({
     paste('Total Alfresco disk space usage: ', 
