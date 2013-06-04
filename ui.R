@@ -35,7 +35,7 @@ specified by the input.')
                #class='span6',
                plotOutput('departmentPlot', width="75%", height="300px"),
                #class='span6',
-               plotOutput('countryPlot', width="75%", height="300px")
+               plotOutput('countryPlot', width="75%")
                ),
       tabPanel('Project growth',
                 div(class='span6', 
@@ -55,7 +55,7 @@ specified by the input.')
                ),
       tabPanel('User distribution',
                plotOutput('userSAGPlot', width="75%", height="300px"),
-               plotOutput('userExternalPlot', width="75%", height="300px")
+               plotOutput('userExternalPlot', width="75%")
                ),
       tabPanel('Disk space usage',
                 p(
@@ -63,7 +63,7 @@ specified by the input.')
                   ),
                 helpText('Alfresco disk space usage summary information (in MB):'),
                 verbatimTextOutput('diskSpaceUsageSummary'),
-                plotOutput('diskspaceUsagePlot', width="85%", height="340px")
+                plotOutput('diskspaceUsagePlot', width="85%")
                ),
       tabPanel('Project templates',
                textOutput('numbOfTemplates'),
