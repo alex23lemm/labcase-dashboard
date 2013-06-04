@@ -58,7 +58,9 @@ specified by the input.')
                plotOutput('userExternalPlot', width="75%", height="300px")
                ),
       tabPanel('Disk space usage',
-                p(textOutput('totalDiskSpaceUsage')),
+                p(
+                  textOutput('totalDiskSpaceUsage')
+                  ),
                 helpText('Alfresco disk space usage summary information (in MB):'),
                 verbatimTextOutput('diskSpaceUsageSummary'),
                 plotOutput('diskspaceUsagePlot', width="85%", height="340px")

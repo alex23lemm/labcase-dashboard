@@ -10,7 +10,7 @@ shinyServer(function(input,output){
   
   #Get necessary data
   #
-  source('../processedData/processedDataDump.R')
+  source('./processedData/processedDataDump.R')
 
   output$date <- renderText({
     paste('Data as of', dateOfExtraction, sep=" ")
@@ -100,14 +100,14 @@ shinyServer(function(input,output){
       geom_point(size=7, shape=21, fill='white') +
       geom_text(aes(label=Freq), size=4) +
       ylim(0, max(weeklyProjCreation.df$Freq) * 1.02) +
-      xlab('Day of generation') + 
+      xlab('Day of creation') + 
       ylab('Number of projects') + 
       theme(plot.title = element_text(size=rel(1.3)),
             axis.title  =element_text(size=14),
             axis.text=element_text(size=12),
             axis.text.x = element_text(angle=30, hjust=1, vjust=1)) +
       ggtitle(paste0(year(dateOfExtraction), ': ',
-                     'Number of generated projects\n in the last 7 days per day'))
+                     'Number of created projects\n in the last 7 days per day'))
     print(g)
     
   })
@@ -124,12 +124,12 @@ shinyServer(function(input,output){
       geom_bar(width=.5, stat='identity', fill='#3182BD') +
       geom_text(aes(label=Freq), vjust=-0.3, size=4) +
       ylim(0, max(year.df$Freq) * 1.03) +
-      xlab('Year of generation') + 
+      xlab('Year of creation') + 
       ylab('Number of projects') + 
       theme(plot.title = element_text(size=rel(1.3)), 
             axis.title = element_text(size=14), 
             axis.text = element_text(size=12)) +
-      ggtitle('Number of generated projects\n per year')
+      ggtitle('Number of created projects\n per year')
     print(g)
   })
   
@@ -141,12 +141,12 @@ shinyServer(function(input,output){
       geom_bar(width=.5, stat='identity', fill='#3182BD') +
       geom_text(aes(label = Freq),vjust=-0.3,size=4) +
       ylim(0, max(quarter.df$Freq) * 1.03) +
-      xlab('Quarter of generation') + 
+      xlab('Quarter of creation') + 
       ylab('Number of projects') + 
       theme(plot.title = element_text(size=rel(1.3)),
             axis.title = element_text(size=14),
             axis.text = element_text(size=12)) +
-      ggtitle(paste0(year(dateOfExtraction), ': ', 'Number of generated projects\n per quarter'))
+      ggtitle(paste0(year(dateOfExtraction), ': ', 'Number of created projects\n per quarter'))
     print(g)
    
   })
@@ -239,35 +239,7 @@ shinyServer(function(input,output){
   output$diskSpaceUsageSummary <- renderPrint({
     summary(projects$project_size, na.rm=T)
   })
-  
-#   # Alfresco disk spage usage boxplot
-#   #
-#   output$diskSpaceUsageBoxPlot <- renderPlot({
-#     
-#     #compute lower and upper whiskers in order to exclude outliers later
-#     #without re-calculating the stats based on the reduced sample
-#     stats <- boxplot.stats(projects$project_size)$stats[c(1, 5)]
-#     
-#     #ps <- projects$project_size[!is.na(projects$project_size)]
-#     
-#     
-#     g <- ggplot(projects, aes(x=1, y=project_size)) +
-#       geom_boxplot() +
-#       ylab('Alfresco disk space usage (MB)') +
-#       scale_x_continuous(breaks=NULL) +
-#       coord_cartesian(ylim = stats*1.05) +
-#       theme(axis.title.x = element_blank()) +
-#       stat_summary(fun.y='mean', geom='point', shape=23, size=3, fill='white')
-#     print(g)
-#     
-# #     boxplot(projects$project_size, horizontal=T, outline=F,
-# #             font.main = 1,
-# #             main = 'Boxplot of project disk space usage (Outliers removed)',            
-# #             xlab = 'Alfresco disk space usage in MB'
-# #             )
-#     
-#   })
-  
+    
   
   # Create disk space usage plot
   #
@@ -286,14 +258,15 @@ shinyServer(function(input,output){
       xlab('Project identifier') + 
       ylab('Alfresco disk space usage (MB)') +
       coord_flip() + 
-      ggtitle('Projects (including subprojects) consuming more than 1GB of Alfresco disk space') + 
+      ggtitle(paste('Projects consuming more than 1GB of Alfresco disk space ', '(', dim(usage)[1], 
+                    ' overall)', sep='')) + 
       theme(plot.title = element_text(size=rel(1.3)), 
             axis.title = element_text(size=14),
             axis.text = element_text(size=11))
     print(g)
   })
   
-  # Template
+  # Number of available templates
   #
   output$numbOfTemplates <- renderText({
     paste('Number of available templates: ', dim(templateUsage.df)[1], sep='')
