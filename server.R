@@ -43,7 +43,7 @@ shinyServer(function(input,output){
   })
   
   output$numbOfIssues <- renderText({
-    paste('Total number of Issues:', sum(projects$issue_count, na.rm=TRUE), sep=" ")
+    paste('Total number of Issues created in projects:', sum(projects$issue_count, na.rm=TRUE), sep=" ")
   })
   
   output$summaryIssuesPerProject <- renderPrint({
