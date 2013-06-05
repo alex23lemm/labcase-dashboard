@@ -1,30 +1,37 @@
 library(shiny)
 
-#this expression is always used 
+
 shinyUI(pageWithSidebar(
   
   headerPanel('LabCase Dashboard'),
 
   sidebarPanel(
     
-    p(textOutput('date')),
-    
-    p(textOutput('numbOfProjectsOverall'),
-    
-    textOutput('numbOfActiveProjectsCurQuart')),
-    
-    p(textOutput('numbOfUsers'),
-    
-    textOutput('numbOfSAGUsers'),
-    
-    textOutput('numbOfExternalUsers')),
-    
-    p(numericInput('numbOfProjects','Specify number of projects',10),
-    
-    helpText('Info: The output (\'Project distribution\' tab) will show those departments/countries which have launched equivalent or more projects as
-specified by the input.')
-    
-    )),
+    p(
+      textOutput('date')
+      ),
+    p(
+      textOutput('numbOfProjectsOverall')#,
+      #textOutput('numbOfActiveProjectsCurQuart')
+      ),
+    p(
+      textOutput('numbOfUsers'),
+      textOutput('numbOfSAGUsers'),
+      textOutput('numbOfExternalUsers'),
+      helpText('Users per project information:'),
+      verbatimTextOutput('summaryUsersPerProject')
+    ),
+    p(
+      textOutput('numbOfIssues'),
+      helpText('Issues per project information:'),
+      verbatimTextOutput('summaryIssuesPerProject')
+      ),
+    p(
+      numericInput('numbOfProjects','Specify number of projects',10),
+      helpText('(Info: The \'Project distribution\' tab will show those departments/countries
+                which have launched equivalent or more projects aS specified by the input.)')
+    )
+  ),
   
   mainPanel(
     
@@ -45,14 +52,14 @@ specified by the input.')
                 div(class='span6',
                     plotOutput('projectQuarterProgressPlot', width="80%", height="320px"))
                ),
-      tabPanel('Project activity',
-               div(class='span6', 
-                   p(textOutput('numbOfActiveProjects')),
-                   textOutput('numbOfInactiveProjects')
-                   ),
-               div(class='span6', 
-                   plotOutput('projectActivityPlot', width='80%', height='320px'))
-               ),
+#       tabPanel('Project activity',
+#                div(class='span6', 
+#                    p(textOutput('numbOfActiveProjects')),
+#                    textOutput('numbOfInactiveProjects')
+#                    ),
+#                div(class='span6', 
+#                    plotOutput('projectActivityPlot', width='80%', height='320px'))
+#                ),
       tabPanel('User distribution',
                plotOutput('userSAGPlot', width="75%", height="300px"),
                plotOutput('userExternalPlot', width="75%")
@@ -69,7 +76,8 @@ specified by the input.')
                textOutput('numbOfTemplates'),
                plotOutput('templateUsagePlot', width="75%", height="300px")
                )
-    ) 
+      )
+    )
   )
-))
+)
   
