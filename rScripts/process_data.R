@@ -1,25 +1,72 @@
 library(lubridate)
 library(plyr)
 
+#This script consists of four mayor parts:
+#1. Load raw data into memory
+#2. Pre-processing
+#3. Processing
+#4. Saving the processed data
 
+
+#
 #Load raw data into memory
-projects.raw <- dget(file="./rawData/projectsRaw.R")
-users.raw <- dget(file="./rawData/usersRaw.R")
+#
+projects <- dget(file="./rawData/projectsRaw.R")
+users <- dget(file="./rawData/usersRaw.R")
+issues.raw <- dget(file="./rawData/issuesRaw.R")
 dateOfExtraction <- dget("./rawData/dateOfExtraction.R")
 customFields.raw <- dget(file="./rawData/customFields.R")
 
-#Extract active users (internal + external)
+
 #
-#last_login_on != NA if user used LabCase at least one time
-#Account status:
-#STATUS_ANONYMOUS  = 0
-#STATUS_ACTIVE     = 1
-#STATUS_REGISTERED = 2
-#STATUS_LOCKED     = 3
-users <- subset(users.raw, !is.na(last_login_on) & status==1)
-users$login <- tolower(users$login)
+#Pre-processing
+#
+
+#Merge project information with custom field information
+#
+
+#In the LabCase database this is the relevant id - custom fields mapping:
+#12: Use as template
+#13: Customer
+#14: Country
+#15: Business Line
+#
+#Add template info to projects
+template.info <- droplevels(subset(customFields.raw, cf_id==12,
+                        select=c(id, cf_value)))
+names(template.info)[names(template.info)=='cf_value'] <- 'template'
+projects <- merge(projects, template.info, by=('id'), all.x=TRUE)
+
+
+#Add customer info to projects
+customer.info <- droplevels(subset(customFields.raw, cf_id==13, 
+                                   select=c(id, cf_value)))
+names(customer.info)[names(customer.info)=='cf_value'] <- 'customer'
+projects <- merge(projects, customer.info, by=c('id'), all.x=TRUE)
+
+#Add country info to projects
+country.info <- droplevels(subset(customFields.raw, cf_id==14, 
+                                  select=c(id, cf_value)))
+names(country.info)[names(country.info)=='cf_value'] <- 'country'
+projects <- merge(projects, country.info, by=c('id'), all.x=TRUE)
+
+
+#Add business line info to projects
+businessline.info <- droplevels(subset(customFields.raw, cf_id==15,
+                                       select=c(id,cf_value)))
+names(businessline.info)[names(businessline.info)=='cf_value'] <- 'business_line'
+projects <- merge(projects, businessline.info, by=c('id'), all.x=TRUE)
+
+
+#Pre-process user data
+#
 users$mail <- tolower(users$mail)
 
+
+
+#
+#Processing: Generate smaller data frames which will serve as input for the Shiny application
+#
 
 #Extract email suffix of SAG users (Software AG, IDS Scheer, itCampus, Terracotta)
 #
@@ -40,53 +87,6 @@ indicator <- grepl('^(softwareag|itcampus|ids-scheer|terracotta).*', suffix)
 suffix.external <- suffix[!indicator]
 suffix.external.table <- sort(table(suffix.external), decreasing=TRUE)
 suffix.external.df <- as.data.frame.table(suffix.external.table)
-
-
-#In the LabCase database this is the relevant id - custom fields mapping:
-#12: Use as template
-#13: Customer
-#14: Country
-#15: Business Line
-
-#Add template info to projects.raw
-template.info <- droplevels(subset(customFields.raw, cf_id==12,
-                        select=c(id, cf_value)))
-names(template.info)[names(template.info)=='cf_value'] <- 'template'
-projects.raw <- merge(projects.raw, template.info, by=('id'), all.x=TRUE)
-
-
-#Add customer info to projects.raw
-customer.info <- droplevels(subset(customFields.raw, cf_id==13, 
-                                   select=c(id, cf_value)))
-names(customer.info)[names(customer.info)=='cf_value'] <- 'customer'
-projects.raw <- merge(projects.raw, customer.info, by=c('id'), all.x=TRUE)
-
-#Add country info to projects.raw
-country.info <- droplevels(subset(customFields.raw, cf_id==14, 
-                                  select=c(id, cf_value)))
-names(country.info)[names(country.info)=='cf_value'] <- 'country'
-projects.raw <- merge(projects.raw, country.info, by=c('id'), all.x=TRUE)
-
-
-#Add business line info to projects.raw
-businessline.info <- droplevels(subset(customFields.raw, cf_id==15,
-                                       select=c(id,cf_value)))
-names(businessline.info)[names(businessline.info)=='cf_value'] <- 'business_line'
-projects.raw <- merge(projects.raw, businessline.info, by=c('id'), all.x=TRUE)
-
-#Create new data frame for further analysis
-projects <- data.frame(id = projects.raw$id,
-                       identifier = projects.raw$identifier,
-                       name = projects.raw$name,
-                       description = projects.raw$description,
-                       customers = projects.raw$customer,
-                       countries = toupper(projects.raw$country),
-                       departments = projects.raw$business_line,
-                       created_on = projects.raw$created_on,
-                       updated_on = projects.raw$updated_on,
-                       project_size = projects.raw$project_size,
-                       template = projects.raw$template,
-                       template_project_id = projects.raw$template_project_id)
 
 
 #Create project frequency table grouped by country
@@ -134,8 +134,7 @@ weeklyProjCreation.table <- table(projectsCreatedInCurrentWeek)
 weeklyProjCreation.df <- as.data.frame.table(weeklyProjCreation.table)
 
 
-##Create project activity table grouped by the last 4 quarters
-#
+#Create project activity table grouped by the last 4 quarters
 #
 #Create interval for the last 12 months
 interval <- new_interval(dateOfExtraction - 31556952, dateOfExtraction)
@@ -146,7 +145,7 @@ activeProjects <- factor(activeProjects[activeProjects != levels(activeProjects)
 activeProjects.df <- as.data.frame.table(table(activeProjects))
 
 
-##Create project template usage distribution table
+#Create project template usage distribution table
 #
 templates <- subset(projects, template == 1, select=c(id, identifier, name))
 countedTemplateInstances <- count(projects, vars ='template_project_id')
@@ -156,8 +155,10 @@ templateUsage.df <- merge(templates, countedTemplateInstances,
 templateUsage.df$freq[is.na(templateUsage.df$freq)] <- 0
 
 
-#Dump all necessary data
 #
+#Save all processed data
+#
+
 dump(c('dateOfExtraction', 
        'users', 
        'projects', 
