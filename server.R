@@ -38,7 +38,18 @@ shinyServer(function(input,output){
     paste('Number of external users:', length(suffix.external), sep=" ")
   })
   
- 
+  output$summaryUsersPerProject <- renderPrint({
+    summary(projects$member_count, digits=3)
+  })
+  
+  output$numbOfIssues <- renderText({
+    paste('Total number of Issues:', sum(projects$issue_count, na.rm=TRUE), sep=" ")
+  })
+  
+  output$summaryIssuesPerProject <- renderPrint({
+    summary(projects$issue_count, digits=2)
+  })
+  
   output$distributionCaption <- renderText({
     paste('Departments/Countries with',
           input$numbOfProjects,'or more LabCase projects', sep=' ')
@@ -107,7 +118,9 @@ shinyServer(function(input,output){
             axis.text=element_text(size=12),
             axis.text.x = element_text(angle=30, hjust=1, vjust=1)) +
       ggtitle(paste0(year(dateOfExtraction), ': ',
-                     'Number of created projects\n in the last 7 days per day'))
+                     'Number of created projects\n in the last 7 days per day (', 
+                      sum(weeklyProjCreation.df$Freq),
+                     ' overall)'))
     print(g)
     
   })

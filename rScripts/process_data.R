@@ -8,21 +8,26 @@ library(plyr)
 #4. Saving the processed data
 
 
+
 #
 #Load raw data into memory
 #
+
+
 projects <- dget(file="./rawData/projectsRaw.R")
 users <- dget(file="./rawData/usersRaw.R")
-issues.raw <- dget(file="./rawData/issuesRaw.R")
+issues <- dget(file="./rawData/issuesRaw.R")
 dateOfExtraction <- dget("./rawData/dateOfExtraction.R")
-customFields.raw <- dget(file="./rawData/customFields.R")
+customFields <- dget(file="./rawData/customFields.R")
+
 
 
 #
 #Pre-processing
 #
 
-#Merge project information with custom field information
+
+#Merge project information with custom field and issue information
 #
 
 #In the LabCase database this is the relevant id - custom fields mapping:
@@ -32,31 +37,34 @@ customFields.raw <- dget(file="./rawData/customFields.R")
 #15: Business Line
 #
 #Add template info to projects
-template.info <- droplevels(subset(customFields.raw, cf_id==12,
+template.info <- droplevels(subset(customFields, cf_id==12,
                         select=c(id, cf_value)))
 names(template.info)[names(template.info)=='cf_value'] <- 'template'
 projects <- merge(projects, template.info, by=('id'), all.x=TRUE)
 
 
 #Add customer info to projects
-customer.info <- droplevels(subset(customFields.raw, cf_id==13, 
+customer.info <- droplevels(subset(customFields, cf_id==13, 
                                    select=c(id, cf_value)))
 names(customer.info)[names(customer.info)=='cf_value'] <- 'customer'
 projects <- merge(projects, customer.info, by=c('id'), all.x=TRUE)
 
 #Add country info to projects
-country.info <- droplevels(subset(customFields.raw, cf_id==14, 
+country.info <- droplevels(subset(customFields, cf_id==14, 
                                   select=c(id, cf_value)))
 names(country.info)[names(country.info)=='cf_value'] <- 'country'
 projects <- merge(projects, country.info, by=c('id'), all.x=TRUE)
 
 
 #Add business line info to projects
-businessline.info <- droplevels(subset(customFields.raw, cf_id==15,
+businessline.info <- droplevels(subset(customFields, cf_id==15,
                                        select=c(id,cf_value)))
 names(businessline.info)[names(businessline.info)=='cf_value'] <- 'business_line'
 projects <- merge(projects, businessline.info, by=c('id'), all.x=TRUE)
 
+#Add issue information to projects
+projects <- merge(projects, by.x='id', by.y='project_id', issues, all.x=TRUE)
+projects$issue_count[is.na(projects$issue_count)] <- 0
 
 #Pre-process user data
 #
@@ -67,6 +75,7 @@ users$mail <- tolower(users$mail)
 #
 #Processing: Generate smaller data frames which will serve as input for the Shiny application
 #
+
 
 #Extract email suffix of SAG users (Software AG, IDS Scheer, itCampus, Terracotta)
 #
@@ -91,12 +100,12 @@ suffix.external.df <- as.data.frame.table(suffix.external.table)
 
 #Create project frequency table grouped by country
 #
-country.table <- sort(table(projects$countries,useNA='ifany'), decreasing=TRUE)
+country.table <- sort(table(projects$country,useNA='ifany'), decreasing=TRUE)
 country.df <- as.data.frame.table(country.table)
 
 #Create project frequency table grouped by department
 #
-department.table <- sort(table(projects$departments,useNA='ifany'), decreasing=TRUE)
+department.table <- sort(table(projects$business_line,useNA='ifany'), decreasing=TRUE)
 department.df <- as.data.frame.table(department.table)
 
 #Get number of of active projects of current quarter
@@ -155,9 +164,11 @@ templateUsage.df <- merge(templates, countedTemplateInstances,
 templateUsage.df$freq[is.na(templateUsage.df$freq)] <- 0
 
 
+
 #
 #Save all processed data
 #
+
 
 dump(c('dateOfExtraction', 
        'users', 

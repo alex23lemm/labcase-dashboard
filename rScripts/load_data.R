@@ -58,9 +58,10 @@ if(!error) {
   } 
 }
 
-#Extract issue information
+#Extract issue information grouped by project
 if(!error) {
-  query <- 'SELECT id, status_id, project_id from issues'
+  query <- 'SELECT project_id, COUNT(id) AS issue_count FROM issues
+            GROUP BY project_id'
   issues.raw <- try(sqlQuery(connect, query=query), silent=TRUE)
   
   if(issues.raw == -1 || 
@@ -81,8 +82,7 @@ if(!error) {
   #15: Business Line
   query <- 'SELECT p.id, c.custom_field_id AS cf_id, c.value AS cf_value
             FROM projects AS p
-            INNER JOIN
-            custom_values AS c
+            INNER JOIN custom_values AS c
             ON
             p.id = c.customized_id
             WHERE 
