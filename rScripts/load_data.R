@@ -8,14 +8,21 @@ config <- yaml.load_file('config.yml')
 
 error <- FALSE
 
-# Connect to database and retrieve projects table
+#Open conncection to database
 connect <- try(odbcConnect('LabCase', uid=config$odbc$uid, pwd=config$odbc$pwd), silent=TRUE)
 
 if(connect == -1 || class(connect) == 'try-error')
   error <- TRUE
   
+#Extract project information and count members per project
 if(!error) {
-  query <- 'SELECT * FROM projects'
+  query <- 'SELECT p.id, p.identifier, p.name, p.created_on, p.updated_on, 
+            p.is_public, p.project_size, p.template_project_id, 
+  		      COUNT(m.user_id) AS member_count
+			      FROM projects AS p
+            LEFT OUTER JOIN members AS m
+            ON p.id = m.project_id
+			      GROUP BY p.id;'
   projects.raw <- try(sqlQuery(connect, query=query), silent=TRUE)
   
   if(projects.raw == -1 ||
@@ -26,8 +33,21 @@ if(!error) {
   } 
 }
 
+
+#Extract active users (internal + external)
+#
+#last_login_on != NULL if user used LabCase at least one time
+#Account status:
+#STATUS_ANONYMOUS  = 0
+#STATUS_ACTIVE     = 1
+#STATUS_REGISTERED = 2
+#STATUS_LOCKED     = 3
 if(!error) {
-  query <- 'SELECT * FROM users'
+  query <- 'SELECT id, login, last_login_on, status, mail FROM users
+            WHERE 
+            status = 1
+  		      AND
+			      last_login_on IS NOT NULL'
   users.raw <- try(sqlQuery(connect, query=query), silent=TRUE)
   
   if(users.raw == -1 || 
@@ -38,6 +58,21 @@ if(!error) {
   } 
 }
 
+#Extract issue information
+if(!error) {
+  query <- 'SELECT id, status_id, project_id from issues'
+  issues.raw <- try(sqlQuery(connect, query=query), silent=TRUE)
+  
+  if(issues.raw == -1 || 
+       grepl('^\\[RODBC\\] ERROR', users.raw[2]) || 
+       class(issues.raw) == 'try-error') {
+    error <- TRUE
+    close(connect)
+  } 
+}
+
+
+#Extract custom field information
 if(!error) {
   #In the LabCase database this is the relevant id - custom fields mapping:
   #12: Use as template
@@ -69,6 +104,7 @@ if(!error) {
   #Dump extracted data and current time
   dput(projects.raw, file="./rawData/projectsRaw.R")
   dput(users.raw, file="./rawData/usersRaw.R")
+  dput(issues.raw, file="./rawData/issuesRaw.R")
   dput(customFields.raw, file="./rawData/customFields.R")
   dput(dateOfExtraction, file="./rawData/dateOfExtraction.R")  
 }
