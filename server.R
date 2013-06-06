@@ -27,7 +27,7 @@ shinyServer(function(input,output){
   })
   
   output$numbOfUsers <- renderText({
-    paste('Total number of active users:', dim(users)[1], sep=" ")
+    paste('Total number of users:', dim(users)[1], sep=" ")
   })
   
   output$numbOfSAGUsers <- renderText({
