@@ -17,7 +17,7 @@ shinyUI(pageWithSidebar(
       textOutput('date')
       ),
     p(
-      textOutput('numbOfProjectsOverall'),
+      textOutput('numbOfProjectsOverall')
       ),
     p(
       textOutput('numbOfUsers'),

@@ -40,7 +40,7 @@ shinyServer(function(input,output){
   
    
   output$numbOfUsers <- renderText({
-    paste('Total number of users:', dim.users[1], sep=" ")
+    paste('Total number of users:', users.dim[1], sep=" ")
   })
   
   
