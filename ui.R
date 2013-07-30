@@ -1,3 +1,9 @@
+
+# Author: Alex Lemm
+#
+# Purpose: ui.R defines the user interface for the Shiny app 'LabCase Dashboard'
+
+
 library(shiny)
 
 
@@ -11,8 +17,7 @@ shinyUI(pageWithSidebar(
       textOutput('date')
       ),
     p(
-      textOutput('numbOfProjectsOverall')#,
-      #textOutput('numbOfActiveProjectsCurQuart')
+      textOutput('numbOfProjectsOverall'),
       ),
     p(
       textOutput('numbOfUsers'),
@@ -52,14 +57,6 @@ shinyUI(pageWithSidebar(
                 div(class='span6',
                     plotOutput('projectQuarterProgressPlot', width="80%", height="320px"))
                ),
-#       tabPanel('Project activity',
-#                div(class='span6', 
-#                    p(textOutput('numbOfActiveProjects')),
-#                    textOutput('numbOfInactiveProjects')
-#                    ),
-#                div(class='span6', 
-#                    plotOutput('projectActivityPlot', width='80%', height='320px'))
-#                ),
       tabPanel('User distribution',
                plotOutput('userSAGPlot', width="75%", height="300px"),
                plotOutput('userExternalPlot', width="75%")
