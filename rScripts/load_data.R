@@ -19,17 +19,21 @@ library(yaml)
 # Read relevant config data for establishing the ODBC conncetion
 config <- yaml.load_file('config.yml')
 
+
 # Initialize error variable
 error <- FALSE
+
 
 # Open conncection to database
 connect <- try(odbcConnect('LabCase', uid=config$odbc$uid, pwd=config$odbc$pwd),
                silent=TRUE)
 
+
 # Error handling
 if (connect == -1 || class(connect) == 'try-error')
   error <- TRUE
   
+
 # Extract project information and count members per project
 if (!error) {
   query <- 'SELECT p.id, p.identifier, p.name, p.created_on, p.updated_on, 
@@ -59,6 +63,7 @@ if (!error) {
   } 
 }
 
+
 # Extract active LC users (internal + external)
 # A user is an active user 
 #   when he logged in to LabCase at least once
@@ -86,6 +91,7 @@ if (!error) {
   } 
 }
 
+
 # Extract number of issues grouped by project
 if (!error) {
   query <- 'SELECT project_id, COUNT(id) AS issue_count FROM issues
@@ -93,12 +99,30 @@ if (!error) {
   issues.raw <- try(sqlQuery(connect, query=query), silent=TRUE)
   
   # Error handling
-  if (issues.raw == -1 || grepl('^\\[RODBC\\] ERROR', users.raw[2]) || 
+  if (issues.raw == -1 || grepl('^\\[RODBC\\] ERROR', issues.raw[2]) || 
       class(issues.raw) == 'try-error') {
     error <- TRUE
     close(connect)
   } 
 }
+
+
+# Extract repository disk space usage information. Per project serveral repos
+# are allowed.
+if (!error) {
+  query <- 'SELECT project_id, SUM(disksize) AS repo_diskspace
+            FROM repositories 
+            GROUP BY project_id;'
+  repos.raw <- try(sqlQuery(connect, query=query), silent=TRUE)
+  
+  # Error handling
+  if (repos.raw == -1 || grepl('^\\[RODBC\\] ERROR', repos.raw[2]) || 
+        class(repos.raw) == 'try-error') {
+    error <- TRUE
+    close(connect)
+  } 
+}
+
 
 # Extract custom field information
 # In the LC database this is the relevant id - custom fields mapping:
@@ -134,6 +158,7 @@ if (!error) {
   dput(projects.raw, file="./rawData/projectsRaw.R")
   dput(users.raw, file="./rawData/usersRaw.R")
   dput(issues.raw, file="./rawData/issuesRaw.R")
+  dput(repos.raw, file="./rawData/reposRaw.R")
   dput(custom.fields.raw, file="./rawData/customFields.R")
   dput(date.of.extraction, file="./rawData/dateOfExtraction.R")  
 }

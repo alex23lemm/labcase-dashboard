@@ -27,14 +27,16 @@ library(plyr)
 projects <- dget(file="./rawData/projectsRaw.R")
 users <- dget(file="./rawData/usersRaw.R")
 issues <- dget(file="./rawData/issuesRaw.R")
-date.of.extraction <- dget("./rawData/dateOfExtraction.R")
+repos <- dget(file="./rawData/reposRaw.R")
 custom.fields <- dget(file="./rawData/customFields.R")
+date.of.extraction <- dget("./rawData/dateOfExtraction.R")
 
 
 
 # 2. Pre-processing
 #  Create 4 new data frames by extracting data from custom.fields data frame
-#  Merge projects data frame with these 4 new data frames and issues data frame
+#  Merge projects data frame with these 4 new data frames, the issues data frame
+#  and the repos data frame
 #  Convert mail column in users data frame to lower-case
 
 
@@ -95,9 +97,17 @@ names(businessline.info)[names(businessline.info) == 'cf_value'] <- 'business_li
 projects <- merge(projects, businessline.info, by=c('id'), all.x=TRUE)
 
 
-# Add issue_count column from issues data frame to projects data frame.
+# Add issue_count column from issues data frame to projects data frame
 projects <- merge(projects, issues,  by.x='id', by.y='project_id', all.x=TRUE)
 projects$issue_count[is.na(projects$issue_count)] <- 0
+
+
+# Add diskspace column from repos data frame to projects data frame
+projects <- merge(projects, repos, by.x='id', by.y='project_id', all.x=TRUE)
+projects$repo_diskspace[is.na(projects$repo_diskspace)] <- 0
+# Transfrom bytes into MB
+projects <- transform(projects, repo_diskspace=repo_diskspace/1024/1024)
+
 
 # Convert entries in mail column to lower-case
 users$mail <- tolower(users$mail)
