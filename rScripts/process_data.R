@@ -118,12 +118,14 @@ users$mail <- tolower(users$mail)
 #  Generate smaller data frames which serve as the input for the Shiny
 #  application
 
+
 # Create interger vector which includes dimension of users data frame
 users.dim <- dim(users)
 
 
 # Subset projects data frame
-projects.df <- subset(projects, select=c(identifier, project_size, member_count,
+projects.df <- subset(projects, select=c(identifier, project_size, 
+                                         repo_diskspace, member_count, 
                                          issue_count))
 
 
@@ -150,8 +152,9 @@ suffix.external.df <- as.data.frame.table(sort(table(suffix.external),
 
 
 # Create project frequency table grouped by country
-proj.created.by.country.df <- as.data.frame.table(sort(table(projects$country,useNA='ifany'),
-                                       decreasing=TRUE))
+proj.created.by.country.df <- as.data.frame.table(sort(table(projects$country,
+                                                             useNA='ifany'), 
+                                                       decreasing=TRUE))
 
 
 # Create project frequency table grouped by department
@@ -205,6 +208,32 @@ template.usage.df <- merge(templates, counted.template.instances,
 template.usage.df$freq[is.na(template.usage.df$freq)] <- 0
 
 
+# Create disk pace usage distribution data frame for projects which consume
+# more than 1000 MB of disk space (sum of Alfresco and repos)
+diskusage.per.project.df <- subset(projects, repo_diskspace + project_size > 1000,
+                                   select=c('identifier', 'repo_diskspace', 
+                                            'project_size'))
+# Add total_diskspace column
+diskusage.per.project.df <- transform(diskusage.per.project.df, 
+                                      total_diskspace=repo_diskspace + project_size)
+# reorder identifer column based on total_diskspace values (reorder() changes 
+# the order of levels in a factor based on values in the data). This step is 
+# necessary for appropriate ordering in stacked bar chart later
+diskusage.per.project.df$identifier <- reorder(diskusage.per.project.df$identifier,
+                                               diskusage.per.project.df$total_diskspace)
+# transform from wide to long data as a prerequiste for stacked bar chart 
+# plotting
+diskusage.per.project.df <- melt(diskusage.per.project.df, id.vars='identifier',
+                                 measure.vars=c('project_size', 
+                                                'repo_diskspace'),
+                                 variable.name='origin', value.name='diskspace')
+# Rename entries in origin column
+diskusage.per.project.df$origin <- revalue(diskusage.per.project.df$origin, 
+                                           c('project_size' = 'Alfresco', 
+                                             'repo_diskspace' = 'Repository'))
+diskusage.per.project.df <- transform(diskusage.per.project.df, 
+                                      diskspace=round(diskspace, digits=0))
+
 
 #  4. Save the processed data
 #
@@ -219,5 +248,6 @@ dump(c('date.of.extraction',
        'proj.created.by.year.df', 
        'proj.created.by.quarter.df',
        'proj.created.in.last.7.days.df',
-       'template.usage.df'),      
+       'template.usage.df',
+       'diskusage.per.project.df'),      
      file='./processedData/processedDataDump.R')
