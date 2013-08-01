@@ -249,22 +249,19 @@ shinyServer(function(input,output){
   
   # Create disk space usage plot
   output$diskspaceUsagePlot <- renderPlot({
-    
-    #Subset projects
-    usage <- subset(projects.df, project_size > 1000, 
-                    select=c(identifier, project_size))
-    #Reorder so that order in the barchart is flipped
-    usage <- transform(usage, identifier = reorder(identifier, project_size))
-    
-    g <- ggplot(usage, aes(x=identifier, y=project_size)) + 
-      geom_bar(stat='identity', fill='#3182BD') +
-      geom_text(aes(label=project_size), hjust=-0.1, size=4) +
-      ylim(0, max(usage$project_size) * 1.02) +
+        
+    g <- ggplot(diskusage.per.project.df, aes(x=identifier, y=diskspace, 
+                                              fill=origin)) + 
+      geom_bar(stat='identity') +
+      scale_fill_manual(values=c('#3182BD', '#FDAE61')) +
+      geom_text(aes(label=diskspace), hjust=-0.1, size=4) +
+      ylim(0, max(diskusage.per.project.df$diskspace) * 1.02) +
       xlab('Project identifier') + 
-      ylab('Alfresco disk space usage (MB)') +
+      ylab('Total disk space usage (MB)') +
       coord_flip() + 
-      ggtitle(paste('Projects consuming more than 1GB of Alfresco disk space ',
-                    '(', dim(usage)[1], ' overall)', sep='')) + 
+      ggtitle(paste('Projects consuming more than 1GB of total disk space ',
+                    '(', dim(diskusage.per.project.df)[1]/2, ' overall)', 
+                    sep='')) + 
       theme(plot.title = element_text(size=rel(1.3)), 
             axis.title = element_text(size=14),
             axis.text = element_text(size=11))
