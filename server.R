@@ -11,7 +11,7 @@
 # starts. In that case the objects in the file would be shared across all 
 # sessions.
 #
-# For plotting purposes ggplot2 is used exclusively. 
+# For plotting purposes ggplot2 and rCharts(Highcharts) are used exclusively. 
 
 
 
@@ -19,6 +19,7 @@ library(shiny)
 library(ggplot2)
 library(RColorBrewer)
 library(lubridate)
+library(rCharts)
 
 
 
@@ -127,26 +128,48 @@ shinyServer(function(input,output){
   
   
   # Create project growth line graph for last 7 days
-  output$projectWeekProgessPlot <- renderPlot({
+#   output$projectWeekProgessPlot <- renderPlot({
+#     
+#     g <- ggplot(proj.created.in.last.7.days.df, 
+#                 aes(x=proj.created.in.last.7.days, y=Freq, group=1)) +
+#       geom_line(colour='#3182BD', size=1) + 
+#       geom_point(size=7, shape=21, fill='white') +
+#       geom_text(aes(label=Freq), size=4) +
+#       ylim(0, max(proj.created.in.last.7.days.df$Freq) * 1.02) +
+#       xlab('Day of creation') + 
+#       ylab('Number of projects') + 
+#       theme(plot.title = element_text(size=rel(1.3)),
+#             axis.title  =element_text(size=14),
+#             axis.text=element_text(size=12),
+#             axis.text.x = element_text(angle=30, hjust=1, vjust=1)) +
+#       ggtitle(paste0(year(date.of.extraction), ': ',
+#                      'Number of created projects\n in the last 7 days per day (', 
+#                       sum(proj.created.in.last.7.days.df$Freq),
+#                      ' overall)'))
+#     print(g)
+#     
+#   })
+  output$projectWeekProgessPlot <- renderChart({
     
-    g <- ggplot(proj.created.in.last.7.days.df, 
-                aes(x=proj.created.in.last.7.days, y=Freq, group=1)) +
-      geom_line(colour='#3182BD', size=1) + 
-      geom_point(size=7, shape=21, fill='white') +
-      geom_text(aes(label=Freq), size=4) +
-      ylim(0, max(proj.created.in.last.7.days.df$Freq) * 1.02) +
-      xlab('Day of creation') + 
-      ylab('Number of projects') + 
-      theme(plot.title = element_text(size=rel(1.3)),
-            axis.title  =element_text(size=14),
-            axis.text=element_text(size=12),
-            axis.text.x = element_text(angle=30, hjust=1, vjust=1)) +
-      ggtitle(paste0(year(date.of.extraction), ': ',
-                     'Number of created projects\n in the last 7 days per day (', 
-                      sum(proj.created.in.last.7.days.df$Freq),
-                     ' overall)'))
-    print(g)
-    
+    hc <- hPlot(Freq ~ proj.created.in.last.7.days, 
+                                 data=proj.created.in.last.7.days.df, type='line')
+    # Add data labels to plot
+    hc$plotOptions(line = list(dataLabels = list(enabled = T)))
+    hc$title(text = paste0(year(date.of.extraction), ': ',
+                           'Number of created projects in the last 7 days per day (',
+                           sum(proj.created.in.last.7.days.df$Freq),
+                           ' overall)'),
+             style = list(width = '290px'))
+    # x-axis ticks added via categories again (Seems to be a bug in the 
+    # R - HighCharts.js mapping)
+    hc$xAxis(categories = proj.created.in.last.7.days.df$proj.created.in.last.7.days,
+             title = list(text = 'Day of creation'),
+             labels = list(rotation = -30, align = 'right'))
+    hc$yAxis(title = list(text = 'Number of projects'),
+             min=0)
+    # Set dom attribute otherwise chart will not appear on the web page
+    hc$set(dom = 'projectWeekProgessPlot')
+    hc
   })
   
   

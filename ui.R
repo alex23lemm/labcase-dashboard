@@ -5,6 +5,7 @@
 
 
 library(shiny)
+library(rCharts)
 
 
 shinyUI(pageWithSidebar(
@@ -51,7 +52,8 @@ shinyUI(pageWithSidebar(
                ),
       tabPanel('Project growth',
                 div(class='span6', 
-                    plotOutput('projectWeekProgessPlot', width="90%", height="340px"),
+                    #plotOutput('projectWeekProgessPlot', width="90%", height="340px"),
+                    showOutput('projectWeekProgessPlot','highcharts'),
                     plotOutput('projectProgressPlot', width="80%", height="320px")
                     ),
                 div(class='span6',
