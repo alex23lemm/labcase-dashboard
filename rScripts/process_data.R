@@ -18,6 +18,7 @@
 
 library(lubridate)
 library(plyr)
+library(reshape2)
 
 
 # 1. Load raw data into memory

@@ -4,7 +4,7 @@
 # Purpose: The load_data.R script extracts the relevant raw data from the LC 
 # database using ODBC. Each extracted table is stored in a seperate .R file at 
 # the end.
-# In total 4 tables are read but only saved as a whole when the entire data
+# In total 5 tables are read but only saved as a whole when the entire data
 # retrieval was successful. The script aborts without saving anything should an 
 # error occur in between.
 #
