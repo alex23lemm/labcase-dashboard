@@ -103,27 +103,49 @@ shinyServer(function(input,output){
   
   
   # Create department ~ projects barchart
-  output$departmentPlot <- renderPlot({
+#   output$departmentPlot <- renderPlot({
+#     
+#     # Subset according to reactive value and exclude NAs
+#     proj.created.by.department.df <- subset(proj.created.by.department.df,
+#                                             Freq >= input$numbOfProjects)# & Var1 != '<NA>')
+#     # Do a reorder so that the order in the barchart is flipped
+#     proj.created.by.department.df <- transform(proj.created.by.department.df,
+#                                                Var1 = reorder(Var1, Freq))
+#     
+#     g <- ggplot(proj.created.by.department.df, aes(x=Var1, y=Freq)) +
+#       geom_bar(stat='identity', fill='#3182BD') +
+#       geom_text(aes(label=Freq), hjust=-0.1, color='black', size=4) +
+#       ylim(0, max(proj.created.by.department.df$Freq) * 1.02) +
+#       xlab('Departments') + 
+#       ylab('Number of projects') + 
+#       theme(plot.title = element_text(size=rel(1.3)),
+#             axis.title = element_text(size=14),
+#             axis.text = element_text(size=10)) +
+#       coord_flip() + 
+#       ggtitle('Number of LabCase projects per department')
+#     print(g)
+#   })
+  
+  output$departmentPlot <- renderChart({
     
     # Subset according to reactive value and exclude NAs
     proj.created.by.department.df <- subset(proj.created.by.department.df,
-                                            Freq >= input$numbOfProjects)# & Var1 != '<NA>')
-    # Do a reorder so that the order in the barchart is flipped
-    proj.created.by.department.df <- transform(proj.created.by.department.df,
-                                               Var1 = reorder(Var1, Freq))
-    
-    g <- ggplot(proj.created.by.department.df, aes(x=Var1, y=Freq)) +
-      geom_bar(stat='identity', fill='#3182BD') +
-      geom_text(aes(label=Freq), hjust=-0.1, color='black', size=4) +
-      ylim(0, max(proj.created.by.department.df$Freq) * 1.02) +
-      xlab('Departments') + 
-      ylab('Number of projects') + 
-      theme(plot.title = element_text(size=rel(1.3)),
-            axis.title = element_text(size=14),
-            axis.text = element_text(size=10)) +
-      coord_flip() + 
-      ggtitle('Number of LabCase projects per department')
-    print(g)
+                                            Freq >= input$numbOfProjects & Var1 != '<NA>')
+  
+    hc <- hPlot(Freq ~ Var1,
+                data = proj.created.by.department.df,
+                type = 'bar')
+    # X-axis text lables added via categories again (Seems to be a bug in the 
+    # R - HighCharts.js mapping)
+    hc$xAxis(categories = proj.created.by.department.df$Var1,
+             title = list(text = 'Departments'))
+    hc$yAxis(title = list(text = 'Number of projects'),
+             max = max(proj.created.by.department.df$Freq))
+    hc$title(text = 'Number of LabCase projects per department')
+    hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
+    # Set dom attribute otherwise chart will not appear on the web page
+    hc$set(dom = 'departmentPlot')
+    hc
   })
   
   
@@ -152,7 +174,7 @@ shinyServer(function(input,output){
   output$projectWeekProgessPlot <- renderChart({
     
     hc <- hPlot(Freq ~ proj.created.in.last.7.days, 
-                                 data=proj.created.in.last.7.days.df, type='line')
+                data=proj.created.in.last.7.days.df, type='line')
     # Add data labels to plot
     hc$plotOptions(line = list(dataLabels = list(enabled = T)))
     hc$title(text = paste0(year(date.of.extraction), ': ',
@@ -160,7 +182,7 @@ shinyServer(function(input,output){
                            sum(proj.created.in.last.7.days.df$Freq),
                            ' overall)'),
              style = list(width = '290px'))
-    # x-axis ticks added via categories again (Seems to be a bug in the 
+    # X-axis text labels added via categories again (Seems to be a bug in the 
     # R - HighCharts.js mapping)
     hc$xAxis(categories = proj.created.in.last.7.days.df$proj.created.in.last.7.days,
              title = list(text = 'Day of creation'),
@@ -194,21 +216,40 @@ shinyServer(function(input,output){
   
   
   # Create project growth plot for current year grouped by quarters
-  output$projectQuarterProgressPlot <- renderPlot({
+#   output$projectQuarterProgressPlot <- renderPlot({
+#     
+#     g <- ggplot(proj.created.by.quarter.df, aes(x=proj.of.current.year, y=Freq)) + 
+#       geom_bar(width=.5, stat='identity', fill='#3182BD') +
+#       geom_text(aes(label = Freq), vjust=-0.3, size=4) +
+#       ylim(0, max(proj.created.by.quarter.df$Freq) * 1.03) +
+#       xlab('Quarter of creation') + 
+#       ylab('Number of projects') + 
+#       theme(plot.title = element_text(size=rel(1.3)),
+#             axis.title = element_text(size=14),
+#             axis.text = element_text(size=12)) +
+#       ggtitle(paste0(year(date.of.extraction), ': ',
+#                      'Number of created projects\n per quarter'))
+#     print(g)
+#    
+#   })
+  
+  output$projectQuarterProgressPlot <- renderChart({
+    hc <- hPlot(Freq ~ proj.of.current.year,
+                data = proj.created.by.quarter.df,
+                type = 'column')
+    # X-axis text lables added via categories again (Seems to be a bug in the 
+    # R - HighCharts.js mapping)
+    hc$xAxis(categories = proj.created.by.quarter.df$proj.of.current.year,
+             title = list(text = 'Quarter of creation'))
+    hc$yAxis(title = list(text = 'Number of projects'))
     
-    g <- ggplot(proj.created.by.quarter.df, aes(x=proj.of.current.year, y=Freq)) + 
-      geom_bar(width=.5, stat='identity', fill='#3182BD') +
-      geom_text(aes(label = Freq), vjust=-0.3, size=4) +
-      ylim(0, max(proj.created.by.quarter.df$Freq) * 1.03) +
-      xlab('Quarter of creation') + 
-      ylab('Number of projects') + 
-      theme(plot.title = element_text(size=rel(1.3)),
-            axis.title = element_text(size=14),
-            axis.text = element_text(size=12)) +
-      ggtitle(paste0(year(date.of.extraction), ': ',
-                     'Number of created projects\n per quarter'))
-    print(g)
-   
+    hc$title(text = paste0(year(date.of.extraction), 
+                           ': ',
+                           'Number of created projects per quarter'))
+    hc$plotOptions(column = list(dataLabels = list(enabled = TRUE)))
+    # Set dom attribute otherwise chart will not appear on the web page
+    hc$set(dom = 'projectQuarterProgressPlot')
+    hc
   })
    
   

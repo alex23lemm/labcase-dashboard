@@ -46,7 +46,8 @@ shinyUI(pageWithSidebar(
       tabPanel('Project distribution',
                helpText(textOutput('distributionCaption')),
                #class='span6',
-               plotOutput('departmentPlot', width="75%", height="300px"),
+               #plotOutput('departmentPlot', width="75%", height="300px"),
+               showOutput('departmentPlot', 'highcharts'),
                #class='span6',
                plotOutput('countryPlot', width="75%")
                ),
@@ -57,7 +58,8 @@ shinyUI(pageWithSidebar(
                     plotOutput('projectProgressPlot', width="80%", height="320px")
                     ),
                 div(class='span6',
-                    plotOutput('projectQuarterProgressPlot', width="80%", height="320px"))
+                    #plotOutput('projectQuarterProgressPlot', width="80%", height="320px"))
+                    showOutput('projectQuarterProgressPlot', 'highcharts'))
                ),
       tabPanel('User distribution',
                plotOutput('userSAGPlot', width="75%", height="300px"),
