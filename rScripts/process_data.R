@@ -211,9 +211,9 @@ template.usage.df$freq[is.na(template.usage.df$freq)] <- 0
 
 # Create disk pace usage distribution data frame for projects which consume
 # more than 1000 MB of disk space (sum of Alfresco and repos)
-diskusage.per.project.df <- subset(projects, repo_diskspace + project_size > 1000,
-                                   select=c('identifier', 'repo_diskspace', 
-                                            'project_size'))
+diskusage.per.project.df <- droplevels(subset(projects, repo_diskspace + project_size > 1000,
+                                              select=c('identifier', 'repo_diskspace', 
+                                              'project_size')))
 # Add total_diskspace column
 diskusage.per.project.df <- transform(diskusage.per.project.df, 
                                       total_diskspace=repo_diskspace + project_size)

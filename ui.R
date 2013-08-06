@@ -49,7 +49,8 @@ shinyUI(pageWithSidebar(
                #plotOutput('departmentPlot', width="75%", height="300px"),
                showOutput('departmentPlot', 'highcharts'),
                #class='span6',
-               plotOutput('countryPlot', width="75%")
+               #plotOutput('countryPlot', width="75%")
+               showOutput('countryPlot', 'highcharts')
                ),
       tabPanel('Project growth',
                 div(class='span6', 
@@ -71,7 +72,8 @@ shinyUI(pageWithSidebar(
                   ),
                 helpText('Alfresco disk space usage summary information (in MB):'),
                 verbatimTextOutput('diskSpaceUsageSummary'),
-                plotOutput('diskspaceUsagePlot', width="85%")
+                #plotOutput('diskspaceUsagePlot', width="85%")
+                showOutput('diskspaceUsagePlot', 'highcharts')
                ),
       tabPanel('Project templates',
                textOutput('numbOfTemplates'),

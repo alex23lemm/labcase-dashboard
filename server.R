@@ -23,6 +23,7 @@ library(rCharts)
 
 
 
+
 shinyServer(function(input,output){
   
   # Source data for user session. Objects in porcessedDataDump.R are defined in 
@@ -78,27 +79,45 @@ shinyServer(function(input,output){
   
   
   # Create country ~ projects barchart
-  output$countryPlot <- renderPlot({
+#   output$countryPlot <- renderPlot({
+#     
+#     # Subset according to reactive value and exclude NAs
+#     proj.created.by.country.df <- subset(proj.created.by.country.df, 
+#                                          Freq >= input$numbOfProjects )#& Var1 != '<NA>')
+#     # Do a reorder so that the order in the barchart is flipped
+#     proj.created.by.country.df <- transform(proj.created.by.country.df,
+#                                             Var1 = reorder(Var1,Freq))
+#     
+#     g <- ggplot(proj.created.by.country.df, aes(x=Var1, y=Freq)) + 
+#       geom_bar(stat='identity', fill='#3182BD') +
+#       geom_text(aes(label=Freq), hjust=-0.1, size=4) +
+#       ylim(0, max(proj.created.by.country.df$Freq) * 1.02) +
+#       xlab('Countries') + 
+#       ylab('Number of projects') + 
+#       theme(plot.title = element_text(size=rel(1.3)),
+#             axis.title = element_text(size=14),
+#             axis.text = element_text(size=10)) +
+#       coord_flip() + 
+#       ggtitle('Number of LabCase projects per country')
+#     print(g)
+#   })
+  output$countryPlot <- renderChart({
     
-    # Subset according to reactive value and exclude NAs
     proj.created.by.country.df <- subset(proj.created.by.country.df, 
-                                         Freq >= input$numbOfProjects )#& Var1 != '<NA>')
-    # Do a reorder so that the order in the barchart is flipped
-    proj.created.by.country.df <- transform(proj.created.by.country.df,
-                                            Var1 = reorder(Var1,Freq))
-    
-    g <- ggplot(proj.created.by.country.df, aes(x=Var1, y=Freq)) + 
-      geom_bar(stat='identity', fill='#3182BD') +
-      geom_text(aes(label=Freq), hjust=-0.1, size=4) +
-      ylim(0, max(proj.created.by.country.df$Freq) * 1.02) +
-      xlab('Countries') + 
-      ylab('Number of projects') + 
-      theme(plot.title = element_text(size=rel(1.3)),
-            axis.title = element_text(size=14),
-            axis.text = element_text(size=10)) +
-      coord_flip() + 
-      ggtitle('Number of LabCase projects per country')
-    print(g)
+                                         Freq >= input$numbOfProjects & Var1 != '<NA>')
+    hc <- hPlot(Freq ~ Var1, 
+                data=proj.created.by.country.df,
+                type='bar')
+    # X-axis text labels added via categories again (Seems to be a bug in the 
+    # R - Highcharts.js mapping)
+    hc$xAxis(categories = proj.created.by.country.df$Var1,
+             title = list(text = 'Countries'))
+    hc$yAxis(title = list(text = 'Number of projects'))
+    hc$title(text = 'Number of projects per country')
+    hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
+    # Set dom attribute otherwise chart will not appear on the web page
+    hc$set(dom = 'countryPlot')
+    hc
   })
   
   
@@ -141,7 +160,7 @@ shinyServer(function(input,output){
              title = list(text = 'Departments'))
     hc$yAxis(title = list(text = 'Number of projects'),
              max = max(proj.created.by.department.df$Freq))
-    hc$title(text = 'Number of LabCase projects per department')
+    hc$title(text = 'Number of projects per department')
     hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
     # Set dom attribute otherwise chart will not appear on the web page
     hc$set(dom = 'departmentPlot')
@@ -312,24 +331,47 @@ shinyServer(function(input,output){
     
   
   # Create disk space usage plot
-  output$diskspaceUsagePlot <- renderPlot({
-        
-    g <- ggplot(diskusage.per.project.df, aes(x=identifier, y=diskspace, 
-                                              fill=origin)) + 
-      geom_bar(stat='identity') +
-      scale_fill_manual(values=c('#3182BD', '#FDAE61')) +
-      geom_text(aes(label=diskspace), hjust=-0.1, size=4) +
-      ylim(0, max(diskusage.per.project.df$diskspace) * 1.02) +
-      xlab('Project identifier') + 
-      ylab('Total disk space usage (MB)') +
-      coord_flip() + 
-      ggtitle(paste('Projects consuming more than 1GB of total disk space ',
-                    '(', dim(diskusage.per.project.df)[1]/2, ' overall)', 
-                    sep='')) + 
-      theme(plot.title = element_text(size=rel(1.3)), 
-            axis.title = element_text(size=14),
-            axis.text = element_text(size=11))
-    print(g)
+#   output$diskspaceUsagePlot <- renderPlot({
+#         
+#     g <- ggplot(diskusage.per.project.df, aes(x=identifier, y=diskspace, 
+#                                               fill=origin)) + 
+#       geom_bar(stat='identity') +
+#       scale_fill_manual(values=c('#3182BD', '#FDAE61')) +
+#       geom_text(aes(label=diskspace), hjust=-0.1, size=4) +
+#       ylim(0, max(diskusage.per.project.df$diskspace) * 1.02) +
+#       xlab('Project identifier') + 
+#       ylab('Total disk space usage (MB)') +
+#       coord_flip() + 
+#       ggtitle(paste('Projects consuming more than 1GB of total disk space ',
+#                     '(', dim(diskusage.per.project.df)[1]/2, ' overall)', 
+#                     sep='')) + 
+#       theme(plot.title = element_text(size=rel(1.3)), 
+#             axis.title = element_text(size=14),
+#             axis.text = element_text(size=11))
+#     print(g)
+#   })
+  output$diskspaceUsagePlot <- renderChart({
+    
+    # Reverse the order of levels in identifier factor for Highchart plotting
+    diskusage.per.project.df <- transform(diskusage.per.project.df,
+                                          identifier = factor(identifier, 
+                                                              levels=rev(levels(identifier))))
+                            
+    hc <- hPlot(diskspace ~ identifier,
+                data = diskusage.per.project.df,
+                group = 'origin',
+                type = 'bar')
+    hc$xAxis(categories = levels(diskusage.per.project.df$identifier),
+             title = list(text = 'Project identifier'))
+    hc$yAxis(title = list(text = 'Total disk space usage (MB)'))
+    hc$title(text = paste('Projects consuming more than 1 GB of total disk space ',
+                          '(',
+                          dim(diskusage.per.project.df)[1]/2,
+                          ' overall)', sep = ''))
+    hc$plotOptions(series = list(stacking = 'normal'))
+    # Set dom attribute otherwise chart will not appear on the web page
+    hc$set(dom = 'diskspaceUsagePlot')
+    hc
   })
   
   
