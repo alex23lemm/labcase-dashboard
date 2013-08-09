@@ -16,10 +16,10 @@ shinyUI(pageWithSidebar(
     
     p(
       textOutput('date')
-      ),
+    ),
     p(
       textOutput('numbOfProjectsOverall')
-      ),
+    ),
     p(
       textOutput('numbOfUsers'),
       textOutput('numbOfSAGUsers'),
@@ -31,7 +31,7 @@ shinyUI(pageWithSidebar(
       textOutput('numbOfIssues'),
       helpText('Issues per project information:'),
       verbatimTextOutput('summaryIssuesPerProject')
-      ),
+    ),
     p(
       numericInput('numbOfProjects','Specify number of projects',10),
       helpText('(Info: The \'Project distribution\' tab will show those departments/countries
@@ -44,43 +44,54 @@ shinyUI(pageWithSidebar(
     tabsetPanel(
       
       tabPanel('Project distribution',
-               helpText(textOutput('distributionCaption')),
-               #class='span6',
-               #plotOutput('departmentPlot', width="75%", height="300px"),
-               showOutput('departmentPlot', 'highcharts'),
-               #class='span6',
-               #plotOutput('countryPlot', width="75%")
-               showOutput('countryPlot', 'highcharts')
-               ),
+               div(class='span8', 
+                   helpText(textOutput('distributionCaption')),
+                   #plotOutput('departmentPlot', width="75%", height="300px"),
+                   showOutput('departmentPlot', 'highcharts'),
+                   #plotOutput('countryPlot', width="75%")
+                   showOutput('countryPlot', 'highcharts')
+               )
+      ),
       tabPanel('Project growth',
-                div(class='span6', 
+                div(class='span5', 
                     #plotOutput('projectWeekProgessPlot', width="90%", height="340px"),
                     showOutput('projectWeekProgessPlot','highcharts'),
-                    plotOutput('projectProgressPlot', width="80%", height="320px")
-                    ),
-                div(class='span6',
+                    #plotOutput('projectProgressPlot', width="80%", height="320px")
+                    showOutput('projectProgressPlot', 'highcharts')
+                ),
+                div(class='span5',
                     #plotOutput('projectQuarterProgressPlot', width="80%", height="320px"))
-                    showOutput('projectQuarterProgressPlot', 'highcharts'))
-               ),
-      tabPanel('User distribution',
-               plotOutput('userSAGPlot', width="75%", height="300px"),
-               plotOutput('userExternalPlot', width="75%")
-               ),
+                    showOutput('projectQuarterProgressPlot', 'highcharts')
+                )
+      ),
+      tabPanel('User distribution', 
+               div(class='span9',
+                   #plotOutput('userSAGPlot', width="75%", height="300px")
+                   showOutput('userSAGPlot', 'highcharts'),
+                   showOutput('userExternalPlot', 'highcharts')
+                   #plotOutput('userExternalPlot', width="75%")
+               )
+      ),
       tabPanel('Disk space usage',
+               div(class = 'span9',
                 p(
                   textOutput('totalDiskSpaceUsage')
-                  ),
+                ),
                 helpText('Alfresco disk space usage summary information (in MB):'),
                 verbatimTextOutput('diskSpaceUsageSummary'),
                 #plotOutput('diskspaceUsagePlot', width="85%")
                 showOutput('diskspaceUsagePlot', 'highcharts')
-               ),
+               )
+      ),
       tabPanel('Project templates',
-               textOutput('numbOfTemplates'),
-               plotOutput('templateUsagePlot', width="75%", height="300px")
+               div(class = 'span9',
+                   textOutput('numbOfTemplates'),
+                   #plotOutput('templateUsagePlot', width="75%", height="300px")
+                   showOutput('templateUsagePlot', 'highcharts')
                )
       )
     )
   )
+)
 )
   

@@ -201,12 +201,13 @@ proj.created.in.last.7.days.df <- as.data.frame.table(table(proj.created.in.last
 
 
 # Create project template usage distribution table
-templates <- subset(projects, template == 1, select=c(id, identifier, name))
+templates <- droplevels(subset(projects, template == 1, select=c(id, name)))
 counted.template.instances <- count(projects, vars ='template_project_id')
 template.usage.df <- merge(templates, counted.template.instances, 
                           by.x='id', by.y='template_project_id', all.x=TRUE)
 # Replace NA values with 0 for those templates which were not used yet
 template.usage.df$freq[is.na(template.usage.df$freq)] <- 0
+template.usage.df$id <- NULL
 
 
 # Create disk pace usage distribution data frame for projects which consume
