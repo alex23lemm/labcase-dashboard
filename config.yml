@@ -1,0 +1,6 @@
+odbc:
+  uid: yourID
+  pwd: yourPassword
+sagEmailSuffixes: [your,list,of,email,suffix,strings]
+
+
