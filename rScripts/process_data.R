@@ -21,6 +21,28 @@ library(plyr)
 library(reshape2)
 
 
+ConstructSAGEmailSuffixRegex <- function(vec) {
+  # Constructs a regular expression by concatenating itmes of a character
+  # vector. This specific regex is later used to extract email suffixes
+  # of SAG users and external users.
+  #
+  # Args:
+  #   list: character vector containing the beginnings of allowed SAG email 
+  #         suffixes
+  # 
+  # Returns:
+  #   Regular expression 
+  regex <- '^('
+  for (i in 1:(length(vec)-1)) {
+    regex <- paste0(regex, vec[i], '|')
+  }
+  regex <- paste0(regex, vec[length(vec)])
+  regex <- paste0(regex, ').*')
+  return (regex)
+}
+
+
+
 # 1. Load raw data into memory
 #
 
@@ -139,15 +161,16 @@ suffix <- sapply(regm.suffix.list, function(x)x[2])
 
 # Extract email suffix of SAG users from suffix vector
 suffix.sag <- regmatches(suffix, 
-                         regexpr('^(softwareag|itcampus|ids-scheer|terracotta).*',
+                         regexpr(ConstructSAGEmailSuffixRegex(config$sagEmailSuffixes),
                                  suffix))
 suffix.sag.df <- as.data.frame.table(sort(table(suffix.sag), decreasing=TRUE))
 
 
 # Extract email suffix of external users from suffix vector
 # grepl returns logical vector
-suffix.external <- suffix[!grepl('^(softwareag|itcampus|ids-scheer|terracotta).*',
+suffix.external <- suffix[!grepl(ConstructSAGEmailSuffixRegex(config$sagEmailSuffixes),
                                  suffix)]
+
 suffix.external.df <- as.data.frame.table(sort(table(suffix.external), 
                                                decreasing=TRUE))
 

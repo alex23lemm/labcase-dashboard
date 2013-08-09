@@ -16,9 +16,6 @@ library(lubridate)
 library(yaml)
 
 
-# Read relevant config data for establishing the ODBC conncetion
-config <- yaml.load_file('config.yml')
-
 
 # Initialize error variable
 error <- FALSE
