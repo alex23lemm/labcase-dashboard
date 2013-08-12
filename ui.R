@@ -1,14 +1,14 @@
 
 # Author: Alex Lemm
 #
-# Purpose: ui.R defines the user interface for the Shiny app 'LabCase Dashboard'
+# Purpose: ui.R defines the HTML page for the Shiny app 'LabCase Dashboard'
 
 
 library(shiny)
 library(rCharts)
 
 
-shinyUI(pageWithSidebar(
+shinyUI(pageWithSidebar( 
   
   headerPanel('LabCase Dashboard'),
 
@@ -35,7 +35,7 @@ shinyUI(pageWithSidebar(
     p(
       numericInput('numbOfProjects','Specify number of projects',10),
       helpText('(Info: The \'Project distribution\' tab will show those departments/countries
-                which have launched equivalent or more projects aS specified by the input.)')
+                which have launched equivalent or more projects as specified by the input.)')
     )
   ),
   
@@ -46,30 +46,23 @@ shinyUI(pageWithSidebar(
       tabPanel('Project distribution',
                div(class='span8', 
                    helpText(textOutput('distributionCaption')),
-                   #plotOutput('departmentPlot', width="75%", height="300px"),
                    showOutput('departmentPlot', 'highcharts'),
-                   #plotOutput('countryPlot', width="75%")
                    showOutput('countryPlot', 'highcharts')
                )
       ),
       tabPanel('Project growth',
                 div(class='span5', 
-                    #plotOutput('projectWeekProgessPlot', width="90%", height="340px"),
                     showOutput('projectWeekProgessPlot','highcharts'),
-                    #plotOutput('projectProgressPlot', width="80%", height="320px")
                     showOutput('projectProgressPlot', 'highcharts')
                 ),
                 div(class='span5',
-                    #plotOutput('projectQuarterProgressPlot', width="80%", height="320px"))
                     showOutput('projectQuarterProgressPlot', 'highcharts')
                 )
       ),
       tabPanel('User distribution', 
                div(class='span9',
-                   #plotOutput('userSAGPlot', width="75%", height="300px")
                    showOutput('userSAGPlot', 'highcharts'),
                    showOutput('userExternalPlot', 'highcharts')
-                   #plotOutput('userExternalPlot', width="75%")
                )
       ),
       tabPanel('Disk space usage',
@@ -78,15 +71,13 @@ shinyUI(pageWithSidebar(
                   textOutput('totalDiskSpaceUsage')
                 ),
                 helpText('Alfresco disk space usage summary information (in MB):'),
-                verbatimTextOutput('diskSpaceUsageSummary'),
-                #plotOutput('diskspaceUsagePlot', width="85%")
+                verbatimTextOutput('diskSpaceUsageSummary'),              
                 showOutput('diskspaceUsagePlot', 'highcharts')
                )
       ),
       tabPanel('Project templates',
                div(class = 'span9',
                    textOutput('numbOfTemplates'),
-                   #plotOutput('templateUsagePlot', width="75%", height="300px")
                    showOutput('templateUsagePlot', 'highcharts')
                )
       )

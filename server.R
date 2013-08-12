@@ -11,12 +11,11 @@
 # starts. In that case the objects in the file would be shared across all 
 # sessions.
 #
-# For plotting purposes ggplot2 and rCharts(Highcharts) are used exclusively. 
+# For plotting purposes rCharts is used exclusively. 
 
 
 
 library(shiny)
-library(ggplot2)
 library(RColorBrewer)
 library(lubridate)
 library(rCharts)
@@ -77,30 +76,30 @@ shinyServer(function(input,output){
           input$numbOfProjects, 'or more LabCase projects', sep=' ')
   })
   
+  # Create department ~ projects barchart
+  output$departmentPlot <- renderChart({
+    
+    # Subset according to reactive value and exclude NAs
+    proj.created.by.department.df <- subset(proj.created.by.department.df,
+                                            Freq >= input$numbOfProjects & Var1 != '<NA>')
+    
+    hc <- hPlot(Freq ~ Var1,
+                data = proj.created.by.department.df,
+                type = 'bar')
+    # X-axis text lables added via categories again
+    hc$xAxis(categories = proj.created.by.department.df$Var1,
+             title = list(text = 'Departments'))
+    hc$yAxis(title = list(text = 'Number of projects'),
+             max = max(proj.created.by.department.df$Freq))
+    hc$title(text = '<span style="font-size:14px">Number of projects per department</span>')
+    hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
+    # Set dom attribute otherwise chart will not appear on the web page
+    hc$set(dom = 'departmentPlot')
+    hc
+  })
+  
   
   # Create country ~ projects barchart
-#   output$countryPlot <- renderPlot({
-#     
-#     # Subset according to reactive value and exclude NAs
-#     proj.created.by.country.df <- subset(proj.created.by.country.df, 
-#                                          Freq >= input$numbOfProjects )#& Var1 != '<NA>')
-#     # Reorder so that the order in the barchart is flipped
-#     proj.created.by.country.df <- transform(proj.created.by.country.df,
-#                                             Var1 = reorder(Var1,Freq))
-#     
-#     g <- ggplot(proj.created.by.country.df, aes(x=Var1, y=Freq)) + 
-#       geom_bar(stat='identity', fill='#3182BD') +
-#       geom_text(aes(label=Freq), hjust=-0.1, size=4) +
-#       ylim(0, max(proj.created.by.country.df$Freq) * 1.02) +
-#       xlab('Countries') + 
-#       ylab('Number of projects') + 
-#       theme(plot.title = element_text(size=rel(1.3)),
-#             axis.title = element_text(size=14),
-#             axis.text = element_text(size=10)) +
-#       coord_flip() + 
-#       ggtitle('Number of LabCase projects per country')
-#     print(g)
-#   })
   output$countryPlot <- renderChart({
     
     proj.created.by.country.df <- subset(proj.created.by.country.df, 
@@ -112,7 +111,7 @@ shinyServer(function(input,output){
     hc$xAxis(categories = proj.created.by.country.df$Var1,
              title = list(text = 'Countries'))
     hc$yAxis(title = list(text = 'Number of projects'))
-    hc$title(text = 'Number of projects per country')
+    hc$title(text = '<span style="font-size:15px">Number of projects per country</span>')
     hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
     # Set dom attribute otherwise chart will not appear on the web page
     hc$set(dom = 'countryPlot')
@@ -120,85 +119,20 @@ shinyServer(function(input,output){
   })
   
   
-  # Create department ~ projects barchart
-#   output$departmentPlot <- renderPlot({
-#     
-#     # Subset according to reactive value and exclude NAs
-#     proj.created.by.department.df <- subset(proj.created.by.department.df,
-#                                             Freq >= input$numbOfProjects)# & Var1 != '<NA>')
-#     # Reorder so that the order in the barchart is flipped
-#     proj.created.by.department.df <- transform(proj.created.by.department.df,
-#                                                Var1 = reorder(Var1, Freq))
-#     
-#     g <- ggplot(proj.created.by.department.df, aes(x=Var1, y=Freq)) +
-#       geom_bar(stat='identity', fill='#3182BD') +
-#       geom_text(aes(label=Freq), hjust=-0.1, color='black', size=4) +
-#       ylim(0, max(proj.created.by.department.df$Freq) * 1.02) +
-#       xlab('Departments') + 
-#       ylab('Number of projects') + 
-#       theme(plot.title = element_text(size=rel(1.3)),
-#             axis.title = element_text(size=14),
-#             axis.text = element_text(size=10)) +
-#       coord_flip() + 
-#       ggtitle('Number of LabCase projects per department')
-#     print(g)
-#   })
-  
-  output$departmentPlot <- renderChart({
-    
-    # Subset according to reactive value and exclude NAs
-    proj.created.by.department.df <- subset(proj.created.by.department.df,
-                                            Freq >= input$numbOfProjects & Var1 != '<NA>')
-  
-    hc <- hPlot(Freq ~ Var1,
-                data = proj.created.by.department.df,
-                type = 'bar')
-    # X-axis text lables added via categories again
-    hc$xAxis(categories = proj.created.by.department.df$Var1,
-             title = list(text = 'Departments'))
-    hc$yAxis(title = list(text = 'Number of projects'),
-             max = max(proj.created.by.department.df$Freq))
-    hc$title(text = 'Number of projects per department')
-    hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
-    # Set dom attribute otherwise chart will not appear on the web page
-    hc$set(dom = 'departmentPlot')
-    hc
-  })
-  
-  
   # Create project growth line graph for last 7 days
-#   output$projectWeekProgessPlot <- renderPlot({
-#     
-#     g <- ggplot(proj.created.in.last.7.days.df, 
-#                 aes(x=proj.created.in.last.7.days, y=Freq, group=1)) +
-#       geom_line(colour='#3182BD', size=1) + 
-#       geom_point(size=7, shape=21, fill='white') +
-#       geom_text(aes(label=Freq), size=4) +
-#       ylim(0, max(proj.created.in.last.7.days.df$Freq) * 1.02) +
-#       xlab('Day of creation') + 
-#       ylab('Number of projects') + 
-#       theme(plot.title = element_text(size=rel(1.3)),
-#             axis.title  =element_text(size=14),
-#             axis.text=element_text(size=12),
-#             axis.text.x = element_text(angle=30, hjust=1, vjust=1)) +
-#       ggtitle(paste0(year(date.of.extraction), ': ',
-#                      'Number of created projects\n in the last 7 days per day (', 
-#                       sum(proj.created.in.last.7.days.df$Freq),
-#                      ' overall)'))
-#     print(g)
-#     
-#   })
   output$projectWeekProgessPlot <- renderChart({
     
     hc <- hPlot(Freq ~ proj.created.in.last.7.days, 
                 data=proj.created.in.last.7.days.df, type='line')
     # Add data labels to plot
     hc$plotOptions(line = list(dataLabels = list(enabled = T)))
-    hc$title(text = paste0(year(date.of.extraction), ': ',
-                           'Number of created projects in the last 7 days per day (',
+    hc$title(text = paste0('<span style="font-size:14px">',
+                           year(date.of.extraction), ': ',
+                           'Number of created projects </span><br/>',
+                           '<span style="font-size:14px">in the last 7 days per day (',
                            sum(proj.created.in.last.7.days.df$Freq),
-                           ' overall)'),
-             style = list(width = '290px'))
+                           ' overall)</span>'))
+    hc$subtitle(text = ' ')
     # X-axis text labels added via categories again
     hc$xAxis(categories = proj.created.in.last.7.days.df$proj.created.in.last.7.days,
              title = list(text = 'Day of creation'),
@@ -212,23 +146,6 @@ shinyServer(function(input,output){
   
   
   # Create project growth plot grouped by years
-#   output$projectProgressPlot <- renderPlot({
-#     
-#     # Reorder so that the order in the barchart is flipped
-#     proj.created.by.year.df <- proj.created.by.year.df[order(proj.created.by.year.df$Var1),]
-#     
-#     g <- ggplot(proj.created.by.year.df, aes(x=Var1, y=Freq)) + 
-#       geom_bar(width=.5, stat='identity', fill='#3182BD') +
-#       geom_text(aes(label=Freq), vjust=-0.3, size=4) +
-#       ylim(0, max(proj.created.by.year.df$Freq) * 1.03) +
-#       xlab('Year of creation') + 
-#       ylab('Number of projects') + 
-#       theme(plot.title = element_text(size=rel(1.3)), 
-#             axis.title = element_text(size=14), 
-#             axis.text = element_text(size=12)) +
-#       ggtitle('Number of created projects\n per year')
-#     print(g)
-#   })
   output$projectProgressPlot <- renderChart({
     
     hc <- hPlot(Freq ~ Var1,
@@ -239,7 +156,9 @@ shinyServer(function(input,output){
              title = list(text = 'Year of creation'))
     hc$yAxis(title = list(text = 'Number of projects'))
     
-    hc$title(text = 'Number of created projects per year')
+    hc$title(text = paste0('<span style="font-size:14px">Number of created projects </span>',
+                  '<br/><span style="font-size:14px">per year</span>'))
+    hc$subtitle(text = ' ')
     hc$plotOptions(column = list(dataLabels = list(enabled = TRUE)))
     # Set dom attribute otherwise chart will not appear on the web page
     hc$set(dom = 'projectProgressPlot')
@@ -248,23 +167,6 @@ shinyServer(function(input,output){
   
   
   # Create project growth plot for current year grouped by quarters
-#   output$projectQuarterProgressPlot <- renderPlot({
-#     
-#     g <- ggplot(proj.created.by.quarter.df, aes(x=proj.of.current.year, y=Freq)) + 
-#       geom_bar(width=.5, stat='identity', fill='#3182BD') +
-#       geom_text(aes(label = Freq), vjust=-0.3, size=4) +
-#       ylim(0, max(proj.created.by.quarter.df$Freq) * 1.03) +
-#       xlab('Quarter of creation') + 
-#       ylab('Number of projects') + 
-#       theme(plot.title = element_text(size=rel(1.3)),
-#             axis.title = element_text(size=14),
-#             axis.text = element_text(size=12)) +
-#       ggtitle(paste0(year(date.of.extraction), ': ',
-#                      'Number of created projects\n per quarter'))
-#     print(g)
-#    
-#   })
-  
   output$projectQuarterProgressPlot <- renderChart({
     
     hc <- hPlot(Freq ~ proj.of.current.year,
@@ -275,9 +177,12 @@ shinyServer(function(input,output){
              title = list(text = 'Quarter of creation'))
     hc$yAxis(title = list(text = 'Number of projects'))
     
-    hc$title(text = paste0(year(date.of.extraction), 
+    hc$title(text = paste0('<span style="font-size:14px">',
+                           year(date.of.extraction), 
                            ': ',
-                           'Number of created projects per quarter'))
+                           'Number of created projects </span><br/>',
+                           '<span style="font-size:14px">per quarter</span>'))
+    hc$subtitle(text = ' ')
     hc$plotOptions(column = list(dataLabels = list(enabled = TRUE)))
     # Set dom attribute otherwise chart will not appear on the web page
     hc$set(dom = 'projectQuarterProgressPlot')
@@ -286,26 +191,6 @@ shinyServer(function(input,output){
    
   
   # Create SAG user distribution plot
-#   output$userSAGPlot <- renderPlot({
-#     
-#     # Reorder so that the order in the barchart is flipped
-#     suffix.sag.df <- transform(suffix.sag.df,
-#                                suffix.sag = reorder(suffix.sag, Freq))
-#     
-#     g <- ggplot(suffix.sag.df, aes(x=suffix.sag, y=Freq)) + 
-#       geom_bar(stat='identity', fill='#3182BD') +
-#       geom_text(aes(label=Freq), hjust=-0.2, color='black', size=4) +
-#       ylim(0, max(suffix.sag.df$Freq) * 1.02) +
-#       xlab('SAG unit') + 
-#       ylab('Number of users') + 
-#       theme(plot.title = element_text(size=rel(1.3)),
-#             axis.title = element_text(size=14),
-#             axis.text = element_text(size=11)) +
-#       coord_flip() + 
-#       ggtitle('Number of active SAG users per unit')
-#     print(g)
-#   })
-  # Reorder so that the order in the barchart is flipped
   output$userSAGPlot <- renderChart({
     
     hc <- hPlot(Freq ~ suffix.sag,
@@ -314,7 +199,7 @@ shinyServer(function(input,output){
     hc$xAxis(categories = suffix.sag.df$suffix.sag,
              title = list(text = 'SAG unit'))
     hc$yAxis(title = list (text = 'Number of users'))
-    hc$title(text = 'Number of active SAG users per unit')
+    hc$title(text = '<span style="font-size:14px">Number of active SAG users per unit</span>')
     hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
     hc$addParams(width = 466)
     # Set dom attribute otherwise chart will not appear on the web page
@@ -324,25 +209,6 @@ shinyServer(function(input,output){
   
   
   # Create external user distribution plot
-#   output$userExternalPlot <- renderPlot({
-#     
-#     # Reorder so that the order in the barchart is flipped
-#     suffix.external.df <- subset(suffix.external.df, Freq > 2)
-#     suffix.external.df <- transform(suffix.external.df,
-#                                     suffix.external = reorder(suffix.external, Freq))
-#     
-#     g <- ggplot(suffix.external.df, aes(x=suffix.external, y=Freq)) + 
-#       geom_bar(stat='identity', fill='#3182BD') +
-#       geom_text(aes(label=Freq), hjust=-0.2, color='black', size=3) +
-#       xlab('Customers') +
-#       ylab('Number of users') + 
-#       theme(plot.title = element_text(size=rel(1.3)),
-#             axis.title = element_text(size=14),
-#             axis.text = element_text(size=11)) +
-#       coord_flip() + 
-#       ggtitle('Customers with more than 2 active users')
-#     print(g)
-#   })
   output$userExternalPlot <- renderChart({
     
     suffix.external.df <- subset(suffix.external.df, Freq > 2)
@@ -353,7 +219,7 @@ shinyServer(function(input,output){
     hc$xAxis(categories = suffix.external.df$suffix.external,
              title = list(text = 'Customers'))
     hc$yAxis(title = list(text = 'Number of users'))
-    hc$title(text = 'Customers with more than 2 active users')
+    hc$title(text = '<span style="font-size:14px">Customers with more than 2 active users</span>')
     hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
     # Set dom attribute otherwise chart will not appear on the web page
     hc$set(dom = 'userExternalPlot')
@@ -374,25 +240,6 @@ shinyServer(function(input,output){
     
   
   # Create disk space usage plot
-#   output$diskspaceUsagePlot <- renderPlot({
-#         
-#     g <- ggplot(diskusage.per.project.df, aes(x=identifier, y=diskspace, 
-#                                               fill=origin)) + 
-#       geom_bar(stat='identity') +
-#       scale_fill_manual(values=c('#3182BD', '#FDAE61')) +
-#       geom_text(aes(label=diskspace), hjust=-0.1, size=4) +
-#       ylim(0, max(diskusage.per.project.df$diskspace) * 1.02) +
-#       xlab('Project identifier') + 
-#       ylab('Total disk space usage (MB)') +
-#       coord_flip() + 
-#       ggtitle(paste('Projects consuming more than 1GB of total disk space ',
-#                     '(', dim(diskusage.per.project.df)[1]/2, ' overall)', 
-#                     sep='')) + 
-#       theme(plot.title = element_text(size=rel(1.3)), 
-#             axis.title = element_text(size=14),
-#             axis.text = element_text(size=11))
-#     print(g)
-#   })
   output$diskspaceUsagePlot <- renderChart({
     
     # Reverse the order of levels in identifier factor for Highchart plotting
@@ -407,10 +254,11 @@ shinyServer(function(input,output){
     hc$xAxis(categories = levels(diskusage.per.project.df$identifier),
              title = list(text = 'Project identifier'))
     hc$yAxis(title = list(text = 'Total disk space usage (MB)'))
-    hc$title(text = paste('Projects consuming more than 1 GB of total disk space ',
-                          '(',
-                          dim(diskusage.per.project.df)[1]/2,
-                          ' overall)', sep = ''))
+    hc$title(text = paste0('<span style="font-size:14px">',
+                           'Projects consuming more than 1 GB of total disk space ',
+                           '(',
+                           dim(diskusage.per.project.df)[1]/2,
+                           ' overall)</span>'))
     hc$plotOptions(series = list(stacking = 'normal'))
     # Set dom attribute otherwise chart will not appear on the web page
     hc$set(dom = 'diskspaceUsagePlot')
@@ -425,24 +273,6 @@ shinyServer(function(input,output){
   
   
   # Create template usage plot
-#   output$templateUsagePlot <- renderPlot({
-#     
-#     # Reorder so that the order in the barchart is flipped
-#     template.usage.df <- transform(template.usage.df, name=reorder(name, freq))
-#     
-#     g <- ggplot(template.usage.df, aes(x=name, y=freq)) +
-#       geom_bar(stat='identity', fill='#3182BD') + 
-#       geom_text(aes(label=freq), hjust=-0.1, size=4) +
-#       ylim(0, max(template.usage.df$freq) * 1.02) +
-#       xlab('Template name') + 
-#       ylab('Number of instances') + 
-#       coord_flip() + 
-#       ggtitle('Number of instantiated projects per template') +
-#       theme(plot.title = element_text(size=rel(1.3)),
-#             axis.title = element_text(size=14),
-#             axis.text = element_text(size=11))
-#     print(g)
-#   })
   output$templateUsagePlot <- renderChart({
     
     # Reorder so that the order in the barchart is flipped
@@ -458,12 +288,11 @@ shinyServer(function(input,output){
     hc$xAxis(categories = levels(template.usage.df$name),
              title = list(text = 'Template name'))
     hc$yAxis(title = list(text = 'Number of instances'))
-    hc$title(text = 'Number of instantiated projects per template')
+    hc$title(text = '<span style="font-size:14px">Number of instantiated projects per template</span>')
     hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
     # Set dom attribute otherwise chart will not appear on the web page
     hc$set(dom = 'templateUsagePlot')
     hc
   })
-  
   
 })
