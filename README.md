@@ -1,6 +1,6 @@
 # LabCase Dashboard
 
-LabCase Dashboard is a web application which visuals business relevant data from the LabCase database.
+LabCase Dashboard is a web application which visualizes business relevant data from the LabCase database.
 LabCase Dashboard consists of two parts:
 * A separate R script for loading and pre-processing the data (needs to be set up as a cron job (Linux) or a task (Windows))
 * A Shiny application visualising the processed data (can run in a separate process locally or on a Shiny server)
