@@ -6,6 +6,14 @@
 # app 'LabCase Dashboard'. Depending on the desired use case and your 
 # operating system main.R is either set up as a Cronjob your as a Scheduled Task.
 
+
+library(RODBC)
+library(lubridate)
+library(yaml)
+
+library(plyr)
+library(reshape2)
+
 # Set working directory
 setwd('~/labcase_wd/lc_dashboard')
 # Load config data

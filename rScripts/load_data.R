@@ -11,9 +11,6 @@
 # Google's R Style Guide (http://bit.ly/12ZBd1J) was applied while writing 
 # the code below.
 
-library(RODBC)
-library(lubridate)
-library(yaml)
 
 
 

@@ -16,9 +16,7 @@
 # the code below.
 
 
-library(lubridate)
-library(plyr)
-library(reshape2)
+
 
 
 ConstructSAGEmailSuffixRegex <- function(vec) {

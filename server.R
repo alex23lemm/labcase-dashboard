@@ -16,8 +16,6 @@
 
 
 library(shiny)
-library(RColorBrewer)
-library(lubridate)
 library(rCharts)
 
 
@@ -82,6 +80,12 @@ shinyServer(function(input,output){
     # Subset according to reactive value and exclude NAs
     proj.created.by.department.df <- subset(proj.created.by.department.df,
                                             Freq >= input$numbOfProjects & Var1 != '<NA>')
+    # If user input is NULL (max will return -Inf in this case) assign 0 to 
+    # avoid empty plot later
+    max <- suppressWarnings(max(proj.created.by.department.df$Freq))
+    if (max == -Inf) {
+      max <- 0
+    }
     
     hc <- hPlot(Freq ~ Var1,
                 data = proj.created.by.department.df,
@@ -90,7 +94,7 @@ shinyServer(function(input,output){
     hc$xAxis(categories = proj.created.by.department.df$Var1,
              title = list(text = 'Departments'))
     hc$yAxis(title = list(text = 'Number of projects'),
-             max = max(proj.created.by.department.df$Freq))
+             max = max)
     hc$title(text = '<span style="font-size:14px">Number of projects per department</span>')
     hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
     # Set dom attribute otherwise chart will not appear on the web page
@@ -104,13 +108,21 @@ shinyServer(function(input,output){
     
     proj.created.by.country.df <- subset(proj.created.by.country.df, 
                                          Freq >= input$numbOfProjects & Var1 != '<NA>')
+    # If user input is NULL (max will return -Inf in this case) assign 0 to 
+    # avoid empty plot later
+    max <- suppressWarnings(max(proj.created.by.country.df$Freq))
+    if (max == -Inf) {
+      max <- 0
+    }
+    
     hc <- hPlot(Freq ~ Var1, 
                 data=proj.created.by.country.df,
                 type='bar')
     # X-axis text labels added via categories again
     hc$xAxis(categories = proj.created.by.country.df$Var1,
              title = list(text = 'Countries'))
-    hc$yAxis(title = list(text = 'Number of projects'))
+    hc$yAxis(title = list(text = 'Number of projects'),
+             max = max)
     hc$title(text = '<span style="font-size:15px">Number of projects per country</span>')
     hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
     # Set dom attribute otherwise chart will not appear on the web page
@@ -124,6 +136,7 @@ shinyServer(function(input,output){
     
     hc <- hPlot(Freq ~ proj.created.in.last.7.days, 
                 data=proj.created.in.last.7.days.df, type='line')
+        
     # Add data labels to plot
     hc$plotOptions(line = list(dataLabels = list(enabled = T)))
     hc$title(text = paste0('<span style="font-size:14px">',
@@ -138,7 +151,9 @@ shinyServer(function(input,output){
              title = list(text = 'Day of creation'),
              labels = list(rotation = -30, align = 'right'))
     hc$yAxis(title = list(text = 'Number of projects'),
-             min=0)
+             min = -0.2,
+             startOnTick = FALSE
+             )
     # Set dom attribute otherwise chart will not appear on the web page
     hc$set(dom = 'projectWeekProgessPlot')
     hc
@@ -193,12 +208,15 @@ shinyServer(function(input,output){
   # Create SAG user distribution plot
   output$userSAGPlot <- renderChart({
     
+    max <- max(suffix.sag.df$Freq)
+    
     hc <- hPlot(Freq ~ suffix.sag,
                 data = suffix.sag.df,
                 type = 'bar')
     hc$xAxis(categories = suffix.sag.df$suffix.sag,
              title = list(text = 'SAG unit'))
-    hc$yAxis(title = list (text = 'Number of users'))
+    hc$yAxis(title = list (text = 'Number of users'),
+             max = max)
     hc$title(text = '<span style="font-size:14px">Number of active SAG users per unit</span>')
     hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
     hc$addParams(width = 466)
@@ -213,12 +231,15 @@ shinyServer(function(input,output){
     
     suffix.external.df <- subset(suffix.external.df, Freq > 2)
     
+    max <- max(suffix.external.df$Freq)
+    
     hc <- hPlot(Freq ~ suffix.external,
                 data = suffix.external.df,
                 type = 'bar')
     hc$xAxis(categories = suffix.external.df$suffix.external,
              title = list(text = 'Customers'))
-    hc$yAxis(title = list(text = 'Number of users'))
+    hc$yAxis(title = list(text = 'Number of users'),
+             max = max)
     hc$title(text = '<span style="font-size:14px">Customers with more than 2 active users</span>')
     hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
     # Set dom attribute otherwise chart will not appear on the web page
@@ -281,13 +302,16 @@ shinyServer(function(input,output){
                                    name = reorder(name, freq))
     template.usage.df <- transform(template.usage.df,
                                    name = factor(name, levels = rev(levels(name))))
+    
+    max <- max(template.usage.df$freq)
  
     hc <- hPlot(freq ~ name,
                 data = template.usage.df,
                 type = 'bar')
     hc$xAxis(categories = levels(template.usage.df$name),
              title = list(text = 'Template name'))
-    hc$yAxis(title = list(text = 'Number of instances'))
+    hc$yAxis(title = list(text = 'Number of instances'),
+             max = max)
     hc$title(text = '<span style="font-size:14px">Number of instantiated projects per template</span>')
     hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
     # Set dom attribute otherwise chart will not appear on the web page
