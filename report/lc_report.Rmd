@@ -1,9 +1,45 @@
 LabCase Report
 ========================================================
 
+Data as of  `r as.character(date.of.extraction)`
+
 ```{r echo=FALSE}
 source('../processedData/processedDataDump.R')
 ```
 
-Data as of  `r as.character(date.of.extraction)`
+### General Information
+
+```{r echo=FALSE, comment=NA }
+paste(getwd())
+
+paste('Data as of', date.of.extraction, sep=" ")
+
+paste('Total number of projects:', dim(projects.df)[1], sep=" ")
+
+paste('Total number of users:', users.dim[1], sep=" ")
+
+paste('Number of SAG users:', sum(suffix.sag.df$Freq), sep=" ")
+
+paste('Number of external users:', sum(suffix.external.df$Freq), sep=" ")
+
+summary(projects.df$member_count, digits=3)
+
+paste('Total number of Issues created in projects:',
+          sum(projects.df$issue_count, na.rm=TRUE), sep=" ")
+
+summary(projects.df$issue_count, digits=2)
+```
+
+
+
+
+  
+  
+  
+  
+  
+ 
+
+
+
 

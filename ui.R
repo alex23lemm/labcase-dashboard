@@ -36,8 +36,12 @@ shinyUI(pageWithSidebar(
       numericInput('numbOfProjects','Specify number of projects',10),
       helpText('(Info: The \'Project distribution\' tab will show those departments/countries
                 which have launched equivalent or more projects as specified by the input.)')
+    ),
+    p(
+      downloadButton('downloadReport', 'Download report', class='btn-primary')
     )
   ),
+  
   
   mainPanel(
     

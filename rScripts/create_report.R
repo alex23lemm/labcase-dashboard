@@ -7,5 +7,11 @@
 # (rather than using the current workspace). Therefore the processed data needs
 # to get sourced in the lc_report.Rmd file.
 
-knit('./report/lc_report.Rmd', './report/lc_report.md')  
+knit('./report/lc_report.Rmd', './report/lc_report.md') 
+
+# TODO (alem): Possible workaround to fix issue: Copy figures folder from 
+# session working directory to knitr process working directory. For unknown
+# reasons folder gets created in session working directory --> figure paths
+# in .md file are wrong
+
 markdownToHTML('./report/lc_report.md', './report/lc_report.html')

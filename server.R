@@ -17,6 +17,7 @@
 
 library(shiny)
 library(rCharts)
+library(lubridate)
 
 
 
@@ -70,9 +71,17 @@ shinyServer(function(input,output){
   
   
   output$distributionCaption <- renderText({
-    paste('Departments/Countries with',
-          input$numbOfProjects, 'or more LabCase projects', sep=' ')
+    paste('Departments/Countries with',  input$numbOfProjects,
+          'or more LabCase projects', sep=' ')
   })
+  
+  
+  output$downloadReport <- downloadHandler('LabCase_Report.html',
+                                           content = function(file) {
+                                             file.copy('report/lc_report.html', 
+                                                       file)
+                                           }, 
+                                           'text/html')
   
   # Create department ~ projects barchart
   output$departmentPlot <- renderChart({
