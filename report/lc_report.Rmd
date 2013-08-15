@@ -1,0 +1,9 @@
+LabCase Report
+========================================================
+
+```{r echo=FALSE}
+source('../processedData/processedDataDump.R')
+```
+
+Data as of  `r as.character(date.of.extraction)`
+

@@ -14,6 +14,9 @@ library(yaml)
 library(plyr)
 library(reshape2)
 
+library(knitr)
+library(markdown)
+
 # Set working directory
 setwd('~/labcase_wd/lc_dashboard')
 # Load config data
@@ -21,4 +24,5 @@ config <- yaml.load_file('config.yml')
 
 source('./rScripts/load_data.R')
 source('./rScripts/process_data.R')
+source('./rScripts/create_report.R')
 rm(list=ls())
