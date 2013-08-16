@@ -1,17 +1,17 @@
-LabCase Report
+LabCase Global Report
 ========================================================
 
 Data as of  `r as.character(date.of.extraction)`
 
 ```{r echo=FALSE}
+library(ggplot2)
+
 source('../processedData/processedDataDump.R')
 ```
 
 ### General Information
 
 ```{r echo=FALSE, comment=NA }
-paste(getwd())
-
 paste('Data as of', date.of.extraction, sep=" ")
 
 paste('Total number of projects:', dim(projects.df)[1], sep=" ")
@@ -32,6 +32,29 @@ summary(projects.df$issue_count, digits=2)
 
 
 
+### Project distribution
+
+```{r echo=FALSE, fig.height=8}
+# Exclude NAs
+proj.created.by.country.df <- subset(proj.created.by.country.df,
+                                        Var1 != '<NA>')
+
+# Reorder so that the order in the barchart is flipped
+proj.created.by.country.df <- transform(proj.created.by.country.df,
+                                        Var1 = reorder(Var1,Freq))
+ggplot(proj.created.by.country.df, aes(x=Var1, y=Freq)) +
+  geom_bar(stat='identity', fill='#3182BD') +
+  geom_text(aes(label=Freq), hjust=-0.1, size=4) +
+  ggtitle('Number of LabCase projects per country') +
+  ylim(0, max(proj.created.by.country.df$Freq) * 1.02) +
+  xlab('Countries') +
+  ylab('Number of projects') +
+  theme(plot.title = element_text(size=rel(1.3)),
+        axis.title = element_text(size=14),
+        axis.text = element_text(size=10)) +
+  coord_flip() 
+
+```
 
   
   

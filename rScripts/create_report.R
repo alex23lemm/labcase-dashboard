@@ -7,11 +7,20 @@
 # (rather than using the current workspace). Therefore the processed data needs
 # to get sourced in the lc_report.Rmd file.
 
-knit('./report/lc_report.Rmd', './report/lc_report.md') 
 
-# TODO (alem): Possible workaround to fix issue: Copy figures folder from 
-# session working directory to knitr process working directory. For unknown
-# reasons folder gets created in session working directory --> figure paths
-# in .md file are wrong
 
-markdownToHTML('./report/lc_report.md', './report/lc_report.html')
+# Why change the working directory?
+# Answer: Workaround to fix the issue regarding "figure" folder generation 
+# through the knit command. 
+
+# Reason for workaround:
+# Although the knit runs in its own process (by default the directory the .Rmd 
+# resides), the figure folder gets created in the working directory of the 
+# overall R session the knit command was started in. Thus the relative paths
+# of the figures in the created .md file point point to figure/ and not to 
+# report/figure/. Thus markdownToHTML cannot reference the figures because a 
+# figure/ folder does not exist in /report.
+setwd("report/")
+knit('lc_report.Rmd', 'lc_report.md')
+markdownToHTML('lc_report.md', 'lc_report.html')
+setwd("..")
