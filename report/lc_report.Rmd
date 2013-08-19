@@ -35,7 +35,7 @@ summary(projects.df$issue_count, digits=2)
 
 ### Project distribution 
 
-This secion provides information about  the project distribution among countries and among SAG departments. For instance, the left figure shows that `r subset(proj.created.by.country.df, Var1 == 'US', Freq)` projects were created in the United States alone. On the right you can see that the GCS department is responsible for the creation of `r subset(proj.created.by.department.df, Var1 == 'GCS', Freq)` projects. 
+This secion provides information about the project distribution among countries and among SAG departments. For instance, the left figure shows that `r subset(proj.created.by.country.df, Var1 == 'US', Freq)` projects were created in the United States alone. On the right you can see that the GCS department is responsible for the creation of `r subset(proj.created.by.department.df, Var1 == 'GCS', Freq)` projects. 
 
 ```{r echo=FALSE, fig.width=12, fig.height=9}
 # Create country ~ projects bar chart plot
