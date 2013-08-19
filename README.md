@@ -1,9 +1,9 @@
 # LabCase Dashboard
 
-LabCase Dashboard is a web application which visualizes business relevant data from the LabCase database.
+LabCase Dashboard is a web application which visualizes business relevant data from the underlying Planio database.
 LabCase Dashboard consists of two parts:
-* A separate R script for loading and processing the data (needs to be set up as a Cron Job (Linux) or a Task (Windows))
-* A Shiny application visualizing the processed data (can run in a separate process locally or on Shiny server)
+* A separate R script for loading and processing the data. Moreover the script creates a HTML report based on the processed data. (The script needs to be set up as a Cron Job (Linux) or a Task (Windows))
+* A Shiny application visualizing the processed data and an option to download the report (Can run in a separate process locally or on Shiny server)
 
 ## Installation
 
@@ -16,6 +16,10 @@ Independent of running the application locally on your computer or deploying it 
   * yaml
   * plyr
   * reshape2
+  * knitr
+  * markdown
+  * xtable
+  * ggplot2
 	* shiny
   * devtools
 	* rCharts (via install_github('rCharts', 'ramnathv'))

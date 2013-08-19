@@ -18,6 +18,7 @@ library(reshape2)
 
 library(knitr)
 library(markdown)
+library(xtable)
 
 # Set working directory
 # This the specified path needs to be changed according to your setup
