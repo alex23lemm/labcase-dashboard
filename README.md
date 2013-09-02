@@ -18,8 +18,8 @@ Independent of running the application locally on your computer or deploying it 
   * reshape2
   * knitr
   * markdown
-  * xtable
   * ggplot2
+  * RcolorBrewer
 	* shiny
   * devtools
 	* rCharts (via install_github('rCharts', 'ramnathv'))

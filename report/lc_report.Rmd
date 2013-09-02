@@ -7,7 +7,7 @@ Data as of  `r as.character(date.of.extraction)`
 library(lubridate)
 library(ggplot2)
 library(grid)
-library(xtable)
+library(RColorBrewer)
 
 source('../processedData/processedDataDump.R')
 ```
@@ -165,19 +165,41 @@ pushViewport(viewport(layout = grid.layout(2, 2)))
 print(g.last.7.days, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
 print(g.quarters, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
 print(g.years, vp = viewport(layout.pos.row = 2, layout.pos.col = 1))
+```
+
+### Diskspace usage
+
+This section provides information about the current disk space usage of projects hosted in LabCase. In general, LabCase projects can use two separate storage locations:
+* The Assets section (Alfresco)
+* The Repository section (Subversion and Git repositories)
+
+The current **overall disk space usage** breakdown is as follows:
+
+* Total disk space usage: `r round(sum(projects$project_size, projects$repo_diskspace, na.rm=TRUE)/1024, digits=2)` GB
+* Total Alfresco disk space usage: `r round(sum(projects$project_size, na.rm=TRUE)/1024, digits=2)` GB
+* Total Repository disk space usage: `r round(sum(projects$repo_diskspace, na.rm=TRUE)/1024, digits=2)` GB
 
 
+```{r echo=FALSE, fig.height=8, fig.width=8}
 
+ g <- ggplot(diskusage.per.project.df, aes(x=identifier, y=diskspace,
+                                              fill=origin)) +
+      geom_bar(stat='identity') +
+      scale_fill_brewer(palette='Set1') +
+      ggtitle(paste('Projects consuming more than 1GB of total disk space ',
+                    '(', dim(diskusage.per.project.df)[1]/2, ' overall)',
+                    sep='')) +
+      ylim(0, max(diskusage.per.project.df$diskspace) * 1.02) +
+      xlab('Project identifier') +
+      ylab('Total disk space usage (MB)') +
+      coord_flip() +
+      theme(plot.title = element_text(size=rel(1.3)),
+            axis.title = element_text(size=14),
+            axis.text = element_text(size=11))
+print(g)
 
 ```
 
-
-
-
-```{r echo=FALSE, results='asis'}
-print(xtable(proj.created.by.country.df,caption="Projects per country"), type='html', html.table.attributes = "border = '1'")
-
-```
 
   
   

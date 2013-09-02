@@ -258,11 +258,16 @@ shinyServer(function(input,output){
   
   # Total Alfresco disk space usage
   output$totalDiskSpaceUsage <- renderText({
-    paste('Total Alfresco disk space usage: ', 
-          round(sum(projects.df$project_size, na.rm=TRUE)/1000), 'GB', sep='')
+    paste('Total disk space usage: ', 
+          round(sum(total.diskspace.usage.df$value), digits=2), ' GB\n',
+          'Total Alfresco disk space usage: ', 
+          round(subset(total.diskspace.usage.df, system == 'Alfresco', 
+                       select=c(value)), digits=2), ' GB\n',
+          'Total Repository disk space usage: ',
+          round(subset(total.diskspace.usage.df, system == 'Repository', 
+                       select=c(value)), digits=2), ' GB', sep='')
   })
     
-  
   # Alfresco disk space usage summary
   output$diskSpaceUsageSummary <- renderPrint({
     summary(projects.df$project_size, na.rm=T)
