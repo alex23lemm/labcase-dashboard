@@ -256,21 +256,36 @@ shinyServer(function(input,output){
     hc
   })
   
-  # Total Alfresco disk space usage
+  # Total disk space usage
   output$totalDiskSpaceUsage <- renderText({
     paste('Total disk space usage: ', 
-          round(sum(total.diskspace.usage.df$value), digits=2), ' GB\n',
-          'Total Alfresco disk space usage: ', 
-          round(subset(total.diskspace.usage.df, system == 'Alfresco', 
-                       select=c(value)), digits=2), ' GB\n',
-          'Total Repository disk space usage: ',
-          round(subset(total.diskspace.usage.df, system == 'Repository', 
-                       select=c(value)), digits=2), ' GB', sep='')
+          round(sum(projects.df$project_size, projects.df$repo_diskspace, 
+                    na.rm=TRUE)/1024, digits=2), ' GB', sep='')
   })
+  
+  # Total Alfresco disk space usage
+  output$totalAlfrescoDiskSpaceUsage <- renderText({
+    paste('Total Alfresco disk space usage: ', 
+          round(sum(projects.df$project_size, na.rm=TRUE)/1024, digits=2),  ' GB',
+          sep='')
+  })
+  
+  # Total repository disk space usage
+  output$totalRepoDiskSpaceUsage <- renderText({
+    paste('Total Repository disk space usage: ',
+          round(sum(projects.df$repo_diskspace, na.rm=TRUE)/1024, digits=2), 
+          ' GB', sep='')
+  })
+  
     
   # Alfresco disk space usage summary
-  output$diskSpaceUsageSummary <- renderPrint({
-    summary(projects.df$project_size, na.rm=T)
+  output$alfrescoSummary <- renderPrint({
+    summary(projects.df$project_size, na.rm=TRUE)
+  })
+  
+  # Repository disk space usage summary
+  output$repositorySummary <- renderPrint({
+    summary(projects.df$repo_diskspace, na.rm=TRUE)
   })
     
   
@@ -318,7 +333,7 @@ shinyServer(function(input,output){
                                    name = factor(name, levels = rev(levels(name))))
     
     max <- max(template.usage.df$freq)
- 
+  
     hc <- hPlot(freq ~ name,
                 data = template.usage.df,
                 type = 'bar')

@@ -72,10 +72,14 @@ shinyUI(pageWithSidebar(
       tabPanel('Disk space usage',
                div(class = 'span9',
                 p(
-                  textOutput('totalDiskSpaceUsage')
+                  textOutput('totalDiskSpaceUsage'),
+                  textOutput('totalAlfrescoDiskSpaceUsage'),
+                  textOutput('totalRepoDiskSpaceUsage')
                 ),
-                helpText('Alfresco disk space usage summary information (in MB):'),
-                verbatimTextOutput('diskSpaceUsageSummary'),              
+                helpText('Alfresco disk space usage summary (in MB):'),
+                verbatimTextOutput('alfrescoSummary'),   
+                helpText('Repository disk space usage summary (in MB):'),
+                verbatimTextOutput('repositorySummary'),
                 showOutput('diskspaceUsagePlot', 'highcharts')
                )
       ),
