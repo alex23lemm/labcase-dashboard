@@ -1,8 +1,6 @@
 LabCase Global Report
 ========================================================
 
-Data as of  `r as.character(date.of.extraction)`
-
 ```{r echo=FALSE}
 library(lubridate)
 library(ggplot2)
@@ -11,6 +9,8 @@ library(RColorBrewer)
 
 source('../processedData/processedDataDump.R')
 ```
+
+Data as of  `r as.character(date.of.extraction)`
 
 ### General Information
 
@@ -167,6 +167,72 @@ print(g.quarters, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
 print(g.years, vp = viewport(layout.pos.row = 2, layout.pos.col = 1))
 ```
 
+### User distribution
+
+This section shows the distribution of LabCase users clustered by Software AG employees and external users (clients, partners):
+* **Total** number of users: **`r users.dim[1]`**
+* Number of **SAG** users: **`r sum(suffix.sag.df$Freq)`**
+* Number of **external** users: **`r sum(suffix.external.df$Freq)`**
+
+
+```{r echo=FALSE, fig.height=10, fig.width=12}
+
+# Reorder so that the order in the barchart is flipped
+suffix.sag.df <- transform(suffix.sag.df, 
+                           suffix.sag = reorder(suffix.sag, Freq))
+
+g.sag.users <- ggplot(suffix.sag.df, aes(x=suffix.sag, y=Freq)) + 
+                 geom_bar(stat='identity', fill='#3182BD') +
+                 geom_text(aes(label=Freq), hjust=-0.2, color='black', size=4) +
+                 ylim(0, max(suffix.sag.df$Freq) * 1.07) +
+                 xlab('SAG unit') +
+                 ggtitle('Number of active SAG users per unit') +
+                 ylab('Number of users') +
+                 theme(plot.title = element_text(size=rel(1.1)),
+                      axis.title = element_text(size=12),
+                      axis.text = element_text(size=10)) +
+                coord_flip()
+
+# Reorder so that the order in the barchart is flipped
+suffix.external.df <- subset(suffix.external.df, Freq > 2)
+suffix.external.df <- transform(suffix.external.df,
+                                suffix.external = reorder(suffix.external, Freq))
+    
+g.external.users <- ggplot(suffix.external.df, aes(x=suffix.external, y=Freq)) +
+                      geom_bar(stat='identity', fill='#3182BD') +
+                      geom_text(aes(label=Freq), hjust=-0.2, color='black', size=4) +
+                       ylim(0, max(suffix.external.df$Freq) * 1.03) +
+                      xlab('Customers') +
+                      ylab('Number of users') +
+                      ggtitle('Customers with more than 2 active users') +
+                      theme(plot.title = element_text(size=rel(1.1)),
+                            axis.title = element_text(size=12),
+                            axis.text = element_text(size=10)) +
+                      coord_flip()
+
+
+    
+
+# Layout plots side-by-side on a 2-row-2-column grid
+grid.newpage()
+# Push viewport to graphic device
+pushViewport(viewport(layout = grid.layout(2, 2)))
+
+print(g.sag.users, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(g.external.users, vp = viewport(layout.pos.row = 1:2, layout.pos.col = 2))
+ 
+
+
+#pushViewport(viewport(layout = grid.layout(2, 2, widths = c(0.5, 0.5))))
+
+
+```
+
+
+
+
+
+
 ### Diskspace usage
 
 This section provides information about the current disk space usage of projects hosted in LabCase. In general, LabCase projects can use two separate storage locations:
@@ -191,6 +257,11 @@ summary(projects.df$repo_diskspace)
 
 ```{r echo=FALSE, fig.height=8, fig.width=8}
 
+# Change order of factor levels in origin column so that 'Alfresco' will get
+# assigened the blue color of the ColorBrewer 'Set1' below
+diskusage.per.project.df$origin <- factor(diskusage.per.project.df$origin,
+                                          levels = c('Repository', 'Alfresco'))
+
  g <- ggplot(diskusage.per.project.df, aes(x=identifier, y=diskspace,
                                               fill=origin)) +
       geom_bar(stat='identity') +
@@ -209,7 +280,34 @@ g
 ```
 
 
-  
+### Project templates
+
+This section is dedicated to the project template feature. Below you will see:
+* How many project templates are available globally
+* The name of each created template
+* The number of projects which were instantiated based on each template
+
+**Number of availabe project templates**: `r dim(template.usage.df)[1]`
+
+```{r echo=FALSE, fig.height=5}
+
+# Reorder so that the order in the barchart is flipped
+template.usage.df <- transform(template.usage.df, name=reorder(name, freq))
+    
+g <- ggplot(template.usage.df, aes(x=name, y=freq)) +
+      geom_bar(stat='identity', fill='#3182BD') +
+      geom_text(aes(label=freq), hjust=-0.1, size=4) +
+      ylim(0, max(template.usage.df$freq) * 1.02) +
+      xlab('Template name') +
+      ylab('Number of instances') +
+      ggtitle('Number of instantiated projects per template') +
+      coord_flip() +
+      theme(plot.title = element_text(size=rel(1.1)),
+            axis.title = element_text(size=12),
+            axis.text = element_text(size=10))
+g
+```
+
   
   
   
