@@ -99,6 +99,8 @@ shinyServer(function(input,output){
     hc <- hPlot(Freq ~ Var1,
                 data = proj.created.by.department.df,
                 type = 'bar')
+    # Add margin to the right to avoid data label cutting
+    hc$chart(marginRight = 20)
     # X-axis text lables added via categories again
     hc$xAxis(categories = proj.created.by.department.df$Var1,
              title = list(text = 'Departments'))
@@ -127,6 +129,8 @@ shinyServer(function(input,output){
     hc <- hPlot(Freq ~ Var1, 
                 data=proj.created.by.country.df,
                 type='bar')
+    # Add margin to the right to avoid data label cutting
+    hc$chart(marginRight = 20)
     # X-axis text labels added via categories again
     hc$xAxis(categories = proj.created.by.country.df$Var1,
              title = list(text = 'Countries'))
@@ -222,6 +226,8 @@ shinyServer(function(input,output){
     hc <- hPlot(Freq ~ suffix.sag,
                 data = suffix.sag.df,
                 type = 'bar')
+    # Add margin to the right to avoid data label cutting
+    hc$chart(marginRight = 20)
     hc$xAxis(categories = suffix.sag.df$suffix.sag,
              title = list(text = 'SAG unit'))
     hc$yAxis(title = list (text = 'Number of users'),
@@ -245,6 +251,8 @@ shinyServer(function(input,output){
     hc <- hPlot(Freq ~ suffix.external,
                 data = suffix.external.df,
                 type = 'bar')
+    # Add margin to the right to avoid data label cutting
+    hc$chart(marginRight = 20)
     hc$xAxis(categories = suffix.external.df$suffix.external,
              title = list(text = 'Customers'))
     hc$yAxis(title = list(text = 'Number of users'),
@@ -337,6 +345,8 @@ shinyServer(function(input,output){
     hc <- hPlot(freq ~ name,
                 data = template.usage.df,
                 type = 'bar')
+    # Add margin to the right to avoid data label cutting
+    hc$chart(marginRight = 20)
     hc$xAxis(categories = levels(template.usage.df$name),
              title = list(text = 'Template name'))
     hc$yAxis(title = list(text = 'Number of instances'),
