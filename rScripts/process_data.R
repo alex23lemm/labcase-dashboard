@@ -16,14 +16,30 @@
 # the code below.
 
 
-library(lubridate)
-library(plyr)
-library(reshape2)
+ConstructSAGEmailSuffixRegex <- function(vec) {
+  # Constructs a regular expression by concatenating itmes of a character
+  # vector. This specific regex is later used to extract email suffixes
+  # of SAG users and external users.
+  #
+  # Args:
+  #   list: character vector containing the beginnings of allowed SAG email 
+  #         suffixes
+  # 
+  # Returns:
+  #   Regular expression 
+  regex <- '^('
+  for (i in 1:(length(vec)-1)) {
+    regex <- paste0(regex, vec[i], '|')
+  }
+  regex <- paste0(regex, vec[length(vec)])
+  regex <- paste0(regex, ').*')
+  return (regex)
+}
+
 
 
 # 1. Load raw data into memory
 #
-
 
 projects <- dget(file="./rawData/projectsRaw.R")
 users <- dget(file="./rawData/usersRaw.R")
@@ -139,15 +155,16 @@ suffix <- sapply(regm.suffix.list, function(x)x[2])
 
 # Extract email suffix of SAG users from suffix vector
 suffix.sag <- regmatches(suffix, 
-                         regexpr('^(softwareag|itcampus|ids-scheer|terracotta).*',
+                         regexpr(ConstructSAGEmailSuffixRegex(config$sagEmailSuffixes),
                                  suffix))
 suffix.sag.df <- as.data.frame.table(sort(table(suffix.sag), decreasing=TRUE))
 
 
 # Extract email suffix of external users from suffix vector
 # grepl returns logical vector
-suffix.external <- suffix[!grepl('^(softwareag|itcampus|ids-scheer|terracotta).*',
+suffix.external <- suffix[!grepl(ConstructSAGEmailSuffixRegex(config$sagEmailSuffixes),
                                  suffix)]
+
 suffix.external.df <- as.data.frame.table(sort(table(suffix.external), 
                                                decreasing=TRUE))
 
@@ -201,13 +218,40 @@ proj.created.in.last.7.days.df <- as.data.frame.table(table(proj.created.in.last
 
 
 # Create project template usage distribution table
-templates <- subset(projects, template == 1, select=c(id, identifier, name))
+templates <- droplevels(subset(projects, template == 1, select=c(id, name)))
 counted.template.instances <- count(projects, vars ='template_project_id')
 template.usage.df <- merge(templates, counted.template.instances, 
                           by.x='id', by.y='template_project_id', all.x=TRUE)
 # Replace NA values with 0 for those templates which were not used yet
 template.usage.df$freq[is.na(template.usage.df$freq)] <- 0
+template.usage.df$id <- NULL
 
+
+# Create disk pace usage distribution data frame for projects which consume
+# more than 1000 MB of disk space (sum of Alfresco and repos)
+diskusage.per.project.df <- droplevels(subset(projects, repo_diskspace + project_size > 1000,
+                                              select=c('identifier', 'repo_diskspace', 
+                                              'project_size')))
+# Add total_diskspace column
+diskusage.per.project.df <- transform(diskusage.per.project.df, 
+                                      total_diskspace=repo_diskspace + project_size)
+# reorder identifer column based on total_diskspace values (reorder() changes 
+# the order of levels in a factor based on values in the data). This step is 
+# necessary for appropriate ordering in stacked bar chart later
+diskusage.per.project.df$identifier <- reorder(diskusage.per.project.df$identifier,
+                                               diskusage.per.project.df$total_diskspace)
+# transform from wide to long data as a prerequiste for stacked bar chart 
+# plotting
+diskusage.per.project.df <- melt(diskusage.per.project.df, id.vars='identifier',
+                                 measure.vars=c('project_size', 
+                                                'repo_diskspace'),
+                                 variable.name='origin', value.name='diskspace')
+# Rename entries in origin column
+diskusage.per.project.df$origin <- revalue(diskusage.per.project.df$origin, 
+                                           c('project_size' = 'Alfresco', 
+                                             'repo_diskspace' = 'Repository'))
+diskusage.per.project.df <- transform(diskusage.per.project.df, 
+                                      diskspace=round(diskspace, digits=0))
 
 # Create disk pace usage distribution data frame for projects which consume
 # more than 1000 MB of disk space (sum of Alfresco and repos)

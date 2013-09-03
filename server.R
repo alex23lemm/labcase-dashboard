@@ -11,14 +11,14 @@
 # starts. In that case the objects in the file would be shared across all 
 # sessions.
 #
-# For plotting purposes ggplot2 is used exclusively. 
+# For plotting purposes rCharts is used exclusively. 
 
 
 
 library(shiny)
-library(ggplot2)
-library(RColorBrewer)
+library(rCharts)
 library(lubridate)
+
 
 
 
@@ -71,201 +71,258 @@ shinyServer(function(input,output){
   
   
   output$distributionCaption <- renderText({
-    paste('Departments/Countries with',
-          input$numbOfProjects, 'or more LabCase projects', sep=' ')
+    paste('Departments/Countries with',  input$numbOfProjects,
+          'or more LabCase projects', sep=' ')
+  })
+  
+  
+  output$downloadReport <- downloadHandler('LabCase_Report.html',
+                                           content = function(file) {
+                                             file.copy('report/lc_report.html', 
+                                                       file)
+                                           }, 
+                                           'text/html')
+  
+  # Create department ~ projects barchart
+  output$departmentPlot <- renderChart({
+    
+    # Subset according to reactive value and exclude NAs
+    proj.created.by.department.df <- subset(proj.created.by.department.df,
+                                            Freq >= input$numbOfProjects & Var1 != '<NA>')
+    # If user input is NULL (max will return -Inf in this case) assign 0 to 
+    # avoid empty plot later
+    max <- suppressWarnings(max(proj.created.by.department.df$Freq))
+    if (max == -Inf) {
+      max <- 0
+    }
+    
+    hc <- hPlot(Freq ~ Var1,
+                data = proj.created.by.department.df,
+                type = 'bar')
+    # Add margin to the right to avoid data label cutting
+    hc$chart(marginRight = 20)
+    # X-axis text lables added via categories again
+    hc$xAxis(categories = proj.created.by.department.df$Var1,
+             title = list(text = 'Departments'))
+    hc$yAxis(title = list(text = 'Number of projects'),
+             max = max)
+    hc$title(text = '<span style="font-size:14px">Number of projects per department</span>')
+    hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
+    # Set dom attribute otherwise chart will not appear on the web page
+    hc$set(dom = 'departmentPlot')
+    hc
   })
   
   
   # Create country ~ projects barchart
-  output$countryPlot <- renderPlot({
+  output$countryPlot <- renderChart({
     
-    # Subset according to reactive value and exclude NAs
     proj.created.by.country.df <- subset(proj.created.by.country.df, 
-                                         Freq >= input$numbOfProjects )#& Var1 != '<NA>')
-    # Do a reorder so that the order in the barchart is flipped
-    proj.created.by.country.df <- transform(proj.created.by.country.df,
-                                            Var1 = reorder(Var1,Freq))
+                                         Freq >= input$numbOfProjects & Var1 != '<NA>')
+    # If user input is NULL (max will return -Inf in this case) assign 0 to 
+    # avoid empty plot later
+    max <- suppressWarnings(max(proj.created.by.country.df$Freq))
+    if (max == -Inf) {
+      max <- 0
+    }
     
-    g <- ggplot(proj.created.by.country.df, aes(x=Var1, y=Freq)) + 
-      geom_bar(stat='identity', fill='#3182BD') +
-      geom_text(aes(label=Freq), hjust=-0.1, size=4) +
-      ylim(0, max(proj.created.by.country.df$Freq) * 1.02) +
-      xlab('Countries') + 
-      ylab('Number of projects') + 
-      theme(plot.title = element_text(size=rel(1.3)),
-            axis.title = element_text(size=14),
-            axis.text = element_text(size=10)) +
-      coord_flip() + 
-      ggtitle('Number of LabCase projects per country')
-    print(g)
-  })
-  
-  
-  # Create department ~ projects barchart
-  output$departmentPlot <- renderPlot({
-    
-    # Subset according to reactive value and exclude NAs
-    proj.created.by.department.df <- subset(proj.created.by.department.df,
-                                            Freq >= input$numbOfProjects)# & Var1 != '<NA>')
-    # Do a reorder so that the order in the barchart is flipped
-    proj.created.by.department.df <- transform(proj.created.by.department.df,
-                                               Var1 = reorder(Var1, Freq))
-    
-    g <- ggplot(proj.created.by.department.df, aes(x=Var1, y=Freq)) +
-      geom_bar(stat='identity', fill='#3182BD') +
-      geom_text(aes(label=Freq), hjust=-0.1, color='black', size=4) +
-      ylim(0, max(proj.created.by.department.df$Freq) * 1.02) +
-      xlab('Departments') + 
-      ylab('Number of projects') + 
-      theme(plot.title = element_text(size=rel(1.3)),
-            axis.title = element_text(size=14),
-            axis.text = element_text(size=10)) +
-      coord_flip() + 
-      ggtitle('Number of LabCase projects per department')
-    print(g)
+    hc <- hPlot(Freq ~ Var1, 
+                data=proj.created.by.country.df,
+                type='bar')
+    # Add margin to the right to avoid data label cutting
+    hc$chart(marginRight = 20)
+    # X-axis text labels added via categories again
+    hc$xAxis(categories = proj.created.by.country.df$Var1,
+             title = list(text = 'Countries'))
+    hc$yAxis(title = list(text = 'Number of projects'),
+             max = max)
+    hc$title(text = '<span style="font-size:15px">Number of projects per country</span>')
+    hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
+    # Set dom attribute otherwise chart will not appear on the web page
+    hc$set(dom = 'countryPlot')
+    hc
   })
   
   
   # Create project growth line graph for last 7 days
-  output$projectWeekProgessPlot <- renderPlot({
+  output$projectWeekProgessPlot <- renderChart({
     
-    g <- ggplot(proj.created.in.last.7.days.df, 
-                aes(x=proj.created.in.last.7.days, y=Freq, group=1)) +
-      geom_line(colour='#3182BD', size=1) + 
-      geom_point(size=7, shape=21, fill='white') +
-      geom_text(aes(label=Freq), size=4) +
-      ylim(0, max(proj.created.in.last.7.days.df$Freq) * 1.02) +
-      xlab('Day of creation') + 
-      ylab('Number of projects') + 
-      theme(plot.title = element_text(size=rel(1.3)),
-            axis.title  =element_text(size=14),
-            axis.text=element_text(size=12),
-            axis.text.x = element_text(angle=30, hjust=1, vjust=1)) +
-      ggtitle(paste0(year(date.of.extraction), ': ',
-                     'Number of created projects\n in the last 7 days per day (', 
-                      sum(proj.created.in.last.7.days.df$Freq),
-                     ' overall)'))
-    print(g)
-    
+    hc <- hPlot(Freq ~ proj.created.in.last.7.days, 
+                data=proj.created.in.last.7.days.df, type='line')
+        
+    # Add data labels to plot
+    hc$plotOptions(line = list(dataLabels = list(enabled = T)))
+    hc$title(text = paste0('<span style="font-size:14px">',
+                           year(date.of.extraction), ': ',
+                           'Number of created projects </span><br/>',
+                           '<span style="font-size:14px">in the last 7 days per day (',
+                           sum(proj.created.in.last.7.days.df$Freq),
+                           ' overall)</span>'))
+    hc$subtitle(text = ' ')
+    # X-axis text labels added via categories again
+    hc$xAxis(categories = proj.created.in.last.7.days.df$proj.created.in.last.7.days,
+             title = list(text = 'Day of creation'),
+             labels = list(rotation = -30, align = 'right'))
+    hc$yAxis(title = list(text = 'Number of projects'),
+             min = -0.2,
+             startOnTick = FALSE
+             )
+    # Set dom attribute otherwise chart will not appear on the web page
+    hc$set(dom = 'projectWeekProgessPlot')
+    hc
   })
   
   
   # Create project growth plot grouped by years
-  output$projectProgressPlot <- renderPlot({
+  output$projectProgressPlot <- renderChart({
     
-    # Do a reorder so that the order in the barchart is flipped
-    proj.created.by.year.df <- proj.created.by.year.df[order(proj.created.by.year.df$Var1),]
+    hc <- hPlot(Freq ~ Var1,
+                data = proj.created.by.year.df,
+                type = 'column')
+    # X-axis text lables added via categories again 
+    hc$xAxis(categories = proj.created.by.year.df$Var1,
+             title = list(text = 'Year of creation'))
+    hc$yAxis(title = list(text = 'Number of projects'))
     
-    g <- ggplot(proj.created.by.year.df, aes(x=Var1, y=Freq)) + 
-      geom_bar(width=.5, stat='identity', fill='#3182BD') +
-      geom_text(aes(label=Freq), vjust=-0.3, size=4) +
-      ylim(0, max(proj.created.by.year.df$Freq) * 1.03) +
-      xlab('Year of creation') + 
-      ylab('Number of projects') + 
-      theme(plot.title = element_text(size=rel(1.3)), 
-            axis.title = element_text(size=14), 
-            axis.text = element_text(size=12)) +
-      ggtitle('Number of created projects\n per year')
-    print(g)
+    hc$title(text = paste0('<span style="font-size:14px">Number of created projects </span>',
+                  '<br/><span style="font-size:14px">per year</span>'))
+    hc$subtitle(text = ' ')
+    hc$plotOptions(column = list(dataLabels = list(enabled = TRUE)))
+    # Set dom attribute otherwise chart will not appear on the web page
+    hc$set(dom = 'projectProgressPlot')
+    hc
   })
   
   
   # Create project growth plot for current year grouped by quarters
-  output$projectQuarterProgressPlot <- renderPlot({
+  output$projectQuarterProgressPlot <- renderChart({
     
-    g <- ggplot(proj.created.by.quarter.df, aes(x=proj.of.current.year, y=Freq)) + 
-      geom_bar(width=.5, stat='identity', fill='#3182BD') +
-      geom_text(aes(label = Freq), vjust=-0.3, size=4) +
-      ylim(0, max(proj.created.by.quarter.df$Freq) * 1.03) +
-      xlab('Quarter of creation') + 
-      ylab('Number of projects') + 
-      theme(plot.title = element_text(size=rel(1.3)),
-            axis.title = element_text(size=14),
-            axis.text = element_text(size=12)) +
-      ggtitle(paste0(year(date.of.extraction), ': ',
-                     'Number of created projects\n per quarter'))
-    print(g)
-   
+    hc <- hPlot(Freq ~ proj.of.current.year,
+                data = proj.created.by.quarter.df,
+                type = 'column')
+    # X-axis text lables added via categories again 
+    hc$xAxis(categories = proj.created.by.quarter.df$proj.of.current.year,
+             title = list(text = 'Quarter of creation'))
+    hc$yAxis(title = list(text = 'Number of projects'))
+    
+    hc$title(text = paste0('<span style="font-size:14px">',
+                           year(date.of.extraction), 
+                           ': ',
+                           'Number of created projects </span><br/>',
+                           '<span style="font-size:14px">per quarter</span>'))
+    hc$subtitle(text = ' ')
+    hc$plotOptions(column = list(dataLabels = list(enabled = TRUE)))
+    # Set dom attribute otherwise chart will not appear on the web page
+    hc$set(dom = 'projectQuarterProgressPlot')
+    hc
   })
    
   
   # Create SAG user distribution plot
-  output$userSAGPlot <- renderPlot({
+  output$userSAGPlot <- renderChart({
     
-    # Do a reorder so that the order in the barchart is flipped
-    suffix.sag.df <- transform(suffix.sag.df,
-                               suffix.sag = reorder(suffix.sag, Freq))
+    max <- max(suffix.sag.df$Freq)
     
-    g <- ggplot(suffix.sag.df, aes(x=suffix.sag, y=Freq)) + 
-      geom_bar(stat='identity', fill='#3182BD') +
-      geom_text(aes(label=Freq), hjust=-0.2, color='black', size=4) +
-      ylim(0, max(suffix.sag.df$Freq) * 1.02) +
-      xlab('SAG unit') + 
-      ylab('Number of users') + 
-      theme(plot.title = element_text(size=rel(1.3)),
-            axis.title = element_text(size=14),
-            axis.text = element_text(size=11)) +
-      coord_flip() + 
-      ggtitle('Number of active SAG users per unit')
-    print(g)
-    
+    hc <- hPlot(Freq ~ suffix.sag,
+                data = suffix.sag.df,
+                type = 'bar')
+    # Add margin to the right to avoid data label cutting
+    hc$chart(marginRight = 20)
+    hc$xAxis(categories = suffix.sag.df$suffix.sag,
+             title = list(text = 'SAG unit'))
+    hc$yAxis(title = list (text = 'Number of users'),
+             max = max)
+    hc$title(text = '<span style="font-size:14px">Number of active SAG users per unit</span>')
+    hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
+    hc$addParams(width = 466)
+    # Set dom attribute otherwise chart will not appear on the web page
+    hc$set(dom = 'userSAGPlot')
+    hc
   })
   
   
   # Create external user distribution plot
-  output$userExternalPlot <- renderPlot({
+  output$userExternalPlot <- renderChart({
     
-    # Do a reorder so that the order in the barchart is flipped
     suffix.external.df <- subset(suffix.external.df, Freq > 2)
-    suffix.external.df <- transform(suffix.external.df,
-                                    suffix.external = reorder(suffix.external, Freq))
     
-    g <- ggplot(suffix.external.df, aes(x=suffix.external, y=Freq)) + 
-      geom_bar(stat='identity', fill='#3182BD') +
-      geom_text(aes(label=Freq), hjust=-0.2, color='black', size=3) +
-      xlab('Customers') +
-      ylab('Number of users') + 
-      theme(plot.title = element_text(size=rel(1.3)),
-            axis.title = element_text(size=14),
-            axis.text = element_text(size=11)) +
-      coord_flip() + 
-      ggtitle('Customers with more than 2 active users')
-    print(g)
+    max <- max(suffix.external.df$Freq)
+    
+    hc <- hPlot(Freq ~ suffix.external,
+                data = suffix.external.df,
+                type = 'bar')
+    # Add margin to the right to avoid data label cutting
+    hc$chart(marginRight = 20)
+    hc$xAxis(categories = suffix.external.df$suffix.external,
+             title = list(text = 'Customers'))
+    hc$yAxis(title = list(text = 'Number of users'),
+             max = max)
+    hc$title(text = '<span style="font-size:14px">Customers with more than 2 active users</span>')
+    hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
+    # Set dom attribute otherwise chart will not appear on the web page
+    hc$set(dom = 'userExternalPlot')
+    hc
   })
   
+  # Total disk space usage
+  output$totalDiskSpaceUsage <- renderText({
+    paste('Total disk space usage: ', 
+          round(sum(projects.df$project_size, projects.df$repo_diskspace, 
+                    na.rm=TRUE)/1024, digits=2), ' GB', sep='')
+  })
   
   # Total Alfresco disk space usage
-  output$totalDiskSpaceUsage <- renderText({
+  output$totalAlfrescoDiskSpaceUsage <- renderText({
     paste('Total Alfresco disk space usage: ', 
-          round(sum(projects.df$project_size, na.rm=TRUE)/1000), 'GB', sep='')
+          round(sum(projects.df$project_size, na.rm=TRUE)/1024, digits=2),  ' GB',
+          sep='')
   })
-    
   
+  # Total repository disk space usage
+  output$totalRepoDiskSpaceUsage <- renderText({
+    paste('Total Repository disk space usage: ',
+          round(sum(projects.df$repo_diskspace, na.rm=TRUE)/1024, digits=2), 
+          ' GB', sep='')
+  })
+  
+    
   # Alfresco disk space usage summary
-  output$diskSpaceUsageSummary <- renderPrint({
-    summary(projects.df$project_size, na.rm=T)
+  output$alfrescoSummary <- renderPrint({
+    summary(projects.df$project_size, na.rm=TRUE)
+  })
+  
+  # Repository disk space usage summary
+  output$repositorySummary <- renderPrint({
+    summary(projects.df$repo_diskspace, na.rm=TRUE)
   })
     
   
   # Create disk space usage plot
-  output$diskspaceUsagePlot <- renderPlot({
-        
-    g <- ggplot(diskusage.per.project.df, aes(x=identifier, y=diskspace, 
-                                              fill=origin)) + 
-      geom_bar(stat='identity') +
-      scale_fill_manual(values=c('#3182BD', '#FDAE61')) +
-      geom_text(aes(label=diskspace), hjust=-0.1, size=4) +
-      ylim(0, max(diskusage.per.project.df$diskspace) * 1.02) +
-      xlab('Project identifier') + 
-      ylab('Total disk space usage (MB)') +
-      coord_flip() + 
-      ggtitle(paste('Projects consuming more than 1GB of total disk space ',
-                    '(', dim(diskusage.per.project.df)[1]/2, ' overall)', 
-                    sep='')) + 
-      theme(plot.title = element_text(size=rel(1.3)), 
-            axis.title = element_text(size=14),
-            axis.text = element_text(size=11))
-    print(g)
+  output$diskspaceUsagePlot <- renderChart({
+    
+    # Reverse the order of levels in identifier factor for Highchart plotting
+    diskusage.per.project.df <- transform(diskusage.per.project.df,
+                                          identifier = factor(identifier, 
+                                                              levels=rev(levels(identifier))))
+                            
+    hc <- hPlot(diskspace ~ identifier,
+                data = diskusage.per.project.df,
+                group = 'origin',
+                type = 'bar')
+    # Add margin to the right to avoid data label cutting
+    hc$chart(marginRight = 20)
+    hc$xAxis(categories = levels(diskusage.per.project.df$identifier),
+             title = list(text = 'Project identifier'))
+    hc$yAxis(title = list(text = 'Total disk space usage (MB)'))
+    hc$title(text = paste0('<span style="font-size:14px">',
+                           'Projects consuming more than 1 GB of total disk space ',
+                           '(',
+                           dim(diskusage.per.project.df)[1]/2,
+                           ' overall)</span>'))
+    hc$plotOptions(series = list(stacking = 'normal'))
+    # Set dom attribute otherwise chart will not appear on the web page
+    hc$set(dom = 'diskspaceUsagePlot')
+    hc
   })
   
   
@@ -276,22 +333,31 @@ shinyServer(function(input,output){
   
   
   # Create template usage plot
-  output$templateUsagePlot <- renderPlot({
+  output$templateUsagePlot <- renderChart({
     
-    #Do a reorder so that the order in the barchart is flipped
-    template.usage.df <- transform(template.usage.df, name=reorder(name, freq))
+    # Reorder so that the order in the barchart is flipped
+    # Reverse the order of levels in name factor for Highchart plotting
+    template.usage.df <- transform(template.usage.df, 
+                                   name = reorder(name, freq))
+    template.usage.df <- transform(template.usage.df,
+                                   name = factor(name, levels = rev(levels(name))))
     
-    g <- ggplot(template.usage.df, aes(x=name, y=freq)) +
-      geom_bar(stat='identity', fill='#3182BD') + 
-      geom_text(aes(label=freq), hjust=-0.1, size=4) +
-      ylim(0, max(template.usage.df$freq) * 1.02) +
-      xlab('Template name') + 
-      ylab('Number of instances') + 
-      coord_flip() + 
-      ggtitle('Number of instantiated projects per template') +
-      theme(plot.title = element_text(size=rel(1.3)),
-            axis.title = element_text(size=14),
-            axis.text = element_text(size=11))
-    print(g)
+    max <- max(template.usage.df$freq)
+  
+    hc <- hPlot(freq ~ name,
+                data = template.usage.df,
+                type = 'bar')
+    # Add margin to the right to avoid data label cutting
+    hc$chart(marginRight = 20)
+    hc$xAxis(categories = levels(template.usage.df$name),
+             title = list(text = 'Template name'))
+    hc$yAxis(title = list(text = 'Number of instances'),
+             max = max)
+    hc$title(text = '<span style="font-size:14px">Number of instantiated projects per template</span>')
+    hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
+    # Set dom attribute otherwise chart will not appear on the web page
+    hc$set(dom = 'templateUsagePlot')
+    hc
   })
+  
 })

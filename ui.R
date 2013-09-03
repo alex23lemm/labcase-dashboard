@@ -1,13 +1,14 @@
 
 # Author: Alex Lemm
 #
-# Purpose: ui.R defines the user interface for the Shiny app 'LabCase Dashboard'
+# Purpose: ui.R defines the HTML page for the Shiny app 'LabCase Dashboard'
 
 
 library(shiny)
+library(rCharts)
 
 
-shinyUI(pageWithSidebar(
+shinyUI(pageWithSidebar( 
   
   headerPanel('LabCase Dashboard'),
 
@@ -15,10 +16,10 @@ shinyUI(pageWithSidebar(
     
     p(
       textOutput('date')
-      ),
+    ),
     p(
       textOutput('numbOfProjectsOverall')
-      ),
+    ),
     p(
       textOutput('numbOfUsers'),
       textOutput('numbOfSAGUsers'),
@@ -30,51 +31,66 @@ shinyUI(pageWithSidebar(
       textOutput('numbOfIssues'),
       helpText('Issues per project information:'),
       verbatimTextOutput('summaryIssuesPerProject')
-      ),
+    ),
     p(
       numericInput('numbOfProjects','Specify number of projects',10),
       helpText('(Info: The \'Project distribution\' tab will show those departments/countries
-                which have launched equivalent or more projects aS specified by the input.)')
+                which have launched equivalent or more projects as specified by the input.)')
+    ),
+    p(
+      downloadButton('downloadReport', 'Download report', class='btn-primary')
     )
   ),
+  
   
   mainPanel(
     
     tabsetPanel(
       
       tabPanel('Project distribution',
-               helpText(textOutput('distributionCaption')),
-               #class='span6',
-               plotOutput('departmentPlot', width="75%", height="300px"),
-               #class='span6',
-               plotOutput('countryPlot', width="75%")
-               ),
+               div(class='span8', 
+                   helpText(textOutput('distributionCaption')),
+                   showOutput('departmentPlot', 'highcharts'),
+                   showOutput('countryPlot', 'highcharts')
+               )
+      ),
       tabPanel('Project growth',
-                div(class='span6', 
-                    plotOutput('projectWeekProgessPlot', width="90%", height="340px"),
-                    plotOutput('projectProgressPlot', width="80%", height="320px")
-                    ),
-                div(class='span6',
-                    plotOutput('projectQuarterProgressPlot', width="80%", height="320px"))
-               ),
-      tabPanel('User distribution',
-               plotOutput('userSAGPlot', width="75%", height="300px"),
-               plotOutput('userExternalPlot', width="75%")
-               ),
+                div(class='span5', 
+                    showOutput('projectWeekProgessPlot','highcharts'),
+                    showOutput('projectProgressPlot', 'highcharts')
+                ),
+                div(class='span5',
+                    showOutput('projectQuarterProgressPlot', 'highcharts')
+                )
+      ),
+      tabPanel('User distribution', 
+               div(class='span9',
+                   showOutput('userSAGPlot', 'highcharts'),
+                   showOutput('userExternalPlot', 'highcharts')
+               )
+      ),
       tabPanel('Disk space usage',
+               div(class = 'span9',
                 p(
-                  textOutput('totalDiskSpaceUsage')
-                  ),
-                helpText('Alfresco disk space usage summary information (in MB):'),
-                verbatimTextOutput('diskSpaceUsageSummary'),
-                plotOutput('diskspaceUsagePlot', width="85%")
-               ),
+                  textOutput('totalDiskSpaceUsage'),
+                  textOutput('totalAlfrescoDiskSpaceUsage'),
+                  textOutput('totalRepoDiskSpaceUsage')
+                ),
+                helpText('Alfresco disk space usage summary (in MB):'),
+                verbatimTextOutput('alfrescoSummary'),   
+                helpText('Repository disk space usage summary (in MB):'),
+                verbatimTextOutput('repositorySummary'),
+                showOutput('diskspaceUsagePlot', 'highcharts')
+               )
+      ),
       tabPanel('Project templates',
-               textOutput('numbOfTemplates'),
-               plotOutput('templateUsagePlot', width="75%", height="300px")
+               div(class = 'span9',
+                   textOutput('numbOfTemplates'),
+                   showOutput('templateUsagePlot', 'highcharts')
                )
       )
     )
   )
+)
 )
   
