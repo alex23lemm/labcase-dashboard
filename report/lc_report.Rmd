@@ -8,36 +8,37 @@ library(grid)
 library(RColorBrewer)
 
 source('../processedData/processedDataDump.R')
+
+# Avoid scientifc notation in inline code for bigger numbers
+options(scipen = 1, digits = 2)
 ```
 
 Data as of  `r as.character(date.of.extraction)`
 
+
 ### General Information
 
-```{r echo=FALSE, comment=NA }
-paste('Data as of', date.of.extraction, sep=" ")
+* Total number of projects: `r dim(projects.df)[1]`
+* Total number of users: `r users.dim[1]`
+* Number of SAG users: `r sum(suffix.sag.df$Freq)`
+* Number of external users: `r sum(suffix.external.df$Freq)`
 
-paste('Total number of projects:', dim(projects.df)[1], sep=" ")
-
-paste('Total number of users:', users.dim[1], sep=" ")
-
-paste('Number of SAG users:', sum(suffix.sag.df$Freq), sep=" ")
-
-paste('Number of external users:', sum(suffix.external.df$Freq), sep=" ")
-
+**User summary**:
+```{r echo=FALSE, comment=NA}
 summary(projects.df$member_count, digits=3)
+```
 
-paste('Total number of Issues created in projects:',
-          sum(projects.df$issue_count, na.rm=TRUE), sep=" ")
+* Total number of issues created in projects: `r sum(projects.df$issue_count, na.rm=TRUE)`
 
+**Issue summary**: 
+```{r echo=FALSE, comment=NA}
 summary(projects.df$issue_count, digits=2)
 ```
 
 
-
 ### Project distribution 
 
-This secion provides information about the project distribution among countries and among SAG departments. Examples how to interpret the figures:
+This section provides information about the project distribution among countries and among SAG departments. Examples how to interpret the figures:
 
 * The left figure shows that `r subset(proj.created.by.country.df, Var1 == 'US', Freq)` projects were created in the United States alone
 * On the right you can see that the GCS department is responsible for the creation of `r subset(proj.created.by.department.df, Var1 == 'GCS', Freq)` projects
@@ -167,6 +168,7 @@ print(g.quarters, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
 print(g.years, vp = viewport(layout.pos.row = 2, layout.pos.col = 1))
 ```
 
+
 ### User distribution
 
 This section shows the distribution of LabCase users clustered by Software AG employees and external users (clients, partners):
@@ -229,11 +231,7 @@ print(g.external.users, vp = viewport(layout.pos.row = 1:2, layout.pos.col = 2))
 ```
 
 
-
-
-
-
-### Diskspace usage
+### Disk space usage
 
 This section provides information about the current disk space usage of projects hosted in LabCase. In general, LabCase projects can use two separate storage locations:
 * The Assets section (Alfresco)
@@ -241,17 +239,17 @@ This section provides information about the current disk space usage of projects
 
 The current **overall disk space usage** breakdown is as follows:
 
-* Total disk space usage: `r round(sum(projects.df$project_size, projects.df$repo_diskspace, na.rm=TRUE)/1024, digits=2)` GB
-* Total Alfresco disk space usage: `r round(sum(projects.df$project_size, na.rm=TRUE)/1024, digits=2)` GB
-* Total repository disk space usage: `r round(sum(projects.df$repo_diskspace, na.rm=TRUE)/1024, digits=2)` GB
+* **Total** disk space usage: **`r round(sum(projects.df$project_size, projects.df$repo_diskspace, na.rm=TRUE)/1024, digits=2)`** GB
+* Total **Alfresco** disk space usage: **`r round(sum(projects.df$project_size, na.rm=TRUE)/1024, digits=2)`** GB
+* Total **repository** disk space usage: **`r round(sum(projects.df$repo_diskspace, na.rm=TRUE)/1024, digits=2)`** GB
 
 
 **Alfresco** disk space **summary** (in MB): 
-```{r echo=FALSE}
+```{r echo=FALSE, comment=NA}
 summary(projects.df$project_size)
 ```
 **Repository** disk space **summary** (in MB):
-```{r echo=FALSE}
+```{r echo=FALSE, comment=NA}
 summary(projects.df$repo_diskspace)
 ```
 
@@ -287,7 +285,7 @@ This section is dedicated to the project template feature. Below you will see:
 * The name of each created template
 * The number of projects which were instantiated based on each template
 
-**Number of availabe project templates**: `r dim(template.usage.df)[1]`
+**Number of available project templates**: `r dim(template.usage.df)[1]`
 
 ```{r echo=FALSE, fig.height=5}
 
@@ -307,12 +305,3 @@ g <- ggplot(template.usage.df, aes(x=name, y=freq)) +
             axis.text = element_text(size=10))
 g
 ```
-
-  
-  
-  
- 
-
-
-
-
