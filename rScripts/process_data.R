@@ -37,9 +37,8 @@ ConstructSAGEmailSuffixRegex <- function(vec) {
 }
 
 
-
+#-------------------------------------------------------------------------------
 # 1. Load raw data into memory
-#
 
 projects <- dget(file="./rawData/projectsRaw.R")
 users <- dget(file="./rawData/usersRaw.R")
@@ -49,7 +48,7 @@ custom.fields <- dget(file="./rawData/customFields.R")
 date.of.extraction <- dget("./rawData/dateOfExtraction.R")
 
 
-
+#-------------------------------------------------------------------------------
 # 2. Pre-processing
 #  Create 4 new data frames by extracting data from custom.fields data frame
 #  Merge projects data frame with these 4 new data frames, the issues data frame
@@ -130,7 +129,7 @@ projects <- transform(projects, repo_diskspace=repo_diskspace/1024/1024)
 users$mail <- tolower(users$mail)
 
 
-
+#-------------------------------------------------------------------------------
 # 3. Processing
 #  Generate smaller data frames which serve as the input for the Shiny
 #  application
@@ -229,9 +228,10 @@ template.usage.df$id <- NULL
 
 # Create disk pace usage distribution data frame for projects which consume
 # more than 1000 MB of disk space (sum of Alfresco and repos)
-diskusage.per.project.df <- droplevels(subset(projects, repo_diskspace + project_size > 1000,
+diskusage.per.project.df <- droplevels(subset(projects, 
+                                              repo_diskspace + project_size > 1000,
                                               select=c('identifier', 'repo_diskspace', 
-                                              'project_size')))
+                                                       'project_size')))
 # Add total_diskspace column
 diskusage.per.project.df <- transform(diskusage.per.project.df, 
                                       total_diskspace=repo_diskspace + project_size)
@@ -251,37 +251,10 @@ diskusage.per.project.df$origin <- revalue(diskusage.per.project.df$origin,
                                            c('project_size' = 'Alfresco', 
                                              'repo_diskspace' = 'Repository'))
 diskusage.per.project.df <- transform(diskusage.per.project.df, 
-                                      diskspace=round(diskspace, digits=0))
+                                      diskspace = round(diskspace, digits=0))
 
-# Create disk pace usage distribution data frame for projects which consume
-# more than 1000 MB of disk space (sum of Alfresco and repos)
-diskusage.per.project.df <- subset(projects, repo_diskspace + project_size > 1000,
-                                   select=c('identifier', 'repo_diskspace', 
-                                            'project_size'))
-# Add total_diskspace column
-diskusage.per.project.df <- transform(diskusage.per.project.df, 
-                                      total_diskspace=repo_diskspace + project_size)
-# reorder identifer column based on total_diskspace values (reorder() changes 
-# the order of levels in a factor based on values in the data). This step is 
-# necessary for appropriate ordering in stacked bar chart later
-diskusage.per.project.df$identifier <- reorder(diskusage.per.project.df$identifier,
-                                               diskusage.per.project.df$total_diskspace)
-# transform from wide to long data as a prerequiste for stacked bar chart 
-# plotting
-diskusage.per.project.df <- melt(diskusage.per.project.df, id.vars='identifier',
-                                 measure.vars=c('project_size', 
-                                                'repo_diskspace'),
-                                 variable.name='origin', value.name='diskspace')
-# Rename entries in origin column
-diskusage.per.project.df$origin <- revalue(diskusage.per.project.df$origin, 
-                                           c('project_size' = 'Alfresco', 
-                                             'repo_diskspace' = 'Repository'))
-diskusage.per.project.df <- transform(diskusage.per.project.df, 
-                                      diskspace=round(diskspace, digits=0))
-
-
+#-------------------------------------------------------------------------------
 #  4. Save the processed data
-#
 
 dump(c('date.of.extraction',
        'users.dim', 

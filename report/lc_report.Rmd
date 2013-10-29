@@ -1,5 +1,5 @@
-LabCase Global Report
-========================================================
+# LabCase Global Report
+
 
 ```{r echo=FALSE}
 library(lubridate)
