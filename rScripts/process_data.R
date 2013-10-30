@@ -63,14 +63,14 @@ date.of.extraction <- dget("./rawData/dateOfExtraction.R")
 #   12: Use as template
 # droplevels() is used to drop unused levels from the cf_value column
 template.info <- droplevels(subset(custom.fields, cf_id == 12,
-                            select=c(id, cf_value)))
+                            select = c(id, cf_value)))
 # Rename 'cf_value' column to 'template'
 names(template.info)[names(template.info) == 'cf_value'] <- 'template'
 # Add template column from template.info data frame to projects data frame.
 # In SQL terminology parameter all.x=TRUE gives a left outer join: non matching
 # cases of x are appended to the result with NA filled in the corresponding 
 # column of y
-projects <- merge(projects, template.info, by=('id'), all.x=TRUE)
+projects <- merge(projects, template.info, by = ('id'), all.x = TRUE)
 
 
 # Extract project id and customer information from custom.fields data frame
@@ -79,11 +79,11 @@ projects <- merge(projects, template.info, by=('id'), all.x=TRUE)
 # In the LC database this is the relevant id - custom fields mapping:
 #   13: Customer
 customer.info <- droplevels(subset(custom.fields, cf_id == 13, 
-                                   select=c(id, cf_value)))
+                                   select = c(id, cf_value)))
 # Rename 'cf_value' column to 'customer'
 names(customer.info)[names(customer.info) == 'cf_value'] <- 'customer'
 # Add customer column from customer.info data frame to projects data frame.
-projects <- merge(projects, customer.info, by=c('id'), all.x=TRUE)
+projects <- merge(projects, customer.info, by = c('id'), all.x = TRUE)
 
 
 # Extract project id and country information from custom.fields data frame
@@ -92,11 +92,11 @@ projects <- merge(projects, customer.info, by=c('id'), all.x=TRUE)
 # In the LC database this is the relevant id - custom fields mapping:
 #   14: Country
 country.info <- droplevels(subset(custom.fields, cf_id == 14, 
-                                  select=c(id, cf_value)))
+                                  select = c(id, cf_value)))
 # Rename 'cf_value' column to 'country'
-names(country.info)[names(country.info)=='cf_value'] <- 'country'
+names(country.info)[names(country.info) == 'cf_value'] <- 'country'
 # Add country column from country.info data frame to projects data frame.
-projects <- merge(projects, country.info, by=c('id'), all.x=TRUE)
+projects <- merge(projects, country.info, by = c('id'), all.x = TRUE)
 
 
 # Extract project id and business line information from custom.fields data frame
@@ -105,24 +105,26 @@ projects <- merge(projects, country.info, by=c('id'), all.x=TRUE)
 # In the LC database this is the relevant id - custom fields mapping:
 #   15: Business line
 businessline.info <- droplevels(subset(custom.fields, cf_id == 15,
-                                       select=c(id, cf_value)))
+                                       select = c(id, cf_value)))
 # Rename 'cf_value' column to 'business_line'
 names(businessline.info)[names(businessline.info) == 'cf_value'] <- 'business_line'
 # Add business line column from businessline.info data frame to projects
 # data frame.
-projects <- merge(projects, businessline.info, by=c('id'), all.x=TRUE)
+projects <- merge(projects, businessline.info, by = c('id'), all.x = TRUE)
 
 
 # Add issue_count column from issues data frame to projects data frame
-projects <- merge(projects, issues,  by.x='id', by.y='project_id', all.x=TRUE)
+projects <- merge(projects, issues, by.x = 'id', by.y = 'project_id', 
+                  all.x = TRUE)
 projects$issue_count[is.na(projects$issue_count)] <- 0
 
 
 # Add diskspace column from repos data frame to projects data frame
-projects <- merge(projects, repos, by.x='id', by.y='project_id', all.x=TRUE)
+projects <- merge(projects, repos, by.x = 'id', by.y = 'project_id', 
+                  all.x = TRUE)
 projects$repo_diskspace[is.na(projects$repo_diskspace)] <- 0
 # Transfrom bytes into MB
-projects <- transform(projects, repo_diskspace=repo_diskspace/1024/1024)
+projects <- transform(projects, repo_diskspace = repo_diskspace/1024/1024)
 
 
 # Convert entries in mail column to lower-case
@@ -140,9 +142,9 @@ users.dim <- dim(users)
 
 
 # Subset projects data frame
-projects.df <- subset(projects, select=c(identifier, project_size, 
-                                         repo_diskspace, member_count, 
-                                         issue_count))
+projects.df <- subset(projects, select = c(identifier, project_size, 
+                                           repo_diskspace, member_count, 
+                                           issue_count))
 
 
 # Extract email suffix from mail column from users data frame
@@ -156,7 +158,7 @@ suffix <- sapply(regm.suffix.list, function(x)x[2])
 suffix.sag <- regmatches(suffix, 
                          regexpr(ConstructSAGEmailSuffixRegex(config$sagEmailSuffixes),
                                  suffix))
-suffix.sag.df <- as.data.frame.table(sort(table(suffix.sag), decreasing=TRUE))
+suffix.sag.df <- as.data.frame.table(sort(table(suffix.sag), decreasing = TRUE))
 
 
 # Extract email suffix of external users from suffix vector
@@ -165,23 +167,24 @@ suffix.external <- suffix[!grepl(ConstructSAGEmailSuffixRegex(config$sagEmailSuf
                                  suffix)]
 
 suffix.external.df <- as.data.frame.table(sort(table(suffix.external), 
-                                               decreasing=TRUE))
+                                               decreasing = TRUE))
 
 
 # Create project frequency table grouped by country
 proj.created.by.country.df <- as.data.frame.table(sort(table(projects$country,
-                                                             useNA='ifany'), 
-                                                       decreasing=TRUE))
+                                                             useNA = 'ifany'), 
+                                                       decreasing = TRUE))
 
 
 # Create project frequency table grouped by department
 proj.created.by.department.df <- as.data.frame.table(sort(table(projects$business_line,
-                                                  useNA='ifany'), decreasing=TRUE))
+                                                                useNA = 'ifany'), 
+                                                          decreasing=TRUE))
 
 
 # Create project creation table grouped by year
 proj.created.by.year.df <- as.data.frame.table(table(year(projects$created_on), 
-                                                     useNA='ifany'))
+                                                     useNA = 'ifany'))
 
 
 # Create project creation table grouped by quarter for current year
@@ -212,15 +215,15 @@ for (i in 6:0) {
 # days as factor levels. Exclude unnecessary data which was concatenated to 
 # retrieve factor levels
 proj.created.in.last.7.days <- factor(c(proj.created.in.last.7.days, factor.week), 
-                                       levels=factor.week[1:7])[1:length(proj.created.in.last.7.days)]
+                                      levels=factor.week[1:7])[1:length(proj.created.in.last.7.days)]
 proj.created.in.last.7.days.df <- as.data.frame.table(table(proj.created.in.last.7.days))
 
 
 # Create project template usage distribution table
-templates <- droplevels(subset(projects, template == 1, select=c(id, name)))
+templates <- droplevels(subset(projects, template == 1, select = c(id, name)))
 counted.template.instances <- count(projects, vars ='template_project_id')
 template.usage.df <- merge(templates, counted.template.instances, 
-                          by.x='id', by.y='template_project_id', all.x=TRUE)
+                          by.x = 'id', by.y = 'template_project_id', all.x = TRUE)
 # Replace NA values with 0 for those templates which were not used yet
 template.usage.df$freq[is.na(template.usage.df$freq)] <- 0
 template.usage.df$id <- NULL
@@ -230,11 +233,12 @@ template.usage.df$id <- NULL
 # more than 1000 MB of disk space (sum of Alfresco and repos)
 diskusage.per.project.df <- droplevels(subset(projects, 
                                               repo_diskspace + project_size > 1000,
-                                              select=c('identifier', 'repo_diskspace', 
-                                                       'project_size')))
+                                              select = c('identifier', 
+                                                         'repo_diskspace', 
+                                                         'project_size')))
 # Add total_diskspace column
 diskusage.per.project.df <- transform(diskusage.per.project.df, 
-                                      total_diskspace=repo_diskspace + project_size)
+                                      total_diskspace = repo_diskspace + project_size)
 # reorder identifer column based on total_diskspace values (reorder() changes 
 # the order of levels in a factor based on values in the data). This step is 
 # necessary for appropriate ordering in stacked bar chart later
@@ -242,16 +246,18 @@ diskusage.per.project.df$identifier <- reorder(diskusage.per.project.df$identifi
                                                diskusage.per.project.df$total_diskspace)
 # transform from wide to long data as a prerequiste for stacked bar chart 
 # plotting
-diskusage.per.project.df <- melt(diskusage.per.project.df, id.vars='identifier',
-                                 measure.vars=c('project_size', 
-                                                'repo_diskspace'),
-                                 variable.name='origin', value.name='diskspace')
+diskusage.per.project.df <- melt(diskusage.per.project.df, 
+                                 id.vars = 'identifier',
+                                 measure.vars = c('project_size', 
+                                                  'repo_diskspace'),
+                                 variable.name = 'origin', 
+                                 value.name ='diskspace')
 # Rename entries in origin column
 diskusage.per.project.df$origin <- revalue(diskusage.per.project.df$origin, 
                                            c('project_size' = 'Alfresco', 
                                              'repo_diskspace' = 'Repository'))
 diskusage.per.project.df <- transform(diskusage.per.project.df, 
-                                      diskspace = round(diskspace, digits=0))
+                                      diskspace = round(diskspace, digits = 0))
 
 #-------------------------------------------------------------------------------
 #  4. Save the processed data

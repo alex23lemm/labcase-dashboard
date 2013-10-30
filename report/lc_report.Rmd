@@ -1,7 +1,7 @@
 # LabCase Global Report
 
 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 library(lubridate)
 library(ggplot2)
 library(grid)
@@ -25,14 +25,14 @@ Data as of  `r as.character(date.of.extraction)`
 
 **User summary**:
 ```{r echo=FALSE, comment=NA}
-summary(projects.df$member_count, digits=3)
+summary(projects.df$member_count, digits = 3)
 ```
 
 * Total number of issues created in projects: `r sum(projects.df$issue_count, na.rm=TRUE)`
 
 **Issue summary**: 
 ```{r echo=FALSE, comment=NA}
-summary(projects.df$issue_count, digits=2)
+summary(projects.df$issue_count, digits = 2)
 ```
 
 
@@ -47,42 +47,42 @@ This section provides information about the project distribution among countries
 # Create country ~ projects bar chart plot
 # Exclude NAs
 proj.created.by.country.df <- subset(proj.created.by.country.df,
-                                        Var1 != '<NA>')
+                                     Var1 != '<NA>')
 
 # Reorder so that the order in the barchart is flipped
 proj.created.by.country.df <- transform(proj.created.by.country.df,
                                         Var1 = reorder(Var1,Freq))
-g.countries <- ggplot(proj.created.by.country.df, aes(x=Var1, y=Freq)) +
-  geom_bar(stat='identity', fill='#3182BD') +
-  geom_text(aes(label=Freq), hjust=-0.1, size=4) +
+g.countries <- ggplot(proj.created.by.country.df, aes(x = Var1, y = Freq)) +
+  geom_bar(stat = 'identity', fill = '#3182BD') +
+  geom_text(aes(label = Freq), hjust = -0.1, size = 4) +
   ggtitle('Number of projects\n per country') +
   ylim(0, max(proj.created.by.country.df$Freq) * 1.06) +
   xlab('Countries') +
   ylab('Number of projects') +
-  theme(plot.title = element_text(size=rel(1.1)),
-        axis.title = element_text(size=12),
-        axis.text = element_text(size=10)) +
+  theme(plot.title = element_text(size = rel(1.1)),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10)) +
   coord_flip() 
 
 
 # Create 'Department ~ projects bar chart plot
 # Exclude NAs
 proj.created.by.department.df <- subset(proj.created.by.department.df,
-                                            Var1 != '<NA>')
+                                        Var1 != '<NA>')
 # Reorder so that the order in the barchart is flipped
 proj.created.by.department.df <- transform(proj.created.by.department.df,
-                                               Var1 = reorder(Var1, Freq))
+                                           Var1 = reorder(Var1, Freq))
     
-g.departments <- ggplot(proj.created.by.department.df, aes(x=Var1, y=Freq)) +
-  geom_bar(stat='identity', fill='#3182BD') +
-  geom_text(aes(label=Freq), hjust=-0.1, color='black', size=4) +
+g.departments <- ggplot(proj.created.by.department.df, aes(x = Var1, y = Freq)) +
+  geom_bar(stat = 'identity', fill = '#3182BD') +
+  geom_text(aes(label = Freq), hjust = -0.1, color = 'black', size = 4) +
   ggtitle('Number of projects\n per department') +
   ylim(0, max(proj.created.by.department.df$Freq) * 1.08) +
   xlab('Departments') +
   ylab('Number of projects') +
-  theme(plot.title = element_text(size=rel(1.1)),
-        axis.title = element_text(size=12),
-        axis.text = element_text(size=10)) +
+  theme(plot.title = element_text(size = rel(1.1)),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10)) +
   coord_flip() 
 
 
@@ -107,10 +107,10 @@ Our main focus lies on the following three periods:
 ```{r echo=FALSE, fig.width=10, fig.height=8}
 # Create time series plot for projects created in last 7 days
 g.last.7.days <- ggplot(proj.created.in.last.7.days.df, 
-                        aes(x=proj.created.in.last.7.days, y=Freq, group=1)) + 
-                        geom_line(colour='#3182BD', size=1) +
-                        geom_point(size=7, shape=21, fill='white') +
-                        geom_text(aes(label=Freq), size=4) +
+                        aes(x = proj.created.in.last.7.days, y = Freq, group = 1)) + 
+                        geom_line(colour = '#3182BD', size  =1) +
+                        geom_point(size = 7, shape = 21, fill = 'white') +
+                        geom_text(aes(label = Freq), size = 4) +
                         ggtitle(paste0(year(date.of.extraction), ': ',
                                 'Number of created projects\n in the last 7 days per day (',
                                 sum(proj.created.in.last.7.days.df$Freq),
@@ -118,41 +118,43 @@ g.last.7.days <- ggplot(proj.created.in.last.7.days.df,
                         ylim(0, max(proj.created.in.last.7.days.df$Freq) * 1.02) +
                         xlab('Day of creation') +
                         ylab('Number of projects') +
-                        theme(plot.title = element_text(size=rel(1.1)),
-                              axis.title = element_text(size=12),
-                              axis.text = element_text(size=10),
-                              axis.text.x = element_text(angle=30, hjust=1, vjust=1))
+                        theme(plot.title = element_text(size = rel(1.1)),
+                              axis.title = element_text(size = 12),
+                              axis.text = element_text(size = 10),
+                              axis.text.x = element_text(angle = 30, hjust = 1, 
+                                                         vjust = 1))
 
 
 # Create projects ~ quarters of current year bar chart
 # Reorder so that the order in the barchart is flipped
-g.quarters <- ggplot(proj.created.by.quarter.df, aes(x=proj.of.current.year, y=Freq)) +
-                     geom_bar(width=.5, stat='identity', fill='#3182BD') +
-                     geom_text(aes(label = Freq), vjust=-0.3, size=4) +
+g.quarters <- ggplot(proj.created.by.quarter.df, aes(x = proj.of.current.year, 
+                                                     y = Freq)) +
+                     geom_bar(width = .5, stat = 'identity', fill = '#3182BD') +
+                     geom_text(aes(label = Freq), vjust = -0.3, size = 4) +
                      ggtitle(paste0(year(date.of.extraction), ': ',
                                     'Number of created projects\n per quarter')) +
                      ylim(0, max(proj.created.by.quarter.df$Freq) * 1.03) +
                      xlab('Quarter of creation') +
                      ylab('Number of projects') +
-                     theme(plot.title = element_text(size=rel(1.1)),
-                           axis.title = element_text(size=12),
-                           axis.text = element_text(size=10)) 
+                     theme(plot.title = element_text(size = rel(1.1)),
+                           axis.title = element_text(size = 12),
+                           axis.text = element_text(size = 10)) 
   
 
 #Create projects ~ years  bar chart
 # Reorder so that the order in the barchart is flipped
 proj.created.by.year.df <- proj.created.by.year.df[order(proj.created.by.year.df$Var1),]
 
-g.years <- ggplot(proj.created.by.year.df, aes(x=Var1, y=Freq)) + 
-                     geom_bar(width=.5, stat='identity', fill='#3182BD') +
-                     geom_text(aes(label=Freq), vjust=-0.3, size=4) +
+g.years <- ggplot(proj.created.by.year.df, aes(x = Var1, y = Freq)) + 
+                     geom_bar(width = .5, stat  ='identity', fill = '#3182BD') +
+                     geom_text(aes(label  =Freq), vjust = -0.3, size = 4) +
                      ggtitle('Number of created projects\n per year') +
                      ylim(0, max(proj.created.by.year.df$Freq) * 1.03) +
                      xlab('Year of creation') +
                      ylab('Number of projects') +
-                     theme(plot.title = element_text(size=rel(1.1)),
-                           axis.title = element_text(size=12),
-                           axis.text = element_text(size=10))
+                     theme(plot.title = element_text(size = rel(1.1)),
+                           axis.title = element_text(size = 12),
+                           axis.text = element_text(size  =10))
                     
   
 
@@ -183,16 +185,17 @@ This section shows the distribution of LabCase users clustered by Software AG em
 suffix.sag.df <- transform(suffix.sag.df, 
                            suffix.sag = reorder(suffix.sag, Freq))
 
-g.sag.users <- ggplot(suffix.sag.df, aes(x=suffix.sag, y=Freq)) + 
-                 geom_bar(stat='identity', fill='#3182BD') +
-                 geom_text(aes(label=Freq), hjust=-0.2, color='black', size=4) +
+g.sag.users <- ggplot(suffix.sag.df, aes(x = suffix.sag, y  =Freq)) + 
+                 geom_bar(stat = 'identity', fill = '#3182BD') +
+                 geom_text(aes(label = Freq), hjust = -0.2, color = 'black', 
+                           size = 4) +
                  ylim(0, max(suffix.sag.df$Freq) * 1.07) +
                  xlab('SAG unit') +
                  ggtitle('Number of active SAG users per unit') +
                  ylab('Number of users') +
-                 theme(plot.title = element_text(size=rel(1.1)),
-                      axis.title = element_text(size=12),
-                      axis.text = element_text(size=10)) +
+                 theme(plot.title = element_text(size = rel(1.1)),
+                      axis.title = element_text(size = 12),
+                      axis.text = element_text(size = 10)) +
                 coord_flip()
 
 # Reorder so that the order in the barchart is flipped
@@ -200,16 +203,17 @@ suffix.external.df <- subset(suffix.external.df, Freq > 2)
 suffix.external.df <- transform(suffix.external.df,
                                 suffix.external = reorder(suffix.external, Freq))
     
-g.external.users <- ggplot(suffix.external.df, aes(x=suffix.external, y=Freq)) +
-                      geom_bar(stat='identity', fill='#3182BD') +
-                      geom_text(aes(label=Freq), hjust=-0.2, color='black', size=4) +
+g.external.users <- ggplot(suffix.external.df, aes(x = suffix.external, y = Freq)) +
+                      geom_bar(stat = 'identity', fill = '#3182BD') +
+                      geom_text(aes(label = Freq), hjust = -0.2, 
+                                color = 'black', size = 4) +
                        ylim(0, max(suffix.external.df$Freq) * 1.03) +
                       xlab('Customers') +
                       ylab('Number of users') +
                       ggtitle('Customers with more than 2 active users') +
-                      theme(plot.title = element_text(size=rel(1.1)),
-                            axis.title = element_text(size=12),
-                            axis.text = element_text(size=10)) +
+                      theme(plot.title = element_text(size = rel(1.1)),
+                            axis.title = element_text(size = 12),
+                            axis.text = element_text(size = 10)) +
                       coord_flip()
 
 
@@ -222,12 +226,6 @@ pushViewport(viewport(layout = grid.layout(2, 2)))
 
 print(g.sag.users, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
 print(g.external.users, vp = viewport(layout.pos.row = 1:2, layout.pos.col = 2))
- 
-
-
-#pushViewport(viewport(layout = grid.layout(2, 2, widths = c(0.5, 0.5))))
-
-
 ```
 
 
@@ -260,10 +258,10 @@ summary(projects.df$repo_diskspace)
 diskusage.per.project.df$origin <- factor(diskusage.per.project.df$origin,
                                           levels = c('Repository', 'Alfresco'))
 
- g <- ggplot(diskusage.per.project.df, aes(x=identifier, y=diskspace,
-                                              fill=origin)) +
-      geom_bar(stat='identity') +
-      scale_fill_brewer(palette='Set1') +
+ g <- ggplot(diskusage.per.project.df, aes(x = identifier, y = diskspace,
+                                              fill = origin)) +
+      geom_bar(stat = 'identity') +
+      scale_fill_brewer(palette = 'Set1') +
       ggtitle(paste('Projects consuming more than 1GB of total disk space ',
                     '(', dim(diskusage.per.project.df)[1]/2, ' overall)',
                     sep='')) +
@@ -271,9 +269,9 @@ diskusage.per.project.df$origin <- factor(diskusage.per.project.df$origin,
       xlab('Project identifier') +
       ylab('Total disk space usage (MB)') +
       coord_flip() +
-      theme(plot.title = element_text(size=rel(1.1)),
-            axis.title = element_text(size=12),
-            axis.text = element_text(size=10))
+      theme(plot.title = element_text(size = rel(1.1)),
+            axis.title = element_text(size = 12),
+            axis.text = element_text(size = 10))
 g
 ```
 
@@ -292,16 +290,16 @@ This section is dedicated to the project template feature. Below you will see:
 # Reorder so that the order in the barchart is flipped
 template.usage.df <- transform(template.usage.df, name=reorder(name, freq))
     
-g <- ggplot(template.usage.df, aes(x=name, y=freq)) +
-      geom_bar(stat='identity', fill='#3182BD') +
-      geom_text(aes(label=freq), hjust=-0.1, size=4) +
+g <- ggplot(template.usage.df, aes(x = name, y = freq)) +
+      geom_bar(stat = 'identity', fill = '#3182BD') +
+      geom_text(aes(label = freq), hjust = -0.1, size  =4) +
       ylim(0, max(template.usage.df$freq) * 1.02) +
       xlab('Template name') +
       ylab('Number of instances') +
       ggtitle('Number of instantiated projects per template') +
       coord_flip() +
-      theme(plot.title = element_text(size=rel(1.1)),
-            axis.title = element_text(size=12),
-            axis.text = element_text(size=10))
+      theme(plot.title = element_text(size = rel(1.1)),
+            axis.title = element_text(size = 12),
+            axis.text = element_text(size = 10))
 g
 ```
