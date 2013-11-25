@@ -21,9 +21,9 @@ Independent of running the application locally on your computer or deploying it 
   * markdown
   * ggplot2
   * RcolorBrewer
-	* shiny
+  * shiny
   * devtools
-	* rCharts (via install_github('rCharts', 'ramnathv'))
+  * rCharts (via install_github('rCharts', 'ramnathv'))
 
 * You have to set up the following folder app structure:
   * `lc_dashboard` (Not included in Git repo. Place Shiny files (`server.R`, `ui.R`) and `config.yml` here)
