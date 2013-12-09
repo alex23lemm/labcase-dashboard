@@ -100,7 +100,7 @@ shinyServer(function(input,output){
                 data = proj.created.by.department.df,
                 type = 'bar')
     # Add margin to the right to avoid data label cutting
-    hc$chart(marginRight = 20)
+    hc$chart(marginRight = 25)
     # X-axis text lables added via categories again
     hc$xAxis(categories = proj.created.by.department.df$Var1,
              title = list(text = 'Departments'))
@@ -130,7 +130,7 @@ shinyServer(function(input,output){
                 data=proj.created.by.country.df,
                 type='bar')
     # Add margin to the right to avoid data label cutting
-    hc$chart(marginRight = 20)
+    hc$chart(marginRight = 25, height = 550)
     # X-axis text labels added via categories again
     hc$xAxis(categories = proj.created.by.country.df$Var1,
              title = list(text = 'Countries'))
@@ -149,7 +149,6 @@ shinyServer(function(input,output){
     
     hc <- hPlot(Freq ~ proj.created.in.last.7.days, 
                 data=proj.created.in.last.7.days.df, type='line')
-        
     # Add data labels to plot
     hc$plotOptions(line = list(dataLabels = list(enabled = T)))
     hc$title(text = paste0('<span style="font-size:14px">',
@@ -227,7 +226,7 @@ shinyServer(function(input,output){
                 data = suffix.sag.df,
                 type = 'bar')
     # Add margin to the right to avoid data label cutting
-    hc$chart(marginRight = 20)
+    hc$chart(marginRight = 25)
     hc$xAxis(categories = suffix.sag.df$suffix.sag,
              title = list(text = 'SAG unit'))
     hc$yAxis(title = list (text = 'Number of users'),
@@ -252,7 +251,7 @@ shinyServer(function(input,output){
                 data = suffix.external.df,
                 type = 'bar')
     # Add margin to the right to avoid data label cutting
-    hc$chart(marginRight = 20)
+    hc$chart(marginRight = 25, height = 500)
     hc$xAxis(categories = suffix.external.df$suffix.external,
              title = list(text = 'Customers'))
     hc$yAxis(title = list(text = 'Number of users'),
@@ -310,7 +309,7 @@ shinyServer(function(input,output){
                 group = 'origin',
                 type = 'bar')
     # Add margin to the right to avoid data label cutting
-    hc$chart(marginRight = 20)
+    hc$chart(marginRight = 25, height = 550)
     hc$xAxis(categories = levels(diskusage.per.project.df$identifier),
              title = list(text = 'Project identifier'))
     hc$yAxis(title = list(text = 'Total disk space usage (MB)'))
@@ -348,7 +347,7 @@ shinyServer(function(input,output){
                 data = template.usage.df,
                 type = 'bar')
     # Add margin to the right to avoid data label cutting
-    hc$chart(marginRight = 20)
+    hc$chart(marginRight = 25)
     hc$xAxis(categories = levels(template.usage.df$name),
              title = list(text = 'Template name'))
     hc$yAxis(title = list(text = 'Number of instances'),
