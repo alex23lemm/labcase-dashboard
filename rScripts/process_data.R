@@ -190,12 +190,20 @@ proj.created.by.year.df <- as.data.frame.table(table(year(projects$created_on),
 # Create project creation table grouped by quarter for current year
 # Extract projects created in current year based on data in created_on column
 proj.of.current.year <- projects$created_on[year(projects$created_on) == year(date.of.extraction)]
+
+                         
 # Encode proj.of.current.year as factor and include possible unused quarters
-# as factor levels (e.g. when data is read in January). Exclude unnecessary data
-# which was concatenated to retrieve factor levels
-proj.of.current.year <- as.factor(c(quarters(proj.of.current.year),
-                   'Q2', 'Q3', 'Q4'))[1:length(proj.of.current.year)]
+# as factor levels (e.g. when data is read in January or when no project has 
+# been created so far in current year). Exclude unnecessary data which was 
+# concatenated to retrieve factor levels
+
+proj.of.current.year <- factor(c(quarter(proj.of.current.year),
+                   1, 2, 3, 4))[0:length(proj.of.current.year)]
+proj.of.current.year <- mapvalues(proj.of.current.year,
+                                 c(1, 2, 3, 4), c('Q1', 'Q2', 'Q3', 'Q4'))
+
 proj.created.by.quarter.df <- as.data.frame.table(table(proj.of.current.year))
+
 
 
 # Create project creation table for the last 7 days
