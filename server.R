@@ -147,19 +147,19 @@ shinyServer(function(input,output){
   # Create project growth line graph for last 7 days
   output$projectWeekProgessPlot <- renderChart({
     
-    hc <- hPlot(Freq ~ proj.created.in.last.7.days, 
-                data=proj.created.in.last.7.days.df, type='line')
+    hc <- hPlot(Freq ~ Date, 
+                data = proj.created.in.last.7.days.vec, type='line')
     # Add data labels to plot
     hc$plotOptions(line = list(dataLabels = list(enabled = T)))
     hc$title(text = paste0('<span style="font-size:14px">',
                            year(date.of.extraction), ': ',
                            'Number of created projects </span><br/>',
                            '<span style="font-size:14px">in the last 7 days per day (',
-                           sum(proj.created.in.last.7.days.df$Freq),
+                           sum(proj.created.in.last.7.days.vec$Freq),
                            ' overall)</span>'))
     hc$subtitle(text = ' ')
     # X-axis text labels added via categories again
-    hc$xAxis(categories = proj.created.in.last.7.days.df$proj.created.in.last.7.days,
+    hc$xAxis(categories = proj.created.in.last.7.days.vec$Date,
              title = list(text = 'Day of creation'),
              labels = list(rotation = -30, align = 'right'))
     hc$yAxis(title = list(text = 'Number of projects'),
@@ -170,6 +170,11 @@ shinyServer(function(input,output){
     hc$set(dom = 'projectWeekProgessPlot')
     hc
   })
+  
+  output$projectsOfLast7DaysTable <- renderTable({
+    proj.created.in.last.7.days.df
+  })
+  
   
   
   # Create project growth plot grouped by years

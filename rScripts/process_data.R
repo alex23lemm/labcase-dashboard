@@ -206,25 +206,38 @@ proj.created.by.quarter.df <- as.data.frame.table(table(proj.of.current.year))
 
 
 
-# Create project creation table for the last 7 days
+# Create project creation table and project creation data frame for the last 7 
+# days
 # Construct interval for last 7 days
 last.7.days.interval <- new_interval(date.of.extraction - days(6), date.of.extraction)
 # Extract projects which were created in last 7 days
-proj.created.in.last.7.days <- projects$created_on[projects$created_on %within% last.7.days.interval]
+proj.created.in.last.7.days.df <- droplevels(subset(projects, 
+                                      created_on %within% last.7.days.interval,
+                                      select = c(name, created_on, member_count,
+                                                 customer, business_line, 
+                                                 country)))
+
 # Convert POSIXct format into '02-Jan-2013'
-proj.created.in.last.7.days <- format(proj.created.in.last.7.days, '%d-%b-%Y')
+proj.created.in.last.7.days.df$created_on <- format(proj.created.in.last.7.days.df$created_on,
+                                                 '%d-%b-%Y')
+
 # Construct proxy week so that all of the 7 last days will be included as levels
 # in final factor
 factor.week <- NULL
 for (i in 6:0) {
   factor.week <- c(factor.week, format(date.of.extraction - days(i),'%d-%b-%Y'))
 }
-# Encode proj.created.in.last.7.days as factor and include possible unused 
+# Encode proj.created.in.last.7.days.vec as factor and include possible unused 
 # days as factor levels. Exclude unnecessary data which was concatenated to 
 # retrieve factor levels
-proj.created.in.last.7.days <- factor(c(proj.created.in.last.7.days, factor.week), 
-                                      levels=factor.week[1:7])[1:length(proj.created.in.last.7.days)]
-proj.created.in.last.7.days.df <- as.data.frame.table(table(proj.created.in.last.7.days))
+proj.created.in.last.7.days.vec <- factor(c(proj.created.in.last.7.days.df$created_on, factor.week), 
+                                          levels = factor.week[1:7])[0:length(proj.created.in.last.7.days.df$created_on)]
+proj.created.in.last.7.days.vec <- as.data.frame.table(table(proj.created.in.last.7.days.vec))
+proj.created.in.last.7.days.vec <- rename(proj.created.in.last.7.days.vec,
+                                          c('proj.created.in.last.7.days.vec' = 'Date'))
+row.names(proj.created.in.last.7.days.df) <- NULL
+names(proj.created.in.last.7.days.df) <- str_replace(names(proj.created.in.last.7.days.df),
+                                                     '_', ' ')
 
 
 # Create project template usage distribution table
@@ -279,6 +292,7 @@ dump(c('date.of.extraction',
        'proj.created.by.department.df', 
        'proj.created.by.year.df', 
        'proj.created.by.quarter.df',
+       'proj.created.in.last.7.days.vec',
        'proj.created.in.last.7.days.df',
        'template.usage.df',
        'diskusage.per.project.df'),      
