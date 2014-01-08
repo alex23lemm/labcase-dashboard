@@ -62,7 +62,7 @@ shinyUI(pageWithSidebar(
                       showOutput('projectWeekProgessPlot','highcharts')
                   ),
                   div(class='span5',
-                      tableOutput('projectsOfLast7DaysTable')
+                      dataTableOutput('projectsOfLast7DaysTable')
                   )  
                ),
                div(class='row-fluid', 

@@ -171,9 +171,9 @@ shinyServer(function(input,output){
     hc
   })
   
-  output$projectsOfLast7DaysTable <- renderTable({
+  output$projectsOfLast7DaysTable <- renderDataTable({
     proj.created.in.last.7.days.df
-  })
+  }, options = list(iDisplayLength = 5, bProcessing = FALSE,  sDom = 'tpr'))
   
   
   
