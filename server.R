@@ -100,7 +100,7 @@ shinyServer(function(input,output){
                 data = proj.created.by.department.df,
                 type = 'bar')
     # Add margin to the right to avoid data label cutting
-    hc$chart(marginRight = 25)
+    hc$chart(marginRight = 30)
     # X-axis text lables added via categories again
     hc$xAxis(categories = proj.created.by.department.df$Var1,
              title = list(text = 'Departments'))

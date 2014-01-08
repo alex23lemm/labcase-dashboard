@@ -48,45 +48,62 @@ shinyUI(pageWithSidebar(
     tabsetPanel(
       
       tabPanel('Project distribution',
-               div(class='span8', 
-                   helpText(textOutput('distributionCaption')),
-                   showOutput('departmentPlot', 'highcharts'),
-                   showOutput('countryPlot', 'highcharts')
+               div(class='row-fluid',
+                 div(class='span9', 
+                     helpText(textOutput('distributionCaption')),
+                     showOutput('departmentPlot', 'highcharts'),
+                     showOutput('countryPlot', 'highcharts')
+                 )
                )
       ),
-      tabPanel('Project growth',
-                div(class='span5', 
-                    showOutput('projectWeekProgessPlot','highcharts'),
-                    showOutput('projectProgressPlot', 'highcharts')
-                ),
-                div(class='span5',
-                    showOutput('projectQuarterProgressPlot', 'highcharts')
-                )
+      tabPanel('Project growth',          
+               div(class='row-fluid',
+                  div(class='span5', 
+                      showOutput('projectWeekProgessPlot','highcharts')
+                  ),
+                  div(class='span5',
+                      tableOutput('projectsOfLast7DaysTable')
+                  )  
+               ),
+               div(class='row-fluid', 
+                  div(class='span5',
+                      showOutput('projectQuarterProgressPlot', 'highcharts')
+                  ),
+                  div(class='span5',
+                      showOutput('projectProgressPlot', 'highcharts')
+                  )
+               )
       ),
-      tabPanel('User distribution', 
-               div(class='span9',
-                   showOutput('userSAGPlot', 'highcharts'),
-                   showOutput('userExternalPlot', 'highcharts')
+      tabPanel('User distribution',
+               div(class='row-fluid',
+                 div(class='span9',
+                     showOutput('userSAGPlot', 'highcharts'),
+                     showOutput('userExternalPlot', 'highcharts')
+                 )
                )
       ),
       tabPanel('Disk space usage',
-               div(class = 'span9',
-                p(
-                  textOutput('totalDiskSpaceUsage'),
-                  textOutput('totalAlfrescoDiskSpaceUsage'),
-                  textOutput('totalRepoDiskSpaceUsage')
-                ),
-                helpText('Alfresco disk space usage summary (in MB):'),
-                verbatimTextOutput('alfrescoSummary'),   
-                helpText('Repository disk space usage summary (in MB):'),
-                verbatimTextOutput('repositorySummary'),
-                showOutput('diskspaceUsagePlot', 'highcharts')
+               div(class='row-fluid',
+                 div(class = 'span9',
+                  p(
+                    textOutput('totalDiskSpaceUsage'),
+                    textOutput('totalAlfrescoDiskSpaceUsage'),
+                    textOutput('totalRepoDiskSpaceUsage')
+                  ),
+                  helpText('Alfresco disk space usage summary (in MB):'),
+                  verbatimTextOutput('alfrescoSummary'),   
+                  helpText('Repository disk space usage summary (in MB):'),
+                  verbatimTextOutput('repositorySummary'),
+                  showOutput('diskspaceUsagePlot', 'highcharts')
+                 )
                )
       ),
       tabPanel('Project templates',
-               div(class = 'span9',
-                   textOutput('numbOfTemplates'),
-                   showOutput('templateUsagePlot', 'highcharts')
+               div(class='row-fluid',
+                   div(class = 'span9',
+                     textOutput('numbOfTemplates'),
+                     showOutput('templateUsagePlot', 'highcharts')
+                   )
                )
       )
     )
