@@ -8,7 +8,7 @@ library(shiny)
 library(rCharts)
 
 
-shinyUI(fluidPage( 
+shinyUI(fluidPage(theme = 'bootstrap.css', 
   
   fluidRow( 
    column(4,    
@@ -34,7 +34,7 @@ shinyUI(fluidPage(
   ),
   
   
-  tabsetPanel(position = 'left',
+  tabsetPanel(position = 'above',
               
     tabPanel('Project metrics',
              

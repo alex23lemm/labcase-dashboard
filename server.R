@@ -136,7 +136,7 @@ shinyServer(function(input,output){
              title = list(text = 'Countries'))
     hc$yAxis(title = list(text = 'Number of projects'),
              max = max)
-    hc$title(text = '<span style="font-size:15px">Number of projects per country</span>')
+    hc$title(text = '<span style="font-size:12px">Number of projects per country</span>')
     hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
     # Set dom attribute otherwise chart will not appear on the web page
     hc$set(dom = 'countryPlot')
@@ -151,10 +151,10 @@ shinyServer(function(input,output){
                 data = proj.created.in.last.7.days.vec, type='line')
     # Add data labels to plot
     hc$plotOptions(line = list(dataLabels = list(enabled = T)))
-    hc$title(text = paste0('<span style="font-size:14px">',
+    hc$title(text = paste0('<span style="font-size:12px">',
                            year(date.of.extraction), ': ',
                            'Number of created projects </span><br/>',
-                           '<span style="font-size:14px">in the last 7 days per day (',
+                           '<span style="font-size:12px">in the last 7 days per day (',
                            sum(proj.created.in.last.7.days.vec$Freq),
                            ' overall)</span>'))
     hc$subtitle(text = ' ')
@@ -188,8 +188,8 @@ shinyServer(function(input,output){
              title = list(text = 'Year of creation'))
     hc$yAxis(title = list(text = 'Number of projects'))
     
-    hc$title(text = paste0('<span style="font-size:14px">Number of created projects </span>',
-                  '<br/><span style="font-size:14px">per year</span>'))
+    hc$title(text = paste0('<span style="font-size:12px">Number of created projects </span>',
+                  '<br/><span style="font-size:12px">per year</span>'))
     hc$subtitle(text = ' ')
     hc$plotOptions(column = list(dataLabels = list(enabled = TRUE)))
     # Set dom attribute otherwise chart will not appear on the web page
@@ -209,11 +209,11 @@ shinyServer(function(input,output){
              title = list(text = 'Quarter of creation'))
     hc$yAxis(title = list(text = 'Number of projects'))
     
-    hc$title(text = paste0('<span style="font-size:14px">',
+    hc$title(text = paste0('<span style="font-size:12px">',
                            year(date.of.extraction), 
                            ': ',
                            'Number of created projects </span><br/>',
-                           '<span style="font-size:14px">per quarter</span>'))
+                           '<span style="font-size:12px">per quarter</span>'))
     hc$subtitle(text = ' ')
     hc$plotOptions(column = list(dataLabels = list(enabled = TRUE)))
     # Set dom attribute otherwise chart will not appear on the web page
@@ -236,7 +236,7 @@ shinyServer(function(input,output){
              title = list(text = 'SAG unit'))
     hc$yAxis(title = list (text = 'Number of users'),
              max = max)
-    hc$title(text = '<span style="font-size:14px">Number of active SAG users per unit</span>')
+    hc$title(text = '<span style="font-size:12px">Number of active SAG users per unit</span>')
     hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
     hc$addParams(width = 466)
     # Set dom attribute otherwise chart will not appear on the web page
@@ -261,7 +261,7 @@ shinyServer(function(input,output){
              title = list(text = 'Customers'))
     hc$yAxis(title = list(text = 'Number of users'),
              max = max)
-    hc$title(text = '<span style="font-size:14px">Customers with more than 2 active users</span>')
+    hc$title(text = '<span style="font-size:12px">Customers with more than 2 active users</span>')
     hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
     # Set dom attribute otherwise chart will not appear on the web page
     hc$set(dom = 'userExternalPlot')
@@ -318,7 +318,7 @@ shinyServer(function(input,output){
     hc$xAxis(categories = levels(diskusage.per.project.df$identifier),
              title = list(text = 'Project identifier'))
     hc$yAxis(title = list(text = 'Total disk space usage (MB)'))
-    hc$title(text = paste0('<span style="font-size:14px">',
+    hc$title(text = paste0('<span style="font-size:12px">',
                            'Projects consuming more than 1 GB of total disk space ',
                            '(',
                            dim(diskusage.per.project.df)[1]/2,
@@ -357,7 +357,7 @@ shinyServer(function(input,output){
              title = list(text = 'Template name'))
     hc$yAxis(title = list(text = 'Number of instances'),
              max = max)
-    hc$title(text = '<span style="font-size:14px">Number of instantiated projects per template</span>')
+    hc$title(text = '<span style="font-size:12px">Number of instantiated projects per template</span>')
     hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
     # Set dom attribute otherwise chart will not appear on the web page
     hc$set(dom = 'templateUsagePlot')
