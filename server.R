@@ -30,7 +30,7 @@ shinyServer(function(input,output){
   
   
   output$date <- renderText({
-    paste('Data as of', date.of.extraction, sep=" ")
+    paste0('(Data as of ', date.of.extraction, ')')
   })
   
   
@@ -106,7 +106,7 @@ shinyServer(function(input,output){
              title = list(text = 'Departments'))
     hc$yAxis(title = list(text = 'Number of projects'),
              max = max)
-    hc$title(text = '<span style="font-size:14px">Number of projects per department</span>')
+    hc$title(text = '<span style="font-size:12px">Number of projects per department</span>')
     hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
     # Set dom attribute otherwise chart will not appear on the web page
     hc$set(dom = 'departmentPlot')
@@ -171,9 +171,9 @@ shinyServer(function(input,output){
     hc
   })
   
-  output$projectsOfLast7DaysTable <- renderDataTable({
+  output$projectsOfLast7DaysTable <- renderTable({
     proj.created.in.last.7.days.df
-  }, options = list(iDisplayLength = 5, bProcessing = FALSE,  sDom = 'tpr'))
+  })#, options = list(iDisplayLength = 5, bFilter=FALSE, bProcessing = FALSE,  sDom = 'tpr'))
   
   
   
