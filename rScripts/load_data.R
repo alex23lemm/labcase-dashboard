@@ -1,6 +1,4 @@
 
-# Author: Alex Lemm
-#
 # Purpose: The load_data.R script extracts the relevant raw data from the LC 
 # database using ODBC. Each extracted table is stored in a seperate .R file at 
 # the end.

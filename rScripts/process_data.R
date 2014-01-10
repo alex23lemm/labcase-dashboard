@@ -1,6 +1,4 @@
 
-# Author: Alex Lemm
-#
 # Purpose: The process.R script loads the previously extracted raw data from the
 # LC database into memory and processes it. Its major task is to construct
 # tiny data frames based on the raw data which will sourced into the Shiny

@@ -1,6 +1,4 @@
 
-# Author: Alex Lemm
-#
 # Purpose: server.R defines the server logic for the Shiny app 'LabCase
 # Dashboard'. processedDataDump.R is sourced within the function which is passed
 # to shinyServer() to make the data available for each separate user session.
@@ -35,22 +33,22 @@ shinyServer(function(input,output){
   
   
   output$numbOfProjectsOverall <- renderText({
-    paste('Total number of projects:', dim(projects.df)[1], sep=" ")
+    dim(projects.df)[1]
   })
   
    
   output$numbOfUsers <- renderText({
-    paste('Total number of users:', users.dim[1], sep=" ")
+    users.dim[1]
   })
   
   
   output$numbOfSAGUsers <- renderText({
-    paste('Number of SAG users:', sum(suffix.sag.df$Freq), sep=" ")
+    sum(suffix.sag.df$Freq)
   })
   
   
   output$numbOfExternalUsers <- renderText({
-    paste('Number of external users:', sum(suffix.external.df$Freq), sep=" ")
+    sum(suffix.external.df$Freq)
   })
   
   
@@ -60,8 +58,7 @@ shinyServer(function(input,output){
   
   
   output$numbOfIssues <- renderText({
-    paste('Total number of Issues created in projects:', 
-          sum(projects.df$issue_count, na.rm=TRUE), sep=" ")
+    sum(projects.df$issue_count, na.rm=TRUE)
   })
   
   
@@ -270,22 +267,19 @@ shinyServer(function(input,output){
   
   # Total disk space usage
   output$totalDiskSpaceUsage <- renderText({
-    paste('Total disk space usage: ', 
-          round(sum(projects.df$project_size, projects.df$repo_diskspace, 
+    paste(round(sum(projects.df$project_size, projects.df$repo_diskspace, 
                     na.rm=TRUE)/1024, digits=2), ' GB', sep='')
   })
   
   # Total Alfresco disk space usage
   output$totalAlfrescoDiskSpaceUsage <- renderText({
-    paste('Total Alfresco disk space usage: ', 
-          round(sum(projects.df$project_size, na.rm=TRUE)/1024, digits=2),  ' GB',
-          sep='')
+    paste(round(sum(projects.df$project_size, na.rm=TRUE)/1024, digits=2),
+          ' GB', sep='')
   })
   
   # Total repository disk space usage
   output$totalRepoDiskSpaceUsage <- renderText({
-    paste('Total Repository disk space usage: ',
-          round(sum(projects.df$repo_diskspace, na.rm=TRUE)/1024, digits=2), 
+    paste(round(sum(projects.df$repo_diskspace, na.rm=TRUE)/1024, digits=2), 
           ' GB', sep='')
   })
   
@@ -332,7 +326,7 @@ shinyServer(function(input,output){
   
   # Number of available templates
   output$numbOfTemplates <- renderText({
-    paste('Number of available templates: ', dim(template.usage.df)[1], sep='')
+    dim(template.usage.df)[1]
   })
   
   

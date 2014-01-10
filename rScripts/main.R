@@ -1,6 +1,4 @@
 
-# Author: Alex Lemm
-#
 # Purpose: main.R sources load_data.R, process_data.R and create_report.
 # The uploaded, processed and saved data of that workflow serves as the input 
 # for the Shiny app 'LabCase Dashboard'. The created report can later be 
