@@ -27,6 +27,9 @@ shinyUI(fluidPage(theme = 'mybootstrap.css',
    )
   ),
 
+fluidRow(
+  column(12,
+                           
   tabsetPanel(position = 'above',
               
     tabPanel('Project metrics',
@@ -60,13 +63,31 @@ shinyUI(fluidPage(theme = 'mybootstrap.css',
           h5('Project distribution'),
           hr(),
                
-          textOutput('distributionCaption'),
+          
                
             fluidRow(
               column(12,
                 wellPanel(
-                  numericInput('numbOfProjects','Specify number of projects',10) 
+                  fluidRow(
+                    column(4,
+                      numericInput('numbOfProjects','Specify number of projects',10) 
+                    ),
+                    column(4,
+                      selectInput('listOfCountries', 'Choose country:', c('DE', 'US'))
+                    ),
+                    column(4,
+                      selectInput('listOfCountries', 'Choose business line:', c('GCS', 'R&D'))
+                    )
+                  )
+                  
+                  
                 )    
+              )
+            ),
+               
+            fluidRow(
+              column(12,
+                textOutput('distributionCaption')
               )
             ),
                
@@ -205,7 +226,7 @@ shinyUI(fluidPage(theme = 'mybootstrap.css',
           verbatimTextOutput('repositorySummary')
         ),
                
-        column(8,
+        column(7,
           h5('Disk space usage distribution'),
           hr(),
                       
@@ -213,6 +234,7 @@ shinyUI(fluidPage(theme = 'mybootstrap.css',
         )      
       )
     )    
-                      
+  )                   
   )
+)
 ))
