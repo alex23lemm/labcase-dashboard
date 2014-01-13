@@ -13,6 +13,7 @@ library(yaml)
 
 library(plyr)
 library(reshape2)
+library(stringr)
 
 library(knitr)
 library(markdown)

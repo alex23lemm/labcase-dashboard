@@ -17,6 +17,7 @@ Independent of running the application locally on your computer or deploying it 
   * yaml
   * plyr
   * reshape2
+  * stringr
   * knitr
   * markdown
   * ggplot2

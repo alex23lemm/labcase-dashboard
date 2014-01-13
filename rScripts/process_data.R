@@ -140,8 +140,12 @@ users.dim <- dim(users)
 
 
 # Subset projects data frame
-projects.df <- subset(projects, select = c(identifier, project_size, 
-                                           repo_diskspace, member_count, 
+projects.df <- subset(projects, select = c(identifier, 
+                                           project_size,
+                                           country,
+                                           business_line,
+                                           repo_diskspace, 
+                                           member_count, 
                                            issue_count))
 
 
@@ -168,16 +172,16 @@ suffix.external.df <- as.data.frame.table(sort(table(suffix.external),
                                                decreasing = TRUE))
 
 
-# Create project frequency table grouped by country
-proj.created.by.country.df <- as.data.frame.table(sort(table(projects$country,
-                                                             useNA = 'ifany'), 
-                                                       decreasing = TRUE))
+# Extract list of departments ordered by frequency of created projects
+departments.vec <- as.character(as.data.frame.table(sort(table(projects.df$business_line,
+                                                  useNA = 'ifany'), 
+                                                         decreasing=TRUE))$Var1)
 
 
-# Create project frequency table grouped by department
-proj.created.by.department.df <- as.data.frame.table(sort(table(projects$business_line,
-                                                                useNA = 'ifany'), 
-                                                          decreasing=TRUE))
+# Extract list of countries ordered by freqency of created projects
+countries.vec <- as.character(as.data.frame.table(sort(table(projects.df$country,
+                                                              useNA = 'ifany'), 
+                                                        decreasing = TRUE))$Var1)
 
 
 # Create project creation table grouped by year
@@ -285,9 +289,9 @@ dump(c('date.of.extraction',
        'users.dim', 
        'projects.df',  
        'suffix.sag.df', 
-       'suffix.external.df', 
-       'proj.created.by.country.df', 
-       'proj.created.by.department.df', 
+       'suffix.external.df',
+       'departments.vec',
+       'countries.vec',
        'proj.created.by.year.df', 
        'proj.created.by.quarter.df',
        'proj.created.in.last.7.days.vec',

@@ -68,7 +68,7 @@ shinyServer(function(input,output){
   
   
   output$distributionCaption <- renderText({
-    paste('Departments/Countries with',  input$numbOfProjects,
+    paste('Chosen Departments/Countries with',  input$numbOfProjects,
           'or more LabCase projects', sep=' ')
   })
   
@@ -80,12 +80,60 @@ shinyServer(function(input,output){
                                            }, 
                                            'text/html')
   
+  # Used to populate selectInput element with server-generated content
+  output$selectDepartment <- renderUI({
+    selectInput('selectedDepartment', 'Choose department:', 
+                c('All', departments.vec),
+                selected = 'All')
+  })
+  
+  # Used to populate selectInput element with server-generated content
+  output$selectCountry <- renderUI({
+    selectInput('selectedCountry', 'Choose country:', 
+                c('All', countries.vec), 
+                selected = 'All')
+  })
+  
+  
+  # Reactive expression for subsetting projects based on user input (department, 
+  # country)
+  selectedProjects <- reactive({
+    
+    # If missing input, return sourced projects.df to avoid error later in 
+    # function. Due to the fact that the input list for the selectInput elements 
+    # on the UI side is generated on the server side , this reactive expression 
+    # has to cope with the 'delay' when reading the reactive values at the start
+    # of each new user session (see also https://gist.github.com/wch/4211337)
+    if(is.null(input$selectedDepartment)|| is.null(input$selectedCountry)) {
+      return (subset(projects.df, select = c(country, business_line)))
+    }
+     
+    if (input$selectedDepartment != 'All') {
+      projects.df <- subset(projects.df,
+                            business_line == input$selectedDepartment)
+    }
+    if (input$selectedCountry != 'All') {
+      projects.df <- subset(projects.df,
+                            country == input$selectedCountry)
+    }
+    subset(projects.df, select = c(country, business_line))
+  })
+  
+  
+  
   # Create department ~ projects barchart
   output$departmentPlot <- renderChart({
     
+    projects <- selectedProjects()
+    
+    # Create project frequency table grouped by department
+    proj.created.by.department.df <- as.data.frame.table(sort(table(projects$business_line,
+                                                                    useNA = 'ifany'), 
+                                                              decreasing=TRUE))
+    
     # Subset according to reactive value and exclude NAs
     proj.created.by.department.df <- subset(proj.created.by.department.df,
-                                            Freq >= input$numbOfProjects & Var1 != '<NA>')
+                                          Freq >= input$numbOfProjects & Var1 != '<NA>')
     # If user input is NULL (max will return -Inf in this case) assign 0 to 
     # avoid empty plot later
     max <- suppressWarnings(max(proj.created.by.department.df$Freq))
@@ -114,6 +162,14 @@ shinyServer(function(input,output){
   # Create country ~ projects barchart
   output$countryPlot <- renderChart({
     
+    projects <- selectedProjects()
+    
+    # Create project frequency table grouped by country
+    proj.created.by.country.df <- as.data.frame.table(sort(table(projects$country,
+                                                                 useNA = 'ifany'), 
+                                                           decreasing = TRUE))
+    
+    # Create project frequency table grouped by country
     proj.created.by.country.df <- subset(proj.created.by.country.df, 
                                          Freq >= input$numbOfProjects & Var1 != '<NA>')
     # If user input is NULL (max will return -Inf in this case) assign 0 to 
@@ -253,7 +309,7 @@ shinyServer(function(input,output){
                 data = suffix.external.df,
                 type = 'bar')
     # Add margin to the right to avoid data label cutting
-    hc$chart(marginRight = 25, height = 500)
+    hc$chart(marginRight = 25, height = 600)
     hc$xAxis(categories = suffix.external.df$suffix.external,
              title = list(text = 'Customers'))
     hc$yAxis(title = list(text = 'Number of users'),
@@ -308,7 +364,7 @@ shinyServer(function(input,output){
                 group = 'origin',
                 type = 'bar')
     # Add margin to the right to avoid data label cutting
-    hc$chart(marginRight = 25, height = 550)
+    hc$chart(marginRight = 25, height = 800)
     hc$xAxis(categories = levels(diskusage.per.project.df$identifier),
              title = list(text = 'Project identifier'))
     hc$yAxis(title = list(text = 'Total disk space usage (MB)'))
