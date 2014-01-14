@@ -11,22 +11,22 @@ shinyUI(fluidPage(theme = 'mybootstrap.css',
   fluidRow(
    column(4,    
       h3(
-        img(src = 'labcase_bin.png', width=35, height=35, align='top'),
+        img(src = 'labcase_bin.png', width = 35, height = 35),
         "LabCase Dashboard"
       )
    ),
    
-   column(4, offset=1,     
+   column(4, offset=1, style = 'margin-top: 14.5px',  
      textOutput('date')
    ),
    
    column(3,
-     div(class = 'pull-right',
+     div(class = 'pull-right', style = 'margin-top: 2.5px',
       downloadButton('downloadReport', 'Download report', class='btn-primary') 
      )
    )
-  ),  
-
+  ),
+                  
   fluidRow(
     column(12,
                            
@@ -236,6 +236,14 @@ shinyUI(fluidPage(theme = 'mybootstrap.css',
           )
         )    
       )               
+    )
+  ),
+  
+  fluidRow(
+    column(12, class = 'text-center',
+      hr(),
+      HTML("<h6 ><small>Software AG LabCase Dashboard, powered by <a href = 'http://www.rstudio.com/shiny/'>Shiny</a> © 2013 RStudio, Inc. <a href = 'https://plan.io/'>
+          Cheerfully deployed by <img width = '41', height = '10', src = 'planio_logo_gray_82x20.png'></a>.</small></h6>")
     )
   )
 ))
