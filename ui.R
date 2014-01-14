@@ -8,7 +8,7 @@ library(rCharts)
 
 shinyUI(fluidPage(theme = 'mybootstrap.css', 
   
-  fluidRow( 
+  fluidRow(
    column(4,    
       h3(
         img(src = 'labcase_bin.png', width=35, height=35, align='top'),
@@ -16,23 +16,23 @@ shinyUI(fluidPage(theme = 'mybootstrap.css',
       )
    ),
    
-   column(4, offset=1,
+   column(4, offset=1,     
      textOutput('date')
    ),
    
-   column(3, 
+   column(3,
      div(class = 'pull-right',
       downloadButton('downloadReport', 'Download report', class='btn-primary') 
      )
    )
-  ),
+  ),  
 
   fluidRow(
     column(12,
                            
       tabsetPanel(position = 'above',
               
-        tabPanel('Project metrics',
+        tabPanel('Project distribution',
              
           fluidRow(
             column(4,    

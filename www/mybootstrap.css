@@ -990,9 +990,9 @@ code {
 
 pre {
   display: block;
-  padding: 9.5px;
+  padding: 4.5px;
   margin: 0 0 10px;
-  font-size: 13px;
+  font-size: 11px;
   line-height: 20px;
   word-break: break-all;
   word-wrap: break-word;
@@ -1056,7 +1056,7 @@ input,
 button,
 select,
 textarea {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: normal;
   line-height: 20px;
 }
@@ -1094,7 +1094,7 @@ input[type="color"],
   height: 20px;
   padding: 4px 6px;
   margin-bottom: 10px;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 20px;
   color: #555555;
   vertical-align: middle;
@@ -3110,7 +3110,7 @@ table th[class*="span"],
 
 .well {
   min-height: 20px;
-  padding: 19px;
+  padding: 10px;
   margin-bottom: 20px;
   background-color: #f5f5f5;
   border: 1px solid #e3e3e3;
