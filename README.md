@@ -22,7 +22,7 @@ Independent of running the application locally on your computer or deploying it 
   * markdown
   * ggplot2
   * RcolorBrewer
-  * shiny
+  * shiny (install_github("shiny", "rstudio"))
   * devtools
   * rCharts (via install_github('rCharts', 'ramnathv'))
 

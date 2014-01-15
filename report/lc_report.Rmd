@@ -11,6 +11,17 @@ source('../processedData/processedDataDump.R')
 
 # Avoid scientifc notation in inline code for bigger numbers
 options(scipen = 1, digits = 2)
+
+# Create project frequency table grouped by country
+proj.created.by.country.df <- as.data.frame.table(sort(table(projects.df$country,
+                                                             useNA = 'ifany'), 
+                                                       decreasing = TRUE))
+
+# Create project frequency table grouped by department
+proj.created.by.department.df <- as.data.frame.table(sort(table(projects.df$business_line,
+                                                                useNA = 'ifany'), 
+                                                          decreasing=TRUE))
+
 ```
 
 Data as of  `r as.character(date.of.extraction)`
@@ -43,7 +54,7 @@ This section provides information about the project distribution among countries
 * The left figure shows that `r subset(proj.created.by.country.df, Var1 == 'US', Freq)` projects were created in the United States alone
 * On the right you can see that the GCS department is responsible for the creation of `r subset(proj.created.by.department.df, Var1 == 'GCS', Freq)` projects
 
-```{r echo=FALSE, fig.width=10, fig.height=9}
+```{r echo=FALSE, fig.height=10, fig.width=10}
 # Create country ~ projects bar chart plot
 # Exclude NAs
 proj.created.by.country.df <- subset(proj.created.by.country.df,
@@ -106,16 +117,16 @@ Our main focus lies on the following three periods:
 
 ```{r echo=FALSE, fig.width=10, fig.height=8}
 # Create time series plot for projects created in last 7 days
-g.last.7.days <- ggplot(proj.created.in.last.7.days.df, 
-                        aes(x = proj.created.in.last.7.days, y = Freq, group = 1)) + 
+g.last.7.days <- ggplot(proj.created.in.last.7.days.vec, 
+                        aes(x = Date, y = Freq, group = 1)) + 
                         geom_line(colour = '#3182BD', size  =1) +
                         geom_point(size = 7, shape = 21, fill = 'white') +
                         geom_text(aes(label = Freq), size = 4) +
                         ggtitle(paste0(year(date.of.extraction), ': ',
                                 'Number of created projects\n in the last 7 days per day (',
-                                sum(proj.created.in.last.7.days.df$Freq),
+                                sum(proj.created.in.last.7.days.vec$Freq),
                                 ' overall)')) +
-                        ylim(0, max(proj.created.in.last.7.days.df$Freq) * 1.02) +
+                        ylim(0, max(proj.created.in.last.7.days.vec$Freq) * 1.02) +
                         xlab('Day of creation') +
                         ylab('Number of projects') +
                         theme(plot.title = element_text(size = rel(1.1)),
@@ -179,7 +190,7 @@ This section shows the distribution of LabCase users clustered by Software AG em
 * Number of **external** users: **`r sum(suffix.external.df$Freq)`**
 
 
-```{r echo=FALSE, fig.height=10, fig.width=12}
+```{r echo=FALSE, fig.height=11, fig.width=12}
 
 # Reorder so that the order in the barchart is flipped
 suffix.sag.df <- transform(suffix.sag.df, 
@@ -251,7 +262,7 @@ summary(projects.df$project_size)
 summary(projects.df$repo_diskspace)
 ```
 
-```{r echo=FALSE, fig.height=8, fig.width=8}
+```{r echo=FALSE, fig.height=10, fig.width=8}
 
 # Change order of factor levels in origin column so that 'Alfresco' will get
 # assigened the blue color of the ColorBrewer 'Set1' below
