@@ -27,7 +27,7 @@ proj.created.by.department.df <- as.data.frame.table(sort(table(projects.df$busi
 Data as of  `r as.character(date.of.extraction)`
 
 
-### General Information
+## General Information
 
 * Total number of projects: `r dim(projects.df)[1]`
 * Total number of users: `r users.dim[1]`
@@ -47,7 +47,7 @@ summary(projects.df$issue_count, digits = 2)
 ```
 
 
-### Project distribution 
+## Project distribution 
 
 This section provides information about the project distribution among countries and among SAG departments. Examples how to interpret the figures:
 
@@ -106,7 +106,7 @@ print(g.departments, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
 ```
 
 
-### Project growth
+## Project growth
 
 This section gives you an overview about projects created within different time spans. 
 Our main focus lies on the following three periods:
@@ -182,7 +182,7 @@ print(g.years, vp = viewport(layout.pos.row = 2, layout.pos.col = 1))
 ```
 
 
-### User distribution
+## User distribution
 
 This section shows the distribution of LabCase users clustered by Software AG employees and external users (clients, partners):
 * **Total** number of users: **`r users.dim[1]`**
@@ -240,7 +240,7 @@ print(g.external.users, vp = viewport(layout.pos.row = 1:2, layout.pos.col = 2))
 ```
 
 
-### Disk space usage
+## Disk space usage
 
 This section provides information about the current disk space usage of projects hosted in LabCase. In general, LabCase projects can use two separate storage locations:
 * The Assets section (Alfresco)
@@ -287,7 +287,7 @@ g
 ```
 
 
-### Project templates
+## Project templates
 
 This section is dedicated to the project template feature. Below you will see:
 * How many project templates are available globally

@@ -16,7 +16,7 @@ library(reshape2)
 library(stringr)
 
 library(knitr)
-library(markdown)
+library(knitrBootstrap)
 
 
 # Set working directory
