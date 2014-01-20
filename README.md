@@ -19,6 +19,7 @@ Independent of running the application locally on your computer or deploying it 
   * reshape2
   * stringr
   * knitr
+  * knitrBootstrap
   * markdown
   * ggplot2
   * RcolorBrewer
