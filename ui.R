@@ -111,7 +111,8 @@ shinyUI(fluidPage(theme = 'mybootstrap.css',
             column(4,
               h5('Weekly growth'),
               hr(),
-              showOutput('projectWeekProgessPlot','highcharts') 
+              showOutput('projectWeekProgessPlot','highcharts') ,
+              dataTableOutput('projectsOfLast7DaysTable')
             ),
                       
             column(4,
@@ -189,7 +190,7 @@ shinyUI(fluidPage(theme = 'mybootstrap.css',
             column(9,
               h5('Project template usage distribution'),
               hr(),
-                   
+                
               showOutput('templateUsagePlot', 'highcharts')
             )
           )
