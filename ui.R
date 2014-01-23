@@ -108,25 +108,40 @@ shinyUI(fluidPage(theme = 'mybootstrap.css',
         tabPanel('Project growth',  
                  
           fluidRow(
-            column(4,
-              h5('Weekly growth'),
-              hr(),
-              showOutput('projectWeekProgessPlot','highcharts') ,
-              dataTableOutput('projectsOfLast7DaysTable')
-            ),
-                      
+             column(8,
+               h5('Weekly growth'),
+               hr(),
+               
+               fluidRow(
+                 column(6,
+                        showOutput('projectWeekProgessPlot','highcharts')
+                 ),
+                 
+                 column(6,
+                  div(style='font-size:11.5px',
+                    HTML("<div style='font-weight: bold;' 
+                         class='text-center'>Created projects in the last 7 days</div>"),
+                    dataTableOutput('projectsOfLast7DaysTable'),
+                    # Get rid of the within-column filters
+                    tags$style('#projectsOfLast7DaysTable tfoot {display:none;}') 
+                  )
+                 )
+               )
+             )
+          ),
+                       
+          fluidRow(
             column(4,
               h5('Quarterly growth'),
               hr(),
-              showOutput('projectQuarterProgressPlot', 'highcharts')    
+              showOutput('projectQuarterProgressPlot', 'highcharts')  
             ),
-                      
             column(4, 
               h5('Yearly growth'),
               hr(),
               showOutput('projectProgressPlot', 'highcharts')
             )
-          )    
+          )  
         ),
               
         tabPanel('User information',

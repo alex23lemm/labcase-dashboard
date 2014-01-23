@@ -226,9 +226,7 @@ shinyServer(function(input,output){
   
   output$projectsOfLast7DaysTable <- renderDataTable({
     proj.created.in.last.7.days.df
-  }, options = list(iDisplayLength = 5, bProcessing = TRUE
-                    ))
-  
+  }, options = list(iDisplayLength = 5, sDom = 'ritp'))
   
   
   # Create project growth plot grouped by years
