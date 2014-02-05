@@ -17,9 +17,6 @@ library(shiny)
 library(rCharts)
 library(lubridate)
 
-# Workaround to correct Highcharts functionality (http://bit.ly/1bqENTh)
-options(rcharts.cdn = TRUE)
-
 
 shinyServer(function(input,output){
   
@@ -309,7 +306,7 @@ shinyServer(function(input,output){
                 data = suffix.external.df,
                 type = 'bar')
     # Add margin to the right to avoid data label cutting
-    hc$chart(marginRight = 25, height = 600)
+    hc$chart(marginRight = 25, height = 750)
     hc$xAxis(categories = suffix.external.df$suffix.external,
              title = list(text = 'Customers'))
     hc$yAxis(title = list(text = 'Number of users'),
@@ -364,7 +361,7 @@ shinyServer(function(input,output){
                 group = 'origin',
                 type = 'bar')
     # Add margin to the right to avoid data label cutting
-    hc$chart(marginRight = 25, height = 800)
+    hc$chart(marginRight = 25, height = 900)
     hc$xAxis(categories = levels(diskusage.per.project.df$identifier),
              title = list(text = 'Project identifier'))
     hc$yAxis(title = list(text = 'Total disk space usage (MB)'))
