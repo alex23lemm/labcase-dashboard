@@ -124,6 +124,9 @@ projects$repo_diskspace[is.na(projects$repo_diskspace)] <- 0
 # Transfrom bytes into MB
 projects <- transform(projects, repo_diskspace = repo_diskspace/1024/1024)
 
+# Replace NAs with 0s in project_size column
+projects$project_size[is.na(projects$project_size)] <-0
+
 
 # Convert entries in mail column to lower-case
 users$mail <- tolower(users$mail)
