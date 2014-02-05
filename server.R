@@ -17,7 +17,8 @@ library(shiny)
 library(rCharts)
 library(lubridate)
 
-
+# Workaround to correct Highcharts functionality (http://bit.ly/1bqENTh)
+options(rcharts.cdn = TRUE)
 
 
 shinyServer(function(input,output){
