@@ -6,7 +6,9 @@ library(shiny)
 library(rCharts)
 
 
-shinyUI(fluidPage(theme = 'mybootstrap.css', 
+shinyUI(fluidPage(
+  
+  tags$head(tags$link(rel="stylesheet", type="text/css", href="custom.css")),
   
   fluidRow(
    column(4,    
@@ -262,4 +264,5 @@ shinyUI(fluidPage(theme = 'mybootstrap.css',
           Cheerfully deployed by <img width = '41', height = '10', src = 'planio_logo_gray_82x20.png'></a>.</small></h6>")
     )
   )
+  
 ))
