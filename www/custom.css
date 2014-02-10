@@ -1,0 +1,35 @@
+body { 
+  font-size: 13px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 2px 0;
+}
+
+hr {
+  margin: 5px 0;
+  border-top: 1px solid #d6d6d6;
+}
+
+pre {
+  padding: 4.5px;
+  font-size: 11px;
+}
+
+label,
+select {
+  font-size: 12px;
+}
+
+.uneditable-input {
+  font-size: 12px;
+}
+
+.well {
+  padding: 10px;
+}
