@@ -29,23 +29,20 @@ Data as of  `r as.character(date.of.extraction)`
 
 ## General Information
 
-* Total number of projects: `r dim(projects.df)[1]`
-* Total number of users: `r users.dim[1]`
-* Number of SAG users: `r sum(suffix.sag.df$Freq)`
-* Number of external users: `r sum(suffix.external.df$Freq)`
+* **Total** number of **projects**: **`r dim(projects.df)[1]`**
+* **Total** number of **users**: **`r users.dim[1]`**
 
 **User summary**:
 ```{r echo=FALSE, comment=NA}
 summary(projects.df$member_count, digits = 3)
 ```
 
-* Total number of issues created in projects: `r sum(projects.df$issue_count, na.rm=TRUE)`
-
 **Issue summary**: 
 ```{r echo=FALSE, comment=NA}
 summary(projects.df$issue_count, digits = 2)
 ```
 
+* **Total** number of **issues** created in projects: **`r sum(projects.df$issue_count, na.rm=TRUE)`**
 
 ## Project distribution 
 
