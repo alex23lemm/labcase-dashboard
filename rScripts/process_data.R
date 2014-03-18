@@ -35,6 +35,46 @@ ConstructSAGEmailSuffixRegex <- function(vec) {
 }
 
 
+calculateActivity <- function(last.updates, date) {
+  # Calculates the activity for a number of observations within predefined time 
+  # intervals.
+  #
+  # Args:
+  #   last.updates: POSIXct vector containing the latest date of activity 
+  #                 for each observation
+  #    date: POSIXct value representing the upper bound for each interval
+  # 
+  # Returns:
+  #   Data frame containing the summarized activity information of the 
+  #   obeservations for each predefined time interval
+  activity.df <- data.frame(interval.type = character(), 
+                            numb.of.users = numeric(), stringsAsFactors = FALSE)
+  
+  tmp.date <- date
+  hour(tmp.date) <- 0
+  minute(tmp.date) <- 0
+  second(tmp.date) <- 0
+  
+  activity.df[1 , ] <- c('today.interval', 
+                         sum(last.updates %within% interval(tmp.date, date)))
+  activity.df <- rbind(activity.df, 
+                       c('7.day.interval', 
+                         sum(last.updates %within% interval(date - days(6), date))))
+  activity.df <- rbind(activity.df, 
+                       c('30.day.interval', 
+                         sum(last.updates %within% interval(date - days(29), date))))
+  activity.df <- rbind(activity.df, 
+                       c('60.day.interval', 
+                         sum(last.updates %within% interval(date - days(59), date))))
+  activity.df <- rbind(activity.df, 
+                       c('12.months.interval', 
+                         sum(last.updates %within% interval(date - months(11), date))))
+  return (activity.df)
+}
+
+
+
+
 #-------------------------------------------------------------------------------
 # 1. Load raw data into memory
 
@@ -175,6 +215,10 @@ suffix.external.df <- as.data.frame.table(sort(table(suffix.external),
                                                decreasing = TRUE))
 
 
+# Calculate user activity
+user.activity.df <- calculateActivity(users$last_login_on, date.of.extraction)
+
+
 # Extract list of departments ordered by frequency of created projects
 departments.vec <- as.character(as.data.frame.table(sort(table(projects.df$business_line,
                                                   useNA = 'ifany'), 
@@ -290,7 +334,8 @@ diskusage.per.project.df <- transform(diskusage.per.project.df,
 
 dump(c('date.of.extraction',
        'users.dim', 
-       'projects.df',  
+       'projects.df',
+       'user.activity.df',
        'suffix.sag.df', 
        'suffix.external.df',
        'departments.vec',
