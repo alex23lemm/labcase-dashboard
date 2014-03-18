@@ -49,6 +49,26 @@ shinyServer(function(input,output){
     sum(suffix.external.df$Freq)
   })
   
+  output$userActivityToday <- renderText({
+    user.activity.df$active.obs[1]
+  })
+  
+  output$userActivitylast7Days <- renderText({
+    user.activity.df$active.obs[2]
+  })
+  
+  output$userActivitylast30Days <- renderText({
+    user.activity.df$active.obs[3]
+  })
+  
+  output$userActivitylast60Days <- renderText({
+    user.activity.df$active.obs[4]
+  })
+  
+  output$userActivitylast12Months <- renderText({
+    user.activity.df$active.obs[5]
+  })
+  
   
   output$summaryUsersPerProject <- renderPrint({
     summary(projects.df$member_count, digits=3)

@@ -46,9 +46,9 @@ calculateActivity <- function(last.updates, date) {
   # 
   # Returns:
   #   Data frame containing the summarized activity information of the 
-  #   obeservations for each predefined time interval
+  #   observations for each predefined time interval
   activity.df <- data.frame(interval.type = character(), 
-                            numb.of.users = numeric(), stringsAsFactors = FALSE)
+                            active.obs = numeric(), stringsAsFactors = FALSE)
   
   tmp.date <- date
   hour(tmp.date) <- 0
