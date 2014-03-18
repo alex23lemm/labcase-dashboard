@@ -170,7 +170,39 @@ shinyUI(fluidPage(
                   div(class = 'pull-right', textOutput('numbOfExternalUsers'))
                 )
               ),
-              br(),     
+              br(),
+              
+              h5('User activity'),
+              hr(),
+                
+              fluidRow(
+                column(7,
+                  "Users active today:",
+                  br(),
+                  "Users active in last 7 days:",
+                  br(),
+                  "Users active in last 30 days:",
+                  br(),
+                  "Users active in last 60 days:",
+                  br(),
+                  "Users active in last 12 months:",
+                  br() 
+                ),
+                
+                column(5,
+                  div(class = 'pull-right', textOutput('userActivityToday')),
+                  br(),
+                  div(class = 'pull-right', textOutput('userActivitylast7Days')),
+                  br(),
+                  div(class = 'pull-right', textOutput('userActivitylast30Days')),
+                  br(),
+                  div(class = 'pull-right', textOutput('userActivitylast60Days')),
+                  br(),
+                  div(class = 'pull-right', textOutput('userActivitylast12Months')),
+                  br()
+                )
+             ),
+             br(),
                    
               h5('Internal user distribution'),
               hr(),
