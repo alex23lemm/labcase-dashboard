@@ -179,6 +179,9 @@ print(g.years, vp = viewport(layout.pos.row = 2, layout.pos.col = 1))
 ```
 
 
+
+
+
 ## User distribution
 
 This section shows the distribution of LabCase users clustered by Software AG employees and external users (clients, partners):
@@ -235,6 +238,16 @@ pushViewport(viewport(layout = grid.layout(2, 2)))
 print(g.sag.users, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
 print(g.external.users, vp = viewport(layout.pos.row = 1:2, layout.pos.col = 2))
 ```
+
+
+## User activity 
+
+This section shows the activity of the **`r users.dim[1]` registered users** within serveral defined time intervals based on their login behavior on the LabCase web frontend.
+
+* Users active **in last 7 days:** **`r user.activity.df$active.obs[2]`**
+* Users active **in last 30 days:** **`r user.activity.df$active.obs[3]`**
+* Users active **in last 60 days:** **`r user.activity.df$active.obs[4]`**
+* Users active **in last 12 months:** **`r user.activity.df$active.obs[5]`**
 
 
 ## Disk space usage
