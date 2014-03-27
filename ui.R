@@ -177,8 +177,8 @@ shinyUI(fluidPage(
                 
               fluidRow(
                 column(7,
-                  "Users active today:",
-                  br(),
+                  #"Users active today:",
+                  #br(),
                   "Users active in last 7 days:",
                   br(),
                   "Users active in last 30 days:",
@@ -190,8 +190,8 @@ shinyUI(fluidPage(
                 ),
                 
                 column(5,
-                  div(class = 'pull-right', textOutput('userActivityToday')),
-                  br(),
+                  #div(class = 'pull-right', textOutput('userActivityToday')),
+                  #br(),
                   div(class = 'pull-right', textOutput('userActivitylast7Days')),
                   br(),
                   div(class = 'pull-right', textOutput('userActivitylast30Days')),
