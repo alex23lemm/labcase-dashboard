@@ -24,7 +24,7 @@ proj.created.by.department.df <- as.data.frame.table(sort(table(projects.df$busi
 
 ```
 
-Data as of  `r as.character(date.of.extraction)`
+Data as of  **`r as.character(date.of.extraction)`**
 
 
 ## General Information
@@ -242,12 +242,15 @@ print(g.external.users, vp = viewport(layout.pos.row = 1:2, layout.pos.col = 2))
 
 ## User activity 
 
-This section shows the activity of the **`r users.dim[1]` registered users** within serveral defined time intervals based on their login behavior on the LabCase web frontend.
+This section shows the activity of the **`r users.dim[1]` registered users** within serveral defined time intervals based on their login behavior on the LabCase web front-end.
 
-* Users active **in last 7 days:** **`r user.activity.df$active.obs[2]`**
-* Users active **in last 30 days:** **`r user.activity.df$active.obs[3]`**
-* Users active **in last 60 days:** **`r user.activity.df$active.obs[4]`**
-* Users active **in last 12 months:** **`r user.activity.df$active.obs[5]`**
+* Users active **in last 7 days:** **`r user.activity.df$active.obs[user.activity.df$interval.type == '7.day.interval']`**
+* Users active **in last 14 days:** **`r user.activity.df$active.obs[user.activity.df$interval.type == '14.days.interval']`**
+* Users active **in last 30 days:** **`r user.activity.df$active.obs[user.activity.df$interval.type == '30.day.interval']`**
+* Users active **in last 60 days:** **`r user.activity.df$active.obs[user.activity.df$interval.type == '60.day.interval']`**
+* Users active **in last 12 months:** **`r user.activity.df$active.obs[user.activity.df$interval.type == '12.months.interval']`**
+
+*Note: We are only tracking user activity based on user logins via the LabCase web front-end. We are not taking into account users interacting with LabCase via a WebDAV client, a Subversion client or a Git client. In addition, the LabCase autologin attribute was set to 7 days. Therefore, the overall user activity in the 'last 7 days'-interval is approximately 20-30% higher than shown by the data above.*
 
 
 ## Disk space usage
