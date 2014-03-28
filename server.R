@@ -49,24 +49,25 @@ shinyServer(function(input,output){
     sum(suffix.external.df$Freq)
   })
   
-  output$userActivityToday <- renderText({
-    user.activity.df$active.obs[1]
-  })
   
   output$userActivitylast7Days <- renderText({
-    user.activity.df$active.obs[2]
+    user.activity.df$active.obs[user.activity.df$interval.type == '7.day.interval']
+  })
+  
+  output$userActitvitylast14Days <- renderText({
+    user.activity.df$active.obs[user.activity.df$interval.type == '14.days.interval']
   })
   
   output$userActivitylast30Days <- renderText({
-    user.activity.df$active.obs[3]
+    user.activity.df$active.obs[user.activity.df$interval.type == '30.day.interval']
   })
   
   output$userActivitylast60Days <- renderText({
-    user.activity.df$active.obs[4]
+    user.activity.df$active.obs[user.activity.df$interval.type == '60.day.interval']
   })
   
   output$userActivitylast12Months <- renderText({
-    user.activity.df$active.obs[5]
+    user.activity.df$active.obs[user.activity.df$interval.type == '12.months.interval']
   })
   
   

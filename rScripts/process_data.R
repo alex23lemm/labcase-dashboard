@@ -48,7 +48,7 @@ calculateActivity <- function(last.updates, date) {
   #   Data frame containing the summarized activity information of the 
   #   observations for each predefined time interval
   activity.df <- data.frame(interval.type = character(), 
-                            active.obs = numeric(), stringsAsFactors = FALSE)
+                            active.obs = character(), stringsAsFactors = FALSE)
   
   tmp.date <- date
   hour(tmp.date) <- 0
@@ -59,16 +59,25 @@ calculateActivity <- function(last.updates, date) {
                          sum(last.updates %within% interval(tmp.date, date)))
   activity.df <- rbind(activity.df, 
                        c('7.day.interval', 
-                         sum(last.updates %within% interval(date - days(6), date))))
+                         sum(last.updates %within% interval(date - days(6), 
+                                                            date))))
+  activity.df <- rbind(activity.df,
+                       c('14.days.interval',
+                         sum(last.updates %within% interval(date - days(13), 
+                                                            date))))
   activity.df <- rbind(activity.df, 
                        c('30.day.interval', 
-                         sum(last.updates %within% interval(date - days(29), date))))
+                         sum(last.updates %within% interval(date - days(29), 
+                                                            date))))
   activity.df <- rbind(activity.df, 
                        c('60.day.interval', 
-                         sum(last.updates %within% interval(date - days(59), date))))
+                         sum(last.updates %within% interval(date - days(59), 
+                                                            date))))
   activity.df <- rbind(activity.df, 
                        c('12.months.interval', 
-                         sum(last.updates %within% interval(date - months(11), date))))
+                         sum(last.updates %within% interval(date - months(11), 
+                                                            date))))
+  
   return (activity.df)
 }
 
