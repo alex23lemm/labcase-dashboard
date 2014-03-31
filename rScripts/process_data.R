@@ -59,23 +59,23 @@ calculateActivity <- function(last.updates, date) {
                          sum(last.updates %within% interval(tmp.date, date)))
   activity.df <- rbind(activity.df, 
                        c('7.day.interval', 
-                         sum(last.updates %within% interval(date - days(6), 
+                         sum(last.updates %within% interval(date - ddays(6), 
                                                             date))))
   activity.df <- rbind(activity.df,
                        c('14.days.interval',
-                         sum(last.updates %within% interval(date - days(13), 
+                         sum(last.updates %within% interval(date - ddays(13), 
                                                             date))))
   activity.df <- rbind(activity.df, 
                        c('30.day.interval', 
-                         sum(last.updates %within% interval(date - days(29), 
+                         sum(last.updates %within% interval(date - ddays(29), 
                                                             date))))
   activity.df <- rbind(activity.df, 
                        c('60.day.interval', 
-                         sum(last.updates %within% interval(date - days(59), 
+                         sum(last.updates %within% interval(date - ddays(59), 
                                                             date))))
   activity.df <- rbind(activity.df, 
                        c('12.months.interval', 
-                         sum(last.updates %within% interval(date - months(11), 
+                         sum(last.updates %within% interval(date - ddays(364), 
                                                             date))))
   
   return (activity.df)
