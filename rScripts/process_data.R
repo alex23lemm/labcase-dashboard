@@ -271,15 +271,11 @@ last.7.days.interval <- new_interval(date.of.extraction - days(6),
                                      date.of.extraction)
 
 # Extract projects which were created in last 7 days
-proj.created.in.last.7.days.df <- droplevels(subset(projects, 
-                                      created_on %within% last.7.days.interval,
-                                      select = c(name, created_on, member_count,
-                                                 customer, business_line, 
-                                                 country)))
-
-# Convert POSIXct format into '02-Jan-2013'
-proj.created.in.last.7.days.df$created_on <- format(proj.created.in.last.7.days.df$created_on,
-                                                    '%d-%b')
+proj.created.in.last.7.days.df <- filter(projects, 
+                                         created_on %within% last.7.days.interval) %>%
+  select(name, created_on, member_count, customer, business_line, country)
+proj.created.in.last.7.days.df <- droplevels(proj.created.in.last.7.days.df)
+  
 
 # Construct proxy week so that all of the 7 last days will be included as levels
 # in final factor
@@ -290,7 +286,9 @@ for (i in 6:0) {
 # Encode proj.created.in.last.7.days.vec as factor and include possible unused 
 # days as factor levels. Exclude unnecessary data which was concatenated to 
 # retrieve factor levels
-proj.created.in.last.7.days.vec <- factor(c(proj.created.in.last.7.days.df$created_on, factor.week), 
+# Convert POSIXct format into '02-Jan-2013'
+proj.created.in.last.7.days.vec <- factor(c(format(proj.created.in.last.7.days.df$created_on,
+                                                   '%d-%b'), factor.week), 
                                           levels = factor.week[1:7])[0:length(proj.created.in.last.7.days.df$created_on)]
 proj.created.in.last.7.days.vec <- as.data.frame.table(table(proj.created.in.last.7.days.vec))
 proj.created.in.last.7.days.vec <- rename(proj.created.in.last.7.days.vec,
