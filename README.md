@@ -10,13 +10,14 @@ LabCase Dashboard consists of two parts:
 
 Independent of running the application locally on your computer or deploying it to Shiny server, you need the following prerequisites installed:
 
-* [R 3.0.2](http://www.r-project.org)
+* [R 3.1.0](http://www.r-project.org)
 * You will need the following R libraries:
 	* RODBC
 	* lubridate
   * yaml
   * plyr
   * dplyr
+  * scales
   * reshape2
   * stringr
   * knitr
