@@ -9,6 +9,10 @@ library(RColorBrewer)
 library(dplyr)
 library(scales)
 
+# Set locale to "C" (reflects North-American usage) 
+Sys.setlocale(category = "LC_TIME", locale = "C")
+
+
 source('../processedData/processedDataDump.R')
 
 # Avoid scientifc notation in inline code for bigger numbers
@@ -146,7 +150,7 @@ g.last.7.days <- ggplot(proj.created.in.last.7.days.df, aes(created_on, numb_of_
   scale_x_date(
     breaks = '1 day', 
     limits = c(as.Date(date.of.extraction) - days(6), as.Date(date.of.extraction)), 
-    labels = date_format("%d-%m")
+    labels = date_format("%d-%b")
    ) + 
   scale_fill_brewer(palette = 'Set1') + 
   labs(fill = 'Business line')
