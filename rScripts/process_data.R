@@ -267,7 +267,9 @@ proj.created.by.quarter.df <- as.data.frame.table(table(proj.of.current.year))
 # Create project creation table and project creation data frame for the last 7 
 # days
 # Construct interval for last 7 days
-last.7.days.interval <- new_interval(date.of.extraction - days(6), date.of.extraction)
+last.7.days.interval <- new_interval(date.of.extraction - days(6), 
+                                     date.of.extraction)
+
 # Extract projects which were created in last 7 days
 proj.created.in.last.7.days.df <- droplevels(subset(projects, 
                                       created_on %within% last.7.days.interval,
@@ -277,13 +279,13 @@ proj.created.in.last.7.days.df <- droplevels(subset(projects,
 
 # Convert POSIXct format into '02-Jan-2013'
 proj.created.in.last.7.days.df$created_on <- format(proj.created.in.last.7.days.df$created_on,
-                                                 '%d-%b-%Y')
+                                                    '%d-%b')
 
 # Construct proxy week so that all of the 7 last days will be included as levels
 # in final factor
 factor.week <- NULL
 for (i in 6:0) {
-  factor.week <- c(factor.week, format(date.of.extraction - days(i),'%d-%b-%Y'))
+  factor.week <- c(factor.week, format(date.of.extraction - days(i),'%d-%b'))
 }
 # Encode proj.created.in.last.7.days.vec as factor and include possible unused 
 # days as factor levels. Exclude unnecessary data which was concatenated to 
@@ -293,9 +295,7 @@ proj.created.in.last.7.days.vec <- factor(c(proj.created.in.last.7.days.df$creat
 proj.created.in.last.7.days.vec <- as.data.frame.table(table(proj.created.in.last.7.days.vec))
 proj.created.in.last.7.days.vec <- rename(proj.created.in.last.7.days.vec,
                                           c('proj.created.in.last.7.days.vec' = 'Date'))
-row.names(proj.created.in.last.7.days.df) <- NULL
-names(proj.created.in.last.7.days.df) <- str_replace(names(proj.created.in.last.7.days.df),
-                                                     '_', ' ')
+
 
 
 # Create project template usage distribution table

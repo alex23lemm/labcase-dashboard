@@ -244,6 +244,10 @@ shinyServer(function(input,output){
   })
   
   output$projectsOfLast7DaysTable <- renderDataTable({
+  
+    row.names(proj.created.in.last.7.days.df) <- NULL
+    names(proj.created.in.last.7.days.df) <- gsub('_', ' ', 
+                                                  names(proj.created.in.last.7.days.df))
     proj.created.in.last.7.days.df
   }, options = list(iDisplayLength = 5, sDom = 'ritp'))
   
