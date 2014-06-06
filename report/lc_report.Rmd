@@ -6,6 +6,7 @@ library(lubridate)
 library(ggplot2)
 library(grid)
 library(RColorBrewer)
+library(dplyr)
 
 source('../processedData/processedDataDump.R')
 
@@ -113,6 +114,17 @@ Our main focus lies on the following three periods:
 
 
 ```{r echo=FALSE, fig.width=10, fig.height=8}
+
+
+
+
+
+
+
+
+
+
+
 # Create time series plot for projects created in last 7 days
 g.last.7.days <- ggplot(proj.created.in.last.7.days.vec, 
                         aes(x = Date, y = Freq, group = 1)) + 
@@ -131,6 +143,13 @@ g.last.7.days <- ggplot(proj.created.in.last.7.days.vec,
                               axis.text = element_text(size = 10),
                               axis.text.x = element_text(angle = 30, hjust = 1, 
                                                          vjust = 1))
+
+
+
+
+
+
+
 
 
 # Create projects ~ quarters of current year bar chart

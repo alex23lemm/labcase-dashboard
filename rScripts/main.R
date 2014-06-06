@@ -12,6 +12,7 @@ library(lubridate)
 library(yaml)
 
 library(plyr)
+library(dplyr)
 library(reshape2)
 library(stringr)
 

@@ -16,6 +16,7 @@ Independent of running the application locally on your computer or deploying it 
 	* lubridate
   * yaml
   * plyr
+  * dplyr
   * reshape2
   * stringr
   * knitr
