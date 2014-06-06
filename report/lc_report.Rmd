@@ -7,6 +7,7 @@ library(ggplot2)
 library(grid)
 library(RColorBrewer)
 library(dplyr)
+library(scales)
 
 source('../processedData/processedDataDump.R')
 
@@ -115,42 +116,41 @@ Our main focus lies on the following three periods:
 
 ```{r echo=FALSE, fig.width=10, fig.height=8}
 
-
-
-
-
-
-
-
-
-
-
-# Create time series plot for projects created in last 7 days
-g.last.7.days <- ggplot(proj.created.in.last.7.days.vec, 
-                        aes(x = Date, y = Freq, group = 1)) + 
-                        geom_line(colour = '#3182BD', size  =1) +
-                        geom_point(size = 7, shape = 21, fill = 'white') +
-                        geom_text(aes(label = Freq), size = 4) +
-                        ggtitle(paste0(year(date.of.extraction), ': ',
-                                'Number of created projects\n in the last 7 days per day (',
-                                sum(proj.created.in.last.7.days.vec$Freq),
-                                ' overall)')) +
-                        ylim(0, max(proj.created.in.last.7.days.vec$Freq) * 1.02) +
-                        xlab('Day of creation') +
-                        ylab('Number of projects') +
-                        theme(plot.title = element_text(size = rel(1.1)),
-                              axis.title = element_text(size = 12),
-                              axis.text = element_text(size = 10),
-                              axis.text.x = element_text(angle = 30, hjust = 1, 
-                                                         vjust = 1))
-
-
-
-
-
-
-
-
+proj.created.in.last.7.days.df <- mutate(proj.created.in.last.7.days.df,
+                                         created_on = as.Date(created_on),
+                                         ) %>%
+  group_by(created_on, business_line) %>%
+  summarise(
+    numb_of_proj = n()
+    ) %>%
+  mutate(
+    label_y = cumsum(numb_of_proj)
+    )
+    
+g.last.7.days <- ggplot(proj.created.in.last.7.days.df, aes(created_on, numb_of_proj,
+                                                           fill = business_line)) +
+  geom_bar(stat = 'identity') +
+  geom_text(aes(y = label_y, label = numb_of_proj), color = 'white', 
+                vjust = 1.3) +
+  ggtitle(paste0(year(date.of.extraction), ': ',
+                 'Number of created projects\n in the last 7 days per day (',
+                 sum(proj.created.in.last.7.days.df$numb_of_proj),
+                 ' overall)')) +
+  xlab('Day of creation') +
+  ylab('Number of projects') +
+  theme(plot.title = element_text(size = rel(1.1)),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10),
+        axis.text.x = element_text(angle = 30, hjust = 1, 
+                                   vjust = 1)) +
+  scale_x_date(
+    breaks = '1 day', 
+    limits = c(as.Date(date.of.extraction) - days(6), as.Date(date.of.extraction)), 
+    labels = date_format("%d-%m")
+   ) + 
+  scale_fill_brewer(palette = 'Set1') + 
+  labs(fill = 'Business line')
+                          
 
 # Create projects ~ quarters of current year bar chart
 # Reorder so that the order in the barchart is flipped
