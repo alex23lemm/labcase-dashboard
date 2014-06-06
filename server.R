@@ -245,6 +245,9 @@ shinyServer(function(input,output){
   
   output$projectsOfLast7DaysTable <- renderDataTable({
   
+    # Convert POSIXct format into '02-Jan-2013'
+    proj.created.in.last.7.days.df$created_on <- format(proj.created.in.last.7.days.df$created_on,
+                                                        '%d-%b')
     row.names(proj.created.in.last.7.days.df) <- NULL
     names(proj.created.in.last.7.days.df) <- gsub('_', ' ', 
                                                   names(proj.created.in.last.7.days.df))
