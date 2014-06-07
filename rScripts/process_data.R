@@ -87,7 +87,6 @@ calculateActivity <- function(last.updates, date) {
 
 # 1. Load raw data into memory -------------------------------------------------
  
-
 projects <- dget(file="./rawData/projectsRaw.R")
 users <- dget(file="./rawData/usersRaw.R")
 issues <- dget(file="./rawData/issuesRaw.R")
@@ -96,13 +95,13 @@ custom.fields <- dget(file="./rawData/customFields.R")
 date.of.extraction <- dget("./rawData/dateOfExtraction.R")
 
 
+
 # 2. Pre-processing ------------------------------------------------------------
 
 #  Create 4 new data frames by extracting data from custom.fields data frame
 #  Merge projects data frame with these 4 new data frames, the issues data frame
 #  and the repos data frame
 #  Convert mail column in users data frame to lower-case
-
 
 # Extract project id and template classifier from custom.fields data frame
 #   id:       project id
@@ -182,11 +181,11 @@ projects$project_size[is.na(projects$project_size)] <-0
 users$mail <- tolower(users$mail)
 
 
+
 # 3. Processing ----------------------------------------------------------------
 
 #  Generate smaller data frames which serve as the input for the Shiny
 #  application
-
 
 # Create interger vector which includes dimension of users data frame
 users.dim <- dim(users)
@@ -337,8 +336,9 @@ diskusage.per.project.df$origin <- revalue(diskusage.per.project.df$origin,
 diskusage.per.project.df <- transform(diskusage.per.project.df, 
                                       diskspace = round(diskspace, digits = 0))
 
-# 4. Save the processed data----------------------------------------------------
 
+
+# 4. Save the processed data----------------------------------------------------
 
 dump(c('date.of.extraction',
        'users.dim', 
