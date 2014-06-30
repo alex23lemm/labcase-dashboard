@@ -1,7 +1,7 @@
 # LabCase Global Report
 
 
-```{r echo=FALSE, warning=FALSE}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 library(lubridate)
 library(ggplot2)
 library(grid)
@@ -127,6 +127,14 @@ proj.created.in.last.7.days.df <- mutate(proj.created.in.last.7.days.df,
     label_y = cumsum(numb_of_proj) 
   )
 
+# Order factor levels according to the number of created projects and reverse
+# their order to reflect a descending order
+proj.created.in.last.7.days.df$business_line <- reorder(proj.created.in.last.7.days.df$business_line,
+                                             proj.created.in.last.7.days.df$numb_of_proj, 
+                                             sum)
+proj.created.in.last.7.days.df$business_line <- factor(proj.created.in.last.7.days.df$business_line, 
+                                            levels=rev(levels(proj.created.in.last.7.days.df$business_line)))
+
 g.last.7.days <- ggplot(proj.created.in.last.7.days.df, aes(created_on, numb_of_proj)) +
   stat_summary(fun.y = sum, geom = 'text', aes(label = ..y..), vjust = -0.3, 
                size = 4) +
@@ -148,7 +156,7 @@ g.last.7.days <- ggplot(proj.created.in.last.7.days.df, aes(created_on, numb_of_
     breaks = '1 day', 
     limits = c(as.Date(date.of.extraction) - days(6), as.Date(date.of.extraction)), 
     labels = date_format("%d-%b"),
-    expand = c(0,0.6)
+    expand = c(0, 0.6)
   ) + 
   scale_fill_brewer(palette = 'Paired') + 
   labs(fill = 'Business line') +
@@ -182,7 +190,7 @@ y.upper <- max(as.vector(
   ))
 
 g.quarters <- ggplot(proj.by.quarter, aes(quarter, numb_of_proj)) +
-  geom_bar(stat = 'identity', aes(fill = business_line)) +
+  geom_bar(stat = 'identity', aes(fill = business_line), width = 0.8) +
   stat_summary(fun.y = sum, geom = 'text', aes(label = ..y..), vjust = -0.3, 
                size = 4) +
   expand_limits(x = c('Q1', 'Q2', 'Q3', 'Q4')) +
@@ -224,14 +232,6 @@ print(g.last.7.days, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
 print(g.quarters, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
 print(g.years, vp = viewport(layout.pos.row = 2, layout.pos.col = 1))
 ```
-
-
-```{r}
-
-
-
-```
-
 
 
 ## User distribution
