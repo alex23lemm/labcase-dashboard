@@ -155,23 +155,50 @@ g.last.7.days <- ggplot(proj.created.in.last.7.days.df, aes(created_on, numb_of_
   ylim(0, max(proj.created.in.last.7.days.df$label_y) * 1.05)
 
 
-# Create projects ~ quarters of current year bar chart
-# Reorder so that the order in the barchart is flipped
-g.quarters <- ggplot(proj.created.by.quarter.df, aes(x = proj.of.current.year, 
-                                                     y = Freq)) +
-                     geom_bar(width = .5, stat = 'identity', fill = '#3182BD') +
-                     geom_text(aes(label = Freq), vjust = -0.3, size = 4) +
-                     ggtitle(paste0(year(date.of.extraction), ': ',
-                                    'Number of created projects\n per quarter')) +
-                     ylim(0, max(proj.created.by.quarter.df$Freq) * 1.03) +
-                     xlab('Quarter of creation') +
-                     ylab('Number of projects') +
-                     theme(plot.title = element_text(size = rel(1.1)),
-                           axis.title = element_text(size = 12),
-                           axis.text = element_text(size = 10)) 
-  
+proj.by.quarter <- filter(projects.df, year(created_on) == year(date.of.extraction)) %>%
+  select(created_on, business_line) %>%
+  mutate(
+    quarter = quarters(created_on)
+    ) %>%
+  group_by(business_line, quarter) %>%
+  summarize(
+    numb_of_proj = n()
+    ) %>% 
+  arrange(numb_of_proj)
 
-#Create projects ~ years  bar chart
+# Order factor levels according to the number of created projects and reverse
+# their order to reflect a descending order
+proj.by.quarter$business_line <- reorder(proj.by.quarter$business_line,
+                                             proj.by.quarter$numb_of_proj, 
+                                             sum)
+proj.by.quarter$business_line <- factor(proj.by.quarter$business_line, 
+                                            levels=rev(levels(proj.by.quarter$business_line)))
+
+# Calculate upper bound for the y-axis
+y.upper <- max(as.vector(
+  group_by(proj.by.quarter, quarter) %>% 
+    summarize(numb_of_proj = sum(numb_of_proj)) %>% 
+    select(numb_of_proj)
+  ))
+
+g.quarters <- ggplot(proj.by.quarter, aes(quarter, numb_of_proj)) +
+  geom_bar(stat = 'identity', aes(fill = business_line)) +
+  stat_summary(fun.y = sum, geom = 'text', aes(label = ..y..), vjust = -0.3, 
+               size = 4) +
+  expand_limits(x = c('Q1', 'Q2', 'Q3', 'Q4')) +
+  scale_fill_brewer(palette = 'Paired') +
+  ggtitle(paste0(year(date.of.extraction), ': ',
+                 'Number of created projects\n per quarter')) +
+  ylim(0, y.upper * 1.03) +
+  xlab('Quarter of creation') +
+  ylab('Number of projects') +
+  theme(plot.title = element_text(size = rel(1.1)),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10)) +
+  labs(fill = "Business line")
+
+
+# Create projects ~ years  bar chart
 # Reorder so that the order in the barchart is flipped
 proj.created.by.year.df <- proj.created.by.year.df[order(proj.created.by.year.df$Var1),]
 
@@ -188,8 +215,6 @@ g.years <- ggplot(proj.created.by.year.df, aes(x = Var1, y = Freq)) +
                     
   
 
-
-
 # Layout plots side-by-side on a 2-row-2-column grid
 grid.newpage()
 # Push viewport to graphic device
@@ -201,6 +226,11 @@ print(g.years, vp = viewport(layout.pos.row = 2, layout.pos.col = 1))
 ```
 
 
+```{r}
+
+
+
+```
 
 
 
