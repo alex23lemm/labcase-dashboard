@@ -192,7 +192,8 @@ users.dim <- dim(users)
 
 
 # Subset projects data frame
-projects.df <- subset(projects, select = c(identifier, 
+projects.df <- subset(projects, select = c(identifier,
+                                           created_on,
                                            project_size,
                                            country,
                                            business_line,
