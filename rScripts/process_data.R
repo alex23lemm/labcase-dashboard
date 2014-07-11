@@ -114,7 +114,7 @@ template.info <- filter(custom.fields, cf_id ==12) %>%
 # Rename 'cf_value' column to 'template'
 names(template.info)[names(template.info) == 'cf_value'] <- 'template'
 # Add template column from template.info data frame to projects data frame.
-projects2 <- left_join(projects, template.info, by = 'id')
+projects <- left_join(projects, template.info, by = 'id')
 
 
 # Extract project id and customer information from custom.fields data frame
