@@ -108,9 +108,9 @@ date.of.extraction <- dget("./rawData/dateOfExtraction.R")
 #   cf_value: template classifier (boolean)
 # In the LC database this is the relevant id - custom fields mapping:
 #   12: Use as template
-# droplevels() is used to drop unused levels from the cf_value column
-template.info <- droplevels(subset(custom.fields, cf_id == 12,
-                            select = c(id, cf_value)))
+template.info <- filter(custom.fields, cf_id ==12) %>%
+  select(id, cf_value) %>%
+  droplevels
 # Rename 'cf_value' column to 'template'
 names(template.info)[names(template.info) == 'cf_value'] <- 'template'
 # Add template column from template.info data frame to projects data frame.
@@ -125,8 +125,9 @@ projects <- merge(projects, template.info, by = ('id'), all.x = TRUE)
 #  cf_value: customer name
 # In the LC database this is the relevant id - custom fields mapping:
 #   13: Customer
-customer.info <- droplevels(subset(custom.fields, cf_id == 13, 
-                                   select = c(id, cf_value)))
+customer.info <- filter(custom.fields, cf_id == 13) %>%
+  select(id, cf_value) %>%
+  droplevels
 # Rename 'cf_value' column to 'customer'
 names(customer.info)[names(customer.info) == 'cf_value'] <- 'customer'
 # Add customer column from customer.info data frame to projects data frame.
@@ -138,8 +139,9 @@ projects <- merge(projects, customer.info, by = c('id'), all.x = TRUE)
 #  cf_value: country name
 # In the LC database this is the relevant id - custom fields mapping:
 #   14: Country
-country.info <- droplevels(subset(custom.fields, cf_id == 14, 
-                                  select = c(id, cf_value)))
+country.info <- filter(custom.fields, cf_id == 14) %>%
+  select(id, cf_value) %>%
+  droplevels
 # Rename 'cf_value' column to 'country'
 names(country.info)[names(country.info) == 'cf_value'] <- 'country'
 # Add country column from country.info data frame to projects data frame.
@@ -151,8 +153,9 @@ projects <- merge(projects, country.info, by = c('id'), all.x = TRUE)
 #  cf_value: business line
 # In the LC database this is the relevant id - custom fields mapping:
 #   15: Business line
-businessline.info <- droplevels(subset(custom.fields, cf_id == 15,
-                                       select = c(id, cf_value)))
+businessline.info <- filter(custom.fields, cf_id == 15) %>%
+  select(id, cf_value) %>%
+  droplevels
 # Rename 'cf_value' column to 'business_line'
 names(businessline.info)[names(businessline.info) == 'cf_value'] <- 'business_line'
 # Add business line column from businessline.info data frame to projects
@@ -192,15 +195,10 @@ users.dim <- dim(users)
 
 
 # Subset projects data frame
-projects.df <- subset(projects, select = c(identifier,
-                                           created_on,
-                                           project_size,
-                                           country,
-                                           business_line,
-                                           repo_diskspace, 
-                                           member_count, 
-                                           issue_count))
-
+projects.df <- select(projects, 
+                      identifier, created_on, project_size, country,
+                      business_line, repo_diskspace, member_count, issue_count)
+              
 
 # Extract email suffix from mail column from users data frame
 # regexec returns the indices for parenthesized sub-expression 
@@ -255,7 +253,6 @@ proj.of.current.year <- projects$created_on[year(projects$created_on) == year(da
 # as factor levels (e.g. when data is read in January or when no project has 
 # been created so far in current year). Exclude unnecessary data which was 
 # concatenated to retrieve factor levels
-
 proj.of.current.year <- factor(c(quarter(proj.of.current.year),
                    1, 2, 3, 4))[0:length(proj.of.current.year)]
 proj.of.current.year <- mapvalues(proj.of.current.year,
@@ -274,8 +271,8 @@ last.7.days.interval <- new_interval(date.of.extraction - days(6),
 # Extract projects which were created in last 7 days
 proj.created.in.last.7.days.df <- filter(projects, 
                                          created_on %within% last.7.days.interval) %>%
-  select(name, created_on, member_count, customer, business_line, country)
-proj.created.in.last.7.days.df <- droplevels(proj.created.in.last.7.days.df)
+  select(name, created_on, member_count, customer, business_line, country) %>%
+  droplevels
   
 
 # Construct proxy week so that all of the 7 last days will be included as levels
@@ -298,7 +295,9 @@ proj.created.in.last.7.days.vec <- rename(proj.created.in.last.7.days.vec,
 
 
 # Create project template usage distribution table
-templates <- droplevels(subset(projects, template == 1, select = c(id, name)))
+templates <- filter(projects, template == 1) %>%
+  select(id, name) %>%
+  droplevels
 counted.template.instances <- count(projects, vars ='template_project_id')
 template.usage.df <- merge(templates, counted.template.instances, 
                           by.x = 'id', by.y = 'template_project_id', all.x = TRUE)
@@ -309,11 +308,11 @@ template.usage.df$id <- NULL
 
 # Create disk pace usage distribution data frame for projects which consume
 # more than 1000 MB of disk space (sum of Alfresco and repos)
-diskusage.per.project.df <- droplevels(subset(projects, 
-                                              repo_diskspace + project_size > 1000,
-                                              select = c('identifier', 
-                                                         'repo_diskspace', 
-                                                         'project_size')))
+diskusage.per.project.df <- filter(projects, 
+                                   repo_diskspace + project_size > 1000) %>%
+  select(identifier, repo_diskspace, project_size) %>%
+  droplevels
+
 # Add total_diskspace column
 diskusage.per.project.df <- transform(diskusage.per.project.df, 
                                       total_diskspace = repo_diskspace + project_size)
