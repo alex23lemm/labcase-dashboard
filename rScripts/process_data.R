@@ -114,10 +114,7 @@ template.info <- filter(custom.fields, cf_id ==12) %>%
 # Rename 'cf_value' column to 'template'
 names(template.info)[names(template.info) == 'cf_value'] <- 'template'
 # Add template column from template.info data frame to projects data frame.
-# In SQL terminology parameter all.x=TRUE gives a left outer join: non matching
-# cases of x are appended to the result with NA filled in the corresponding 
-# column of y
-projects <- merge(projects, template.info, by = ('id'), all.x = TRUE)
+projects2 <- left_join(projects, template.info, by = 'id')
 
 
 # Extract project id and customer information from custom.fields data frame
@@ -131,7 +128,7 @@ customer.info <- filter(custom.fields, cf_id == 13) %>%
 # Rename 'cf_value' column to 'customer'
 names(customer.info)[names(customer.info) == 'cf_value'] <- 'customer'
 # Add customer column from customer.info data frame to projects data frame.
-projects <- merge(projects, customer.info, by = c('id'), all.x = TRUE)
+projects <- left_join(projects, customer.info, by = 'id')
 
 
 # Extract project id and country information from custom.fields data frame
@@ -145,7 +142,7 @@ country.info <- filter(custom.fields, cf_id == 14) %>%
 # Rename 'cf_value' column to 'country'
 names(country.info)[names(country.info) == 'cf_value'] <- 'country'
 # Add country column from country.info data frame to projects data frame.
-projects <- merge(projects, country.info, by = c('id'), all.x = TRUE)
+projects <- left_join(projects, country.info, by = 'id')
 
 
 # Extract project id and business line information from custom.fields data frame
@@ -160,7 +157,7 @@ businessline.info <- filter(custom.fields, cf_id == 15) %>%
 names(businessline.info)[names(businessline.info) == 'cf_value'] <- 'business_line'
 # Add business line column from businessline.info data frame to projects
 # data frame.
-projects <- merge(projects, businessline.info, by = c('id'), all.x = TRUE)
+projects <- left_join(projects, businessline.info, by = 'id')
 
 
 # Add issue_count column from issues data frame to projects data frame
