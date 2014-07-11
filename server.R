@@ -16,6 +16,7 @@
 library(shiny)
 library(rCharts)
 library(lubridate)
+library(dplyr)
 
 
 shinyServer(function(input,output){
@@ -124,18 +125,18 @@ shinyServer(function(input,output){
     # has to cope with the 'delay' when reading the reactive values at the start
     # of each new user session (see also https://gist.github.com/wch/4211337)
     if(is.null(input$selectedDepartment)|| is.null(input$selectedCountry)) {
-      return (subset(projects.df, select = c(country, business_line)))
+      
+      return(select(projects.df, country, business_line))
     }
      
     if (input$selectedDepartment != 'All') {
-      projects.df <- subset(projects.df,
+      projects.df <- filter(projects.df,
                             business_line == input$selectedDepartment)
     }
     if (input$selectedCountry != 'All') {
-      projects.df <- subset(projects.df,
-                            country == input$selectedCountry)
+      projects.df <- filter(projects.df, country == input$selectedCountry)
     }
-    subset(projects.df, select = c(country, business_line))
+    select(projects.df, country, business_line)
   })
   
   
@@ -151,8 +152,8 @@ shinyServer(function(input,output){
                                                               decreasing=TRUE))
     
     # Subset according to reactive value and exclude NAs
-    proj.created.by.department.df <- subset(proj.created.by.department.df,
-                                          Freq >= input$numbOfProjects & Var1 != '<NA>')
+    proj.created.by.department.df <- filter(proj.created.by.department.df,
+                                          Freq >= input$numbOfProjects, Var1 != '<NA>')
     # If user input is NULL (max will return -Inf in this case) assign 0 to 
     # avoid empty plot later
     max <- suppressWarnings(max(proj.created.by.department.df$Freq))
@@ -189,8 +190,8 @@ shinyServer(function(input,output){
                                                            decreasing = TRUE))
     
     # Create project frequency table grouped by country
-    proj.created.by.country.df <- subset(proj.created.by.country.df, 
-                                         Freq >= input$numbOfProjects & Var1 != '<NA>')
+    proj.created.by.country.df <- filter(proj.created.by.country.df, 
+                                         Freq >= input$numbOfProjects, Var1 != '<NA>')
     # If user input is NULL (max will return -Inf in this case) assign 0 to 
     # avoid empty plot later
     max <- suppressWarnings(max(proj.created.by.country.df$Freq))
@@ -326,7 +327,7 @@ shinyServer(function(input,output){
   # Create external user distribution plot
   output$userExternalPlot <- renderChart({
     
-    suffix.external.df <- subset(suffix.external.df, Freq > 2)
+    suffix.external.df <- filter(suffix.external.df, Freq > 2)
     
     max <- max(suffix.external.df$Freq)
     
