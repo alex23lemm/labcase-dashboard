@@ -87,7 +87,7 @@ g.departments <- ggplot(proj.created.by.department.df, aes(x = Var1, y = Freq)) 
   geom_bar(stat = 'identity', fill = '#3182BD') +
   geom_text(aes(label = Freq), hjust = -0.1, color = 'black', size = 4) +
   ggtitle('Number of projects\n per department') +
-  ylim(0, max(proj.created.by.department.df$Freq) * 1.08) +
+  ylim(0, max(proj.created.by.department.df$Freq) * 1.09) +
   xlab('Departments') +
   ylab('Number of projects') +
   theme(plot.title = element_text(size = rel(1.1)),
@@ -242,7 +242,7 @@ This section shows the distribution of LabCase users clustered by Software AG em
 * Number of **external** users: **`r sum(suffix.external.df$Freq)`**
 
 
-```{r echo=FALSE, fig.height=11, fig.width=12}
+```{r echo=FALSE, fig.height=12, fig.width=12}
 
 # Reorder so that the order in the barchart is flipped
 suffix.sag.df <- transform(suffix.sag.df, 
@@ -270,10 +270,10 @@ g.external.users <- ggplot(suffix.external.df, aes(x = suffix.external, y = Freq
                       geom_bar(stat = 'identity', fill = '#3182BD') +
                       geom_text(aes(label = Freq), hjust = -0.2, 
                                 color = 'black', size = 4) +
-                       ylim(0, max(suffix.external.df$Freq) * 1.03) +
-                      xlab('Customers') +
+                       ylim(0, max(suffix.external.df$Freq) * 1.05) +
+                      xlab('External user groups') +
                       ylab('Number of users') +
-                      ggtitle('Customers with more than 2 active users') +
+                      ggtitle('Customers/Partners with more than 2 active users') +
                       theme(plot.title = element_text(size = rel(1.1)),
                             axis.title = element_text(size = 12),
                             axis.text = element_text(size = 10)) +
