@@ -110,7 +110,7 @@ template.info <- filter(custom.fields, cf_id ==12) %>%
   select(id, cf_value) %>%
   droplevels
 # Rename 'cf_value' column to 'template'
-names(template.info)[names(template.info) == 'cf_value'] <- 'template'
+template.info <- rename(template.info, template = cf_value)
 # Add template column from template.info data frame to projects data frame.
 projects <- left_join(projects, template.info, by = 'id')
 
@@ -124,7 +124,7 @@ customer.info <- filter(custom.fields, cf_id == 13) %>%
   select(id, cf_value) %>%
   droplevels
 # Rename 'cf_value' column to 'customer'
-names(customer.info)[names(customer.info) == 'cf_value'] <- 'customer'
+customer.info <- rename(customer.info, customer = cf_value)
 # Add customer column from customer.info data frame to projects data frame.
 projects <- left_join(projects, customer.info, by = 'id')
 
@@ -138,7 +138,7 @@ country.info <- filter(custom.fields, cf_id == 14) %>%
   select(id, cf_value) %>%
   droplevels
 # Rename 'cf_value' column to 'country'
-names(country.info)[names(country.info) == 'cf_value'] <- 'country'
+country.info <- rename(country.info, country = cf_value)
 # Add country column from country.info data frame to projects data frame.
 projects <- left_join(projects, country.info, by = 'id')
 
@@ -152,7 +152,7 @@ businessline.info <- filter(custom.fields, cf_id == 15) %>%
   select(id, cf_value) %>%
   droplevels
 # Rename 'cf_value' column to 'business_line'
-names(businessline.info)[names(businessline.info) == 'cf_value'] <- 'business_line'
+businessline.info <- rename(businessline.info, business_line = cf_value)
 # Add business line column from businessline.info data frame to projects
 # data frame.
 projects <- left_join(projects, businessline.info, by = 'id')
@@ -284,8 +284,8 @@ proj.created.in.last.7.days.vec <- factor(c(format(proj.created.in.last.7.days.d
                                                    '%d-%b'), factor.week), 
                                           levels = factor.week[1:7])[0:length(proj.created.in.last.7.days.df$created_on)]
 proj.created.in.last.7.days.vec <- as.data.frame.table(table(proj.created.in.last.7.days.vec))
-proj.created.in.last.7.days.vec <- plyr::rename(proj.created.in.last.7.days.vec,
-                                          c('proj.created.in.last.7.days.vec' = 'Date'))
+proj.created.in.last.7.days.vec <- rename(proj.created.in.last.7.days.vec, 
+                                          Date = proj.created.in.last.7.days.vec)
 
 
 
