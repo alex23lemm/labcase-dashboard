@@ -114,10 +114,10 @@ Our main focus lies on the following three periods:
 * Years since LabCase started its service
 
 
-```{r echo=FALSE, fig.width=12, fig.height=10}
+```{r echo=FALSE, warning = FALSE, fig.width=12, fig.height=10}
 
 proj.created.in.last.7.days.df <- mutate(proj.created.in.last.7.days.df,
-                                         created_on = as.Date(created_on),
+                                         created_on = as.Date(created_on)
 ) %>%
   group_by(created_on, business_line) %>%
   summarise(
