@@ -10,8 +10,6 @@
 #  3. Processing
 #  4. Save the processed data
 #
-# Google's R Style Guide (http://bit.ly/12ZBd1J) was applied while writing 
-# the code below.
 
 # Define utility functions -----------------------------------------------------
 
@@ -286,7 +284,7 @@ proj.created.in.last.7.days.vec <- factor(c(format(proj.created.in.last.7.days.d
                                                    '%d-%b'), factor.week), 
                                           levels = factor.week[1:7])[0:length(proj.created.in.last.7.days.df$created_on)]
 proj.created.in.last.7.days.vec <- as.data.frame.table(table(proj.created.in.last.7.days.vec))
-proj.created.in.last.7.days.vec <- rename(proj.created.in.last.7.days.vec,
+proj.created.in.last.7.days.vec <- plyr::rename(proj.created.in.last.7.days.vec,
                                           c('proj.created.in.last.7.days.vec' = 'Date'))
 
 
