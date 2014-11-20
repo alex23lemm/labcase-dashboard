@@ -31,7 +31,7 @@ if (connect == -1 || class(connect) == 'try-error')
 if (!error) {
   query <- 'SELECT p.id, p.identifier, p.name, p.created_on, p.updated_on, 
             p.is_public, p.project_size, p.template_project_id, 
-            COUNT(m.user_id) AS member_count
+            p.last_updated_on, COUNT(m.user_id) AS member_count
             FROM projects AS p
             LEFT OUTER JOIN members AS m
             ON p.id = m.project_id
