@@ -233,6 +233,29 @@ print(g.quarters, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
 print(g.years, vp = viewport(layout.pos.row = 2, layout.pos.col = 1))
 ```
 
+## Project activity 
+
+This section shows the activity of the **`r dim(projects.df)[1]` registered projects** within serveral defined time intervals based on the activity of the respective project members.
+
+* Projects active **in last 7 days:** **`r proj.activity.df$active.obs[proj.activity.df$interval.type == '7.day.interval']`**
+* Projects active **in last 14 days:** **`r proj.activity.df$active.obs[proj.activity.df$interval.type == '14.days.interval']`**
+* Projects active **in last 30 days:** **`r proj.activity.df$active.obs[proj.activity.df$interval.type == '30.day.interval']`**
+* Projects active **in last 60 days:** **`r proj.activity.df$active.obs[proj.activity.df$interval.type == '60.day.interval']`**
+* Projects active **in last 12 months:** **`r proj.activity.df$active.obs[proj.activity.df$interval.type == '12.months.interval']`**
+
+```{r echo=FALSE}
+
+inactive.projects <- projects.df$last_updated_on[!is.na(projects.df$last_updated_on)]
+inactive.projects <- sum(inactive.projects < date.of.extraction - ddays(364*2))
+
+```
+
+* Projects **inactive since more than 2 years:** **`r inactive.projects`**
+
+*Note: Project activity is derived from any kind of user activity within the projects: Creating/updating issues/wiki pages/blog posts, updating projects settings, uploading/updating assets, repo commits, etc.*
+
+
+
 
 ## User distribution
 
