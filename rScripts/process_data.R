@@ -36,11 +36,17 @@ ConstructSAGEmailSuffixRegex <- function(vec) {
 
 calculateActivity <- function(last.updates, date) {
   # Calculates the activity for a number of observations within predefined time 
-  # intervals.
+  # intervals. For the following time intervals activity is calculated:
+  #   - today
+  #   - last 7 days
+  #   - last 14 days
+  #   - last 30 days
+  #   - last 60 days
+  #   - last 12 months
   #
   # Args:
   #   last.updates: POSIXct vector containing the latest date of activity 
-  #                 for each observation
+  #                 for each observation. NAs will be ignored
   #    date: POSIXct value representing the upper bound for each interval
   # 
   # Returns:
@@ -48,6 +54,8 @@ calculateActivity <- function(last.updates, date) {
   #   observations for each predefined time interval
   activity.df <- data.frame(interval.type = character(), 
                             active.obs = character(), stringsAsFactors = FALSE)
+  
+  last.updates <- last.updates[!is.na(last.updates)]
   
   tmp.date <- date
   hour(tmp.date) <- 0
@@ -192,7 +200,8 @@ users.dim <- dim(users)
 # Subset projects data frame
 projects.df <- select(projects, 
                       identifier, created_on, project_size, country,
-                      business_line, repo_diskspace, member_count, issue_count)
+                      business_line, repo_diskspace, member_count, issue_count,
+                      last_updated_on)
               
 
 # Extract email suffix from mail column from users data frame
@@ -288,6 +297,9 @@ proj.created.in.last.7.days.vec <- rename(proj.created.in.last.7.days.vec,
                                           Date = proj.created.in.last.7.days.vec)
 
 
+# Calculate project activity
+proj.activity.df <- calculateActivity(projects.df$last_updated_on, 
+                                      date.of.extraction)
 
 # Create project template usage distribution table
 templates <- filter(projects, template == 1) %>%
@@ -347,6 +359,7 @@ dump(c('date.of.extraction',
        'proj.created.by.quarter.df',
        'proj.created.in.last.7.days.vec',
        'proj.created.in.last.7.days.df',
+       'proj.activity.df',
        'template.usage.df',
        'diskusage.per.project.df'),      
      file='./processedData/processedDataDump.R')
