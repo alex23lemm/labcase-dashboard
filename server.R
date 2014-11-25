@@ -57,6 +57,29 @@ shinyServer(function(input,output){
     summary(projects.df$member_count, digits=3)
   })
 
+  output$projectActivityToday <- renderText({
+    proj.activity.df$active.obs[proj.activity.df$interval.type == 'today.interval']
+  })
+
+  output$projectActivityLast7Days <- renderText({
+    proj.activity.df$active.obs[proj.activity.df$interval.type == '7.day.interval']
+  })
+
+  output$projectActivityLast14Days <- renderText({
+    proj.activity.df$active.obs[proj.activity.df$interval.type == '14.days.interval']    
+  })
+
+  output$projectActivityLast30Days <- renderText({
+    proj.activity.df$active.obs[proj.activity.df$interval.type == '30.day.interval']
+  })
+
+  output$projectActivityLast60days <- renderText({
+    proj.activity.df$active.obs[proj.activity.df$interval.type == '60.day.interval']
+  })
+
+  output$projectActivityLast12Months <- renderText({
+    proj.activity.df$active.obs[proj.activity.df$interval.type == '12.months.interval']
+  })
 
   # Used to populate selectInput element with server-generated content
   output$selectDepartment <- renderUI({

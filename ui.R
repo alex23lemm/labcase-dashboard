@@ -33,8 +33,10 @@ shinyUI(fluidPage(
     column(12,
                            
       tabsetPanel(position = 'above',
-              
-        tabPanel('Project distribution',
+
+# Project information tab ------------------------------------------------------                  
+                  
+        tabPanel('Project information',
              
           fluidRow(
             column(4,    
@@ -58,7 +60,44 @@ shinyUI(fluidPage(
               verbatimTextOutput('summaryIssuesPerProject'),
               br(),
               'Users per project information:',
-              verbatimTextOutput('summaryUsersPerProject')
+              verbatimTextOutput('summaryUsersPerProject'),
+              br(),
+              h5('Project activity'),
+              hr(),
+              
+              fluidRow(
+               column(7,
+                "Projects active today:",
+                br(),
+                "Projects active in last 7 days:",
+                br(), 
+                "Projects active in last 14 days:",
+                br(),
+                "Projects active in last 30 days:",
+                br(),
+                "Projects active in last 60 days:",
+                br(),
+                "Projects active in the last 12 days:",
+                br()    
+               ),
+               
+               column(5,
+                 div(class = 'pull-right', textOutput('projectActivityToday')),
+                 br(),
+                 div(class = 'pull-right', textOutput('projectActivityLast7Days')),
+                 br(),
+                 div(class = 'pull-right', textOutput('projectActivityLast14Days')),
+                 br(),
+                 div(class = 'pull-right', textOutput('projectActivityLast30Days')),
+                 br(),
+                 div(class = 'pull-right', textOutput('projectActivityLast60days')),
+                 br(),
+                 div(class = 'pull-right', textOutput('projectActivityLast12Months')),
+                 br()
+               )
+                
+              )
+              
             ),
             
             column(8,    
@@ -106,7 +145,9 @@ shinyUI(fluidPage(
             )
           ) 
         ),
-              
+        
+# Project growth tab -----------------------------------------------------------
+
         tabPanel('Project growth',  
                  
           fluidRow(
@@ -145,6 +186,8 @@ shinyUI(fluidPage(
             )
           )  
         ),
+
+# User information tab ---------------------------------------------------------
               
         tabPanel('User information',
                  
@@ -218,6 +261,8 @@ shinyUI(fluidPage(
             )
           )
         ),
+
+# Project templates tab --------------------------------------------------------
                
         tabPanel('Project templates',
                  
@@ -244,6 +289,8 @@ shinyUI(fluidPage(
             )
           )
         ),
+
+# Disk space usage tab ---------------------------------------------------------
               
         tabPanel('Disk space usage',
                  
