@@ -26,72 +26,11 @@ shinyServer(function(input,output){
   source('./processedData/processedDataDump.R')
   
   
+# Dashboard header--------------------------------------------------------------  
+  
   output$date <- renderText({
     paste0('(Data as of ', date.of.extraction, ')')
   })
-  
-  
-  output$numbOfProjectsOverall <- renderText({
-    dim(projects.df)[1]
-  })
-  
-   
-  output$numbOfUsers <- renderText({
-    users.dim[1]
-  })
-  
-  
-  output$numbOfSAGUsers <- renderText({
-    sum(suffix.sag.df$Freq)
-  })
-  
-  
-  output$numbOfExternalUsers <- renderText({
-    sum(suffix.external.df$Freq)
-  })
-  
-  
-  output$userActivitylast7Days <- renderText({
-    user.activity.df$active.obs[user.activity.df$interval.type == '7.day.interval']
-  })
-  
-  output$userActitvitylast14Days <- renderText({
-    user.activity.df$active.obs[user.activity.df$interval.type == '14.days.interval']
-  })
-  
-  output$userActivitylast30Days <- renderText({
-    user.activity.df$active.obs[user.activity.df$interval.type == '30.day.interval']
-  })
-  
-  output$userActivitylast60Days <- renderText({
-    user.activity.df$active.obs[user.activity.df$interval.type == '60.day.interval']
-  })
-  
-  output$userActivitylast12Months <- renderText({
-    user.activity.df$active.obs[user.activity.df$interval.type == '12.months.interval']
-  })
-  
-  
-  output$summaryUsersPerProject <- renderPrint({
-    summary(projects.df$member_count, digits=3)
-  })
-  
-  
-  output$numbOfIssues <- renderText({
-    sum(projects.df$issue_count, na.rm=TRUE)
-  })
-  
-  
-  output$summaryIssuesPerProject <- renderPrint({
-    summary(projects.df$issue_count, digits=2)
-  })
-  
-  
-  output$distributionCaption <- renderText({
-    paste('Chosen Departments/Countries with',  input$numbOfProjects,
-          'or more LabCase projects', sep=' ')
-  })
-  
   
   output$downloadReport <- downloadHandler('LabCase_Report.html',
                                            content = function(file) {
@@ -100,21 +39,44 @@ shinyServer(function(input,output){
                                            }, 
                                            'text/html')
   
+# Project information tab ------------------------------------------------------  
+  
+  output$numbOfProjectsOverall <- renderText({
+    dim(projects.df)[1]
+  })
+  
+  output$numbOfIssues <- renderText({
+    sum(projects.df$issue_count, na.rm=TRUE)
+  })
+
+  output$summaryIssuesPerProject <- renderPrint({
+    summary(projects.df$issue_count, digits=2)
+  })
+
+  output$summaryUsersPerProject <- renderPrint({
+    summary(projects.df$member_count, digits=3)
+  })
+
+
   # Used to populate selectInput element with server-generated content
   output$selectDepartment <- renderUI({
     selectInput('selectedDepartment', 'Choose department:', 
                 c('All', departments.vec),
                 selected = 'All')
   })
-  
+
   # Used to populate selectInput element with server-generated content
   output$selectCountry <- renderUI({
     selectInput('selectedCountry', 'Choose country:', 
                 c('All', countries.vec), 
                 selected = 'All')
   })
-  
-  
+
+  output$distributionCaption <- renderText({
+    paste('Chosen Departments/Countries with',  input$numbOfProjects,
+          'or more LabCase projects', sep=' ')
+  })
+
   # Reactive expression for subsetting projects based on user input (department, 
   # country)
   selectedProjects <- reactive({
@@ -128,7 +90,7 @@ shinyServer(function(input,output){
       
       return(select(projects.df, country, business_line))
     }
-     
+    
     if (input$selectedDepartment != 'All') {
       projects.df <- filter(projects.df,
                             business_line == input$selectedDepartment)
@@ -138,9 +100,9 @@ shinyServer(function(input,output){
     }
     select(projects.df, country, business_line)
   })
-  
-  
-  
+
+
+
   # Create department ~ projects barchart
   output$departmentPlot <- renderChart({
     
@@ -153,7 +115,7 @@ shinyServer(function(input,output){
     
     # Subset according to reactive value and exclude NAs
     proj.created.by.department.df <- filter(proj.created.by.department.df,
-                                          Freq >= input$numbOfProjects, Var1 != '<NA>')
+                                            Freq >= input$numbOfProjects, Var1 != '<NA>')
     # If user input is NULL (max will return -Inf in this case) assign 0 to 
     # avoid empty plot later
     max <- suppressWarnings(max(proj.created.by.department.df$Freq))
@@ -177,8 +139,8 @@ shinyServer(function(input,output){
     hc$set(dom = 'departmentPlot')
     hc
   })
-  
-  
+
+
   # Create country ~ projects barchart
   output$countryPlot <- renderChart({
     
@@ -215,8 +177,10 @@ shinyServer(function(input,output){
     hc$set(dom = 'countryPlot')
     hc
   })
-  
-  
+
+
+# Project growth tab -----------------------------------------------------------
+
   # Create project growth line graph for last 7 days
   output$projectWeekProgessPlot <- renderChart({
     
@@ -238,14 +202,14 @@ shinyServer(function(input,output){
     hc$yAxis(title = list(text = 'Number of projects'),
              min = -0.2,
              startOnTick = FALSE
-             )
+    )
     # Set dom attribute otherwise chart will not appear on the web page
     hc$set(dom = 'projectWeekProgessPlot')
     hc
   })
-  
+
   output$projectsOfLast7DaysTable <- renderDataTable({
-  
+    
     # Convert POSIXct format into '02-Jan-2013'
     proj.created.in.last.7.days.df$created_on <- format(proj.created.in.last.7.days.df$created_on,
                                                         '%d-%b')
@@ -254,8 +218,7 @@ shinyServer(function(input,output){
                                                   names(proj.created.in.last.7.days.df))
     proj.created.in.last.7.days.df
   }, options = list(iDisplayLength = 5, sDom = 'ritp'))
-  
-  
+
   # Create project growth plot grouped by years
   output$projectProgressPlot <- renderChart({
     
@@ -268,15 +231,14 @@ shinyServer(function(input,output){
     hc$yAxis(title = list(text = 'Number of projects'))
     
     hc$title(text = paste0('<span style="font-size:12px">Number of created projects </span>',
-                  '<br/><span style="font-size:12px">per year</span>'))
+                           '<br/><span style="font-size:12px">per year</span>'))
     hc$subtitle(text = ' ')
     hc$plotOptions(column = list(dataLabels = list(enabled = TRUE)))
     # Set dom attribute otherwise chart will not appear on the web page
     hc$set(dom = 'projectProgressPlot')
     hc
   })
-  
-  
+
   # Create project growth plot for current year grouped by quarters
   output$projectQuarterProgressPlot <- renderChart({
     
@@ -299,7 +261,41 @@ shinyServer(function(input,output){
     hc$set(dom = 'projectQuarterProgressPlot')
     hc
   })
-   
+
+
+# User information tab ---------------------------------------------------------
+
+  output$numbOfUsers <- renderText({
+    users.dim[1]
+  })  
+
+  output$numbOfSAGUsers <- renderText({
+    sum(suffix.sag.df$Freq)
+  })
+    
+  output$numbOfExternalUsers <- renderText({
+    sum(suffix.external.df$Freq)
+  })
+  
+  output$userActivitylast7Days <- renderText({
+    user.activity.df$active.obs[user.activity.df$interval.type == '7.day.interval']
+  })
+  
+  output$userActitvitylast14Days <- renderText({
+    user.activity.df$active.obs[user.activity.df$interval.type == '14.days.interval']
+  })
+  
+  output$userActivitylast30Days <- renderText({
+    user.activity.df$active.obs[user.activity.df$interval.type == '30.day.interval']
+  })
+  
+  output$userActivitylast60Days <- renderText({
+    user.activity.df$active.obs[user.activity.df$interval.type == '60.day.interval']
+  })
+  
+  output$userActivitylast12Months <- renderText({
+    user.activity.df$active.obs[user.activity.df$interval.type == '12.months.interval']
+  })
   
   # Create SAG user distribution plot
   output$userSAGPlot <- renderChart({
@@ -323,7 +319,6 @@ shinyServer(function(input,output){
     hc
   })
   
-  
   # Create external user distribution plot
   output$userExternalPlot <- renderChart({
     
@@ -346,7 +341,46 @@ shinyServer(function(input,output){
     hc$set(dom = 'userExternalPlot')
     hc
   })
-  
+
+
+# Project template tab ---------------------------------------------------------
+
+  # Number of available templates
+  output$numbOfTemplates <- renderText({
+    dim(template.usage.df)[1]
+  })
+
+  # Create template usage plot
+  output$templateUsagePlot <- renderChart({
+    
+    # Reorder so that the order in the barchart is flipped
+    # Reverse the order of levels in name factor for Highchart plotting
+    template.usage.df <- transform(template.usage.df, 
+                                   name = reorder(name, freq))
+    template.usage.df <- transform(template.usage.df,
+                                   name = factor(name, levels = rev(levels(name))))
+    
+    max <- max(template.usage.df$freq)
+    
+    hc <- hPlot(freq ~ name,
+                data = template.usage.df,
+                type = 'bar')
+    # Add margin to the right to avoid data label cutting
+    hc$chart(marginRight = 25)
+    hc$xAxis(categories = levels(template.usage.df$name),
+             title = list(text = 'Template name'))
+    hc$yAxis(title = list(text = 'Number of instances'),
+             max = max)
+    hc$title(text = '<span style="font-size:12px">Number of instantiated projects per template</span>')
+    hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
+    # Set dom attribute otherwise chart will not appear on the web page
+    hc$set(dom = 'templateUsagePlot')
+    hc
+  })
+
+
+# Disk space usage tab ---------------------------------------------------------
+
   # Total disk space usage
   output$totalDiskSpaceUsage <- renderText({
     paste(round(sum(projects.df$project_size, projects.df$repo_diskspace, 
@@ -405,39 +439,5 @@ shinyServer(function(input,output){
     hc
   })
   
-  
-  # Number of available templates
-  output$numbOfTemplates <- renderText({
-    dim(template.usage.df)[1]
-  })
-  
-  
-  # Create template usage plot
-  output$templateUsagePlot <- renderChart({
-    
-    # Reorder so that the order in the barchart is flipped
-    # Reverse the order of levels in name factor for Highchart plotting
-    template.usage.df <- transform(template.usage.df, 
-                                   name = reorder(name, freq))
-    template.usage.df <- transform(template.usage.df,
-                                   name = factor(name, levels = rev(levels(name))))
-    
-    max <- max(template.usage.df$freq)
-  
-    hc <- hPlot(freq ~ name,
-                data = template.usage.df,
-                type = 'bar')
-    # Add margin to the right to avoid data label cutting
-    hc$chart(marginRight = 25)
-    hc$xAxis(categories = levels(template.usage.df$name),
-             title = list(text = 'Template name'))
-    hc$yAxis(title = list(text = 'Number of instances'),
-             max = max)
-    hc$title(text = '<span style="font-size:12px">Number of instantiated projects per template</span>')
-    hc$plotOptions(bar = list(dataLabels = list(enabled = TRUE)))
-    # Set dom attribute otherwise chart will not appear on the web page
-    hc$set(dom = 'templateUsagePlot')
-    hc
-  })
   
 })
