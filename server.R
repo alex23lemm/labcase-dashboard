@@ -240,7 +240,7 @@ shinyServer(function(input,output){
     names(proj.created.in.last.7.days.df) <- gsub('_', ' ', 
                                                   names(proj.created.in.last.7.days.df))
     proj.created.in.last.7.days.df
-  }, options = list(iDisplayLength = 5, sDom = 'ritp'))
+  }, options = list(pageLength = 5, dom = 'ritp'))
 
   # Create project growth plot grouped by years
   output$projectProgressPlot <- renderChart({
