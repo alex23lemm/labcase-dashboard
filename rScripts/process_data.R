@@ -296,10 +296,12 @@ proj.created.in.last.7.days.vec <- as.data.frame.table(table(proj.created.in.las
 proj.created.in.last.7.days.vec <- rename(proj.created.in.last.7.days.vec, 
                                           Date = proj.created.in.last.7.days.vec)
 
-
 # Calculate project activity
 proj.activity.df <- calculateActivity(projects.df$last_updated_on, 
                                       date.of.extraction)
+proj.inactive.vec <- projects.df$last_updated_on[!is.na(projects.df$last_updated_on)]
+proj.inactive.vec <- sum(proj.inactive.vec < date.of.extraction - ddays(364*2))
+
 
 # Create project template usage distribution table
 templates <- filter(projects, template == 1) %>%
@@ -360,6 +362,7 @@ dump(c('date.of.extraction',
        'proj.created.in.last.7.days.vec',
        'proj.created.in.last.7.days.df',
        'proj.activity.df',
+       'proj.inactive.vec',
        'template.usage.df',
        'diskusage.per.project.df'),      
      file='./processedData/processedDataDump.R')

@@ -78,7 +78,9 @@ shinyUI(fluidPage(
                 "Projects active in last 60 days:",
                 br(),
                 "Projects active in the last 12 days:",
-                br()    
+                br(),
+                br(),
+                "Projects inactive since 2 years:"
                ),
                
                column(5,
@@ -93,7 +95,10 @@ shinyUI(fluidPage(
                  div(class = 'pull-right', textOutput('projectActivityLast60days')),
                  br(),
                  div(class = 'pull-right', textOutput('projectActivityLast12Months')),
-                 br()
+                 br(),
+                 br(),
+                 div(class = 'pull-right', textOutput('projectInactivity'))
+                 
                )
                 
               )

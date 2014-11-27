@@ -81,6 +81,10 @@ shinyServer(function(input,output){
     proj.activity.df$active.obs[proj.activity.df$interval.type == '12.months.interval']
   })
 
+  output$projectInactivity <- renderText({
+    proj.inactive.vec 
+  })
+
   # Used to populate selectInput element with server-generated content
   output$selectDepartment <- renderUI({
     selectInput('selectedDepartment', 'Choose department:', 
