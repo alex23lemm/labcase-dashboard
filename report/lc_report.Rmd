@@ -115,11 +115,12 @@ This section gives you an overview about projects created within different time 
 Our main focus lies on the following three periods:
 
 * The last seven days
+* Months of the current year
 * Quarters of the current year
 * Years since LabCase started its service
 
 
-```{r echo=FALSE, warning = FALSE, fig.width=12, fig.height=10}
+```{r echo=FALSE, warning = FALSE, fig.width=14, fig.height=10}
 
 proj.created.in.last.7.days.df <- mutate(proj.created.in.last.7.days.df,
                                          created_on = as.Date(created_on)
@@ -166,6 +167,39 @@ g.last.7.days <- ggplot(proj.created.in.last.7.days.df, aes(created_on, numb_of_
   scale_fill_brewer(palette = 'Paired') + 
   labs(fill = 'Business line') +
   ylim(0, max(proj.created.in.last.7.days.df$label_y) * 1.05)
+
+
+proj.by.month <- filter(projects.df, 
+                      year(created_on) == year(date.of.extraction)) %>%
+  mutate(
+  month = month(created_on, TRUE)
+  ) %>%
+  group_by(month, business_line) %>%
+  summarize(
+    numb_of_proj = n()
+  ) 
+
+# Order factor levels according to the number of created projects and reverse
+# their order to reflect a descending order
+proj.by.month$business_line <- reorder(proj.by.month$business_line, 
+                                       proj.by.month$numb_of_proj, sum)
+proj.by.month$business_line <- factor(proj.by.month$business_line,
+                                      levels = rev(levels(proj.by.month$business_line)))
+
+g.months <- ggplot(proj.by.month, aes(month, numb_of_proj)) + 
+  geom_bar(aes(fill = business_line), stat = 'identity', width = 0.8 ) +
+  stat_summary(fun.y = sum, geom = 'text', aes(label = ..y..), vjust = -0.3, 
+               size = 4) +
+  ggtitle(paste0(year(date.of.extraction), ': ', 'Number of created projects per month')) +
+  xlab('Number of projects') +
+  ylab('Month of creation') +
+  theme(plot.title = element_text(size = rel(1.1)),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10)
+        ) +
+  scale_x_discrete(drop = FALSE) +
+  scale_fill_brewer(palette = 'Paired') +
+  labs(fill = 'Business line')
 
 
 proj.by.quarter <- filter(projects.df, year(created_on) == year(date.of.extraction)) %>%
@@ -234,8 +268,9 @@ grid.newpage()
 pushViewport(viewport(layout = grid.layout(2, 2)))
 
 print(g.last.7.days, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
-print(g.quarters, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
-print(g.years, vp = viewport(layout.pos.row = 2, layout.pos.col = 1))
+print(g.months, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
+print(g.quarters, vp = viewport(layout.pos.row = 2, layout.pos.col = 1))
+print(g.years, vp = viewport(layout.pos.row = 2, layout.pos.col = 2))
 ```
 
 ## Project activity 
