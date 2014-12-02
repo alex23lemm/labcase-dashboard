@@ -6,8 +6,9 @@ library(lubridate)
 library(ggplot2)
 library(grid)
 library(RColorBrewer)
-library(dplyr)
 library(scales)
+library(dplyr)
+
 
 source('../processedData/processedDataDump.R')
 
@@ -31,20 +32,23 @@ Data as of  **`r as.character(date.of.extraction)`**
 
 ## General Information
 
+This section provides information in terms of absolute numbers about certain key variables. Additionally, summary statistics for some variables are shown.
+
 * **Total** number of **projects**: **`r dim(projects.df)[1]`**
 * **Total** number of **users**: **`r users.dim[1]`**
+* **Total** number of **issues** created in projects: **`r sum(projects.df$issue_count, na.rm=TRUE)`**
 
-**User summary**:
+**Users per project** summary statistics:
 ```{r echo=FALSE, comment=NA}
 summary(projects.df$member_count, digits = 3)
 ```
 
-**Issue summary**: 
+**Issues per project** summary statistics: 
 ```{r echo=FALSE, comment=NA}
 summary(projects.df$issue_count, digits = 2)
 ```
 
-* **Total** number of **issues** created in projects: **`r sum(projects.df$issue_count, na.rm=TRUE)`**
+
 
 ## Project distribution 
 
@@ -109,6 +113,7 @@ print(g.departments, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
 
 This section gives you an overview about projects created within different time spans. 
 Our main focus lies on the following three periods:
+
 * The last seven days
 * Quarters of the current year
 * Years since LabCase started its service
@@ -235,7 +240,7 @@ print(g.years, vp = viewport(layout.pos.row = 2, layout.pos.col = 1))
 
 ## Project activity 
 
-This section shows the activity of the **`r dim(projects.df)[1]` registered projects** within serveral defined time intervals based on the activity of the respective project members.
+This section shows the activity of the **`r dim(projects.df)[1]` registered projects** within several defined time intervals based on the activity of the respective project members.
 
 * Projects active **in last 7 days:** **`r proj.activity.df$active.obs[proj.activity.df$interval.type == '7.day.interval']`**
 * Projects active **in last 14 days:** **`r proj.activity.df$active.obs[proj.activity.df$interval.type == '14.days.interval']`**
@@ -260,6 +265,7 @@ inactive.projects <- sum(inactive.projects < date.of.extraction - ddays(364*2))
 ## User distribution
 
 This section shows the distribution of LabCase users clustered by Software AG employees and external users (clients, partners):
+
 * **Total** number of users: **`r users.dim[1]`**
 * Number of **SAG** users: **`r sum(suffix.sag.df$Freq)`**
 * Number of **external** users: **`r sum(suffix.external.df$Freq)`**
@@ -317,7 +323,7 @@ print(g.external.users, vp = viewport(layout.pos.row = 1:2, layout.pos.col = 2))
 
 ## User activity 
 
-This section shows the activity of the **`r users.dim[1]` registered users** within serveral defined time intervals based on their login behavior on the LabCase web front-end.
+This section shows the activity of the **`r users.dim[1]` registered users** within several defined time intervals based on their login behavior on the LabCase web front-end.
 
 * Users active **in last 7 days:** **`r user.activity.df$active.obs[user.activity.df$interval.type == '7.day.interval']`**
 * Users active **in last 14 days:** **`r user.activity.df$active.obs[user.activity.df$interval.type == '14.days.interval']`**
@@ -331,6 +337,7 @@ This section shows the activity of the **`r users.dim[1]` registered users** wit
 ## Disk space usage
 
 This section provides information about the current disk space usage of projects hosted in LabCase. In general, LabCase projects can use two separate storage locations:
+
 * The Assets section (Alfresco)
 * The Repository section (Subversion and Git repositories)
 
@@ -341,11 +348,11 @@ The current **overall disk space usage** breakdown is as follows:
 * Total **repository** disk space usage: **`r round(sum(projects.df$repo_diskspace, na.rm=TRUE)/1024, digits=2)`** GB
 
 
-**Alfresco** disk space **summary** (in MB): 
+**Alfresco disk space usage per project** summary statistics (in MB): 
 ```{r echo=FALSE, comment=NA}
 summary(projects.df$project_size)
 ```
-**Repository** disk space **summary** (in MB):
+**Repository disk space usage per project** summary statistics (in MB):
 ```{r echo=FALSE, comment=NA}
 summary(projects.df$repo_diskspace)
 ```
@@ -378,6 +385,7 @@ g
 ## Project templates
 
 This section is dedicated to the project template feature. Below you will see:
+
 * How many project templates are available globally
 * The name of each created template
 * The number of projects which were instantiated based on each template
