@@ -32,7 +32,7 @@ Data as of  **`r as.character(date.of.extraction)`**
 
 ## General Information
 
-This section provides information in terms of absolute numbers about certain key variables. Additionally, summary statistics for some variables are shown.
+This section provides information in terms of absolute numbers of certain key variables. Additionally, summary statistics for some variables are shown.
 
 * **Total** number of **projects**: **`r dim(projects.df)[1]`**
 * **Total** number of **users**: **`r users.dim[1]`**
@@ -141,6 +141,7 @@ proj.created.in.last.7.days.df$business_line <- reorder(proj.created.in.last.7.d
 proj.created.in.last.7.days.df$business_line <- factor(proj.created.in.last.7.days.df$business_line, 
                                             levels=rev(levels(proj.created.in.last.7.days.df$business_line)))
 
+
 g.last.7.days <- ggplot(proj.created.in.last.7.days.df, aes(created_on, numb_of_proj)) +
   stat_summary(fun.y = sum, geom = 'text', aes(label = ..y..), vjust = -0.3, 
                size = 4) +
@@ -186,6 +187,12 @@ proj.by.month$business_line <- reorder(proj.by.month$business_line,
 proj.by.month$business_line <- factor(proj.by.month$business_line,
                                       levels = rev(levels(proj.by.month$business_line)))
 
+# Calculate upper bound for y-axis based on month in which the most projects
+# were created
+max.month <- proj.by.month %>% group_by(month) %>% 
+  summarize(numb_of_proj = sum(numb_of_proj)) %>% select(numb_of_proj) %>%
+  as.vector %>% max
+
 g.months <- ggplot(proj.by.month, aes(month, numb_of_proj)) + 
   geom_bar(aes(fill = business_line), stat = 'identity', width = 0.8 ) +
   stat_summary(fun.y = sum, geom = 'text', aes(label = ..y..), vjust = -0.3, 
@@ -193,9 +200,12 @@ g.months <- ggplot(proj.by.month, aes(month, numb_of_proj)) +
   ggtitle(paste0(year(date.of.extraction), ': ', 'Number of created projects per month')) +
   xlab('Number of projects') +
   ylab('Month of creation') +
+  ylim(0, max.month * 1.03) +
   theme(plot.title = element_text(size = rel(1.1)),
         axis.title = element_text(size = 12),
-        axis.text = element_text(size = 10)
+        axis.text = element_text(size = 10),
+        axis.text.x = element_text(angle = 30, hjust = 1, 
+                                   vjust = 1)
         ) +
   scale_x_discrete(drop = FALSE) +
   scale_fill_brewer(palette = 'Paired') +
@@ -221,19 +231,22 @@ proj.by.quarter$business_line <- reorder(proj.by.quarter$business_line,
 proj.by.quarter$business_line <- factor(proj.by.quarter$business_line, 
                                             levels=rev(levels(proj.by.quarter$business_line)))
 
-# Calculate upper bound for the y-axis
+# Calculate upper bound for the y-axis based on quarter in which most projects
+# were created
 y.upper <- max(as.vector(
   group_by(proj.by.quarter, quarter) %>% 
-    summarize(numb_of_proj = sum(numb_of_proj)) %>% 
+    summarize(
+      numb_of_proj = sum(numb_of_proj)
+      ) %>% 
     select(numb_of_proj)
   ))
 
+
 g.quarters <- ggplot(proj.by.quarter, aes(quarter, numb_of_proj)) +
-  geom_bar(stat = 'identity', aes(fill = business_line), width = 0.8) +
+  geom_bar(stat = 'identity', width = 0.6, fill = '#3182BD') +
   stat_summary(fun.y = sum, geom = 'text', aes(label = ..y..), vjust = -0.3, 
                size = 4) +
   expand_limits(x = c('Q1', 'Q2', 'Q3', 'Q4')) +
-  scale_fill_brewer(palette = 'Paired') +
   ggtitle(paste0(year(date.of.extraction), ': ',
                  'Number of created projects\n per quarter')) +
   ylim(0, y.upper * 1.03) +
@@ -250,7 +263,7 @@ g.quarters <- ggplot(proj.by.quarter, aes(quarter, numb_of_proj)) +
 proj.created.by.year.df <- proj.created.by.year.df[order(proj.created.by.year.df$Var1),]
 
 g.years <- ggplot(proj.created.by.year.df, aes(x = Var1, y = Freq)) + 
-                     geom_bar(width = .5, stat  ='identity', fill = '#3182BD') +
+                     geom_bar(width = .6, stat  ='identity', fill = '#3182BD') +
                      geom_text(aes(label  =Freq), vjust = -0.3, size = 4) +
                      ggtitle('Number of created projects\n per year') +
                      ylim(0, max(proj.created.by.year.df$Freq) * 1.03) +
