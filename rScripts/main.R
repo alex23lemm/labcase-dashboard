@@ -13,7 +13,7 @@ library(yaml)
 
 library(plyr)
 library(dplyr)
-library(reshape2)
+library(tidyr)
 library(stringr)
 
 library(knitr)
@@ -22,7 +22,7 @@ library(knitrBootstrap)
 
 # Set working directory
 # This the specified path needs to be changed according to your setup
-setwd('~/labcase_wd/lc_dashboard')
+#setwd('~/Documents/projects/lc_dashboard')
 
 
 # Load config data
