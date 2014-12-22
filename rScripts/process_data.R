@@ -13,7 +13,7 @@
 
 # Define utility functions -----------------------------------------------------
 
-ConstructSAGEmailSuffixRegex <- function(vec) {
+create_sag_email_suffix_regex <- function(vec) {
   # Constructs a regular expression by concatenating itmes of a character
   # vector. This specific regex is later used to extract email suffixes
   # of SAG users and external users.
@@ -28,13 +28,13 @@ ConstructSAGEmailSuffixRegex <- function(vec) {
   for (i in 1:(length(vec)-1)) {
     regex <- paste0(regex, vec[i], '|')
   }
-  regex <- paste0(regex, vec[length(vec)])
-  regex <- paste0(regex, ').*')
+  regex <- paste0(regex, vec[length(vec)], ').*')
+ # regex <- paste0(regex, ').*')
   return (regex)
 }
 
 
-calculateActivity <- function(last.updates, date) {
+calculate_activity <- function(last.updates, date) {
   # Calculates the activity for a number of observations within predefined time 
   # intervals. For the following time intervals activity is calculated:
   #   - today
@@ -52,8 +52,8 @@ calculateActivity <- function(last.updates, date) {
   # Returns:
   #   Data frame containing the summarized activity information of the 
   #   observations for each predefined time interval
-  activity.df <- data.frame(interval.type = character(), 
-                            active.obs = character(), stringsAsFactors = FALSE)
+  activity.df <- data_frame(interval.type = character(), 
+                            active.obs = character())
   
   last.updates <- last.updates[!is.na(last.updates)]
   
@@ -105,8 +105,8 @@ date.of.extraction <- dget("./rawData/dateOfExtraction.R")
 # 2. Pre-processing ------------------------------------------------------------
 
 #  Create 4 new data frames by extracting data from custom.fields data frame
-#  Merge projects data frame with these 4 new data frames, the issues data frame
-#  and the repos data frame
+#  Left join projects data frame with these 4 new data frames, the issues data 
+#  frame  and the repos data frame.
 #  Convert mail column in users data frame to lower-case
 
 # Extract project id and template classifier from custom.fields data frame
@@ -114,77 +114,58 @@ date.of.extraction <- dget("./rawData/dateOfExtraction.R")
 #   cf_value: template classifier (boolean)
 # In the LC database this is the relevant id - custom fields mapping:
 #   12: Use as template
-template.info <- filter(custom.fields, cf_id ==12) %>%
+projects <- filter(custom.fields, cf_id == 12) %>%
   select(id, cf_value) %>%
-  droplevels
-# Rename 'cf_value' column to 'template'
-template.info <- rename(template.info, template = cf_value)
-# Add template column from template.info data frame to projects data frame.
-projects <- left_join(projects, template.info, by = 'id')
-
+  droplevels %>%
+  rename(template = cf_value) %>%
+  left_join(projects, ., by = 'id')
 
 # Extract project id and customer information from custom.fields data frame
 #  id:       project id
 #  cf_value: customer name
 # In the LC database this is the relevant id - custom fields mapping:
 #   13: Customer
-customer.info <- filter(custom.fields, cf_id == 13) %>%
+projects <- filter(custom.fields, cf_id == 13) %>%
   select(id, cf_value) %>%
-  droplevels
-# Rename 'cf_value' column to 'customer'
-customer.info <- rename(customer.info, customer = cf_value)
-# Add customer column from customer.info data frame to projects data frame.
-projects <- left_join(projects, customer.info, by = 'id')
-
+  droplevels %>%
+  rename(customer = cf_value) %>%
+  left_join(projects, ., by = 'id')
 
 # Extract project id and country information from custom.fields data frame
 #  id:       project id
 #  cf_value: country name
 # In the LC database this is the relevant id - custom fields mapping:
 #   14: Country
-country.info <- filter(custom.fields, cf_id == 14) %>%
+projects <- filter(custom.fields, cf_id == 14) %>%
   select(id, cf_value) %>%
-  droplevels
-# Rename 'cf_value' column to 'country'
-country.info <- rename(country.info, country = cf_value)
-# Add country column from country.info data frame to projects data frame.
-projects <- left_join(projects, country.info, by = 'id')
-
+  droplevels %>%
+  rename(country = cf_value) %>%
+  left_join(projects, ., by = "id")
+  
 
 # Extract project id and business line information from custom.fields data frame
 #  id:       project id
 #  cf_value: business line
 # In the LC database this is the relevant id - custom fields mapping:
 #   15: Business line
-businessline.info <- filter(custom.fields, cf_id == 15) %>%
+projects <- filter(custom.fields, cf_id == 15) %>%
   select(id, cf_value) %>%
-  droplevels
-# Rename 'cf_value' column to 'business_line'
-businessline.info <- rename(businessline.info, business_line = cf_value)
-# Add business line column from businessline.info data frame to projects
-# data frame.
-projects <- left_join(projects, businessline.info, by = 'id')
+  droplevels %>%
+  rename(business_line = cf_value) %>%
+  left_join(projects, ., by = "id")
 
+projects %<>% left_join(issues, by = c("id" = "project_id")) %>%
+  left_join(repos, by = c("id" = "project_id"))
 
-# Add issue_count column from issues data frame to projects data frame
-projects <- merge(projects, issues, by.x = 'id', by.y = 'project_id', 
-                  all.x = TRUE)
 projects$issue_count[is.na(projects$issue_count)] <- 0
-
-
-# Add diskspace column from repos data frame to projects data frame
-projects <- merge(projects, repos, by.x = 'id', by.y = 'project_id', 
-                  all.x = TRUE)
 projects$repo_diskspace[is.na(projects$repo_diskspace)] <- 0
-# Transfrom bytes into MB
-projects <- transform(projects, repo_diskspace = repo_diskspace/1024/1024)
-
-# Replace NAs with 0s in project_size column
 projects$project_size[is.na(projects$project_size)] <-0
 
+# Transfrom bytes into MB
+projects %<>% mutate(repo_diskspace = repo_diskspace/1024/1024)
 
 # Convert entries in mail column to lower-case
-users$mail <- tolower(users$mail)
+users$mail %<>% tolower
 
 
 
@@ -213,14 +194,14 @@ suffix <- sapply(regm.suffix.list, function(x)x[2])
 
 # Extract email suffix of SAG users from suffix vector
 suffix.sag <- regmatches(suffix, 
-                         regexpr(ConstructSAGEmailSuffixRegex(config$sagEmailSuffixes),
+                         regexpr(create_sag_email_suffix_regex(config$sagEmailSuffixes),
                                  suffix))
 suffix.sag.df <- as.data.frame.table(sort(table(suffix.sag), decreasing = TRUE))
 
 
 # Extract email suffix of external users from suffix vector
 # grepl returns logical vector
-suffix.external <- suffix[!grepl(ConstructSAGEmailSuffixRegex(config$sagEmailSuffixes),
+suffix.external <- suffix[!grepl(create_sag_email_suffix_regex(config$sagEmailSuffixes),
                                  suffix)]
 
 suffix.external.df <- as.data.frame.table(sort(table(suffix.external), 
@@ -228,7 +209,7 @@ suffix.external.df <- as.data.frame.table(sort(table(suffix.external),
 
 
 # Calculate user activity
-user.activity.df <- calculateActivity(users$last_login_on, date.of.extraction)
+user.activity.df <- calculate_activity(users$last_login_on, date.of.extraction)
 
 
 # Extract list of departments ordered by frequency of created projects
@@ -297,7 +278,7 @@ proj.created.in.last.7.days.vec <- rename(proj.created.in.last.7.days.vec,
                                           Date = proj.created.in.last.7.days.vec)
 
 # Calculate project activity
-proj.activity.df <- calculateActivity(projects.df$last_updated_on, 
+proj.activity.df <- calculate_activity(projects.df$last_updated_on, 
                                       date.of.extraction)
 proj.inactive.vec <- projects.df$last_updated_on[!is.na(projects.df$last_updated_on)]
 proj.inactive.vec <- sum(proj.inactive.vec < date.of.extraction - ddays(364*2))
@@ -308,8 +289,9 @@ templates <- filter(projects, template == 1) %>%
   select(id, name) %>%
   droplevels
 counted.template.instances <- plyr::count(projects, vars ='template_project_id')
-template.usage.df <- merge(templates, counted.template.instances, 
-                          by.x = 'id', by.y = 'template_project_id', all.x = TRUE)
+template.usage.df <- left_join(templates, counted.template.instances, 
+                               c("id" = "template_project_id"))
+
 # Replace NA values with 0 for those templates which were not used yet
 template.usage.df$freq[is.na(template.usage.df$freq)] <- 0
 template.usage.df$id <- NULL
