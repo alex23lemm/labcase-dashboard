@@ -77,7 +77,7 @@ shinyUI(fluidPage(
                 br(),
                 "Projects active in last 60 days:",
                 br(),
-                "Projects active in the last 12 days:",
+                "Projects active in the last 12 months:",
                 br(),
                 br(),
                 "Projects inactive since 2 years:"
