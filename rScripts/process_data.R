@@ -6,8 +6,8 @@
 #
 # process.data.R consists of four mayor parts:
 #  1. Load raw data into memory
-#  2. Pre-processing
-#  3. Processing
+#  2. Processing data
+#  3. Pre-processing Shiny output
 #  4. Save the processed data
 #
 
@@ -177,14 +177,6 @@ users$mail %<>% tolower
 # Create interger vector which includes dimension of users data frame
 users.dim <- dim(users)
 
-
-# Subset projects data frame
-projects.df <- select(projects, 
-                      identifier, created_on, project_size, country,
-                      business_line, repo_diskspace, member_count, issue_count,
-                      last_updated_on)
-              
-
 # Extract email suffix from mail column from users data frame
 # regexec returns the indices for parenthesized sub-expression 
 regm.suffix.list <- regmatches(users$mail, regexec('.*@(.*)', users$mail))
@@ -213,13 +205,13 @@ user.activity.df <- calculate_activity(users$last_login_on, date.of.extraction)
 
 
 # Extract list of departments ordered by frequency of created projects
-departments.vec <- as.character(as.data.frame.table(sort(table(projects.df$business_line,
+departments.vec <- as.character(as.data.frame.table(sort(table(projects$business_line,
                                                   useNA = 'ifany'), 
                                                          decreasing=TRUE))$Var1)
 
 
 # Extract list of countries ordered by freqency of created projects
-countries.vec <- as.character(as.data.frame.table(sort(table(projects.df$country,
+countries.vec <- as.character(as.data.frame.table(sort(table(projects$country,
                                                               useNA = 'ifany'), 
                                                         decreasing = TRUE))$Var1)
 
@@ -278,9 +270,9 @@ proj.created.in.last.7.days.vec <- rename(proj.created.in.last.7.days.vec,
                                           Date = proj.created.in.last.7.days.vec)
 
 # Calculate project activity
-proj.activity.df <- calculate_activity(projects.df$last_updated_on, 
+proj.activity.df <- calculate_activity(projects$last_updated_on, 
                                       date.of.extraction)
-proj.inactive.vec <- projects.df$last_updated_on[!is.na(projects.df$last_updated_on)]
+proj.inactive.vec <- projects$last_updated_on[!is.na(projects$last_updated_on)]
 proj.inactive.vec <- sum(proj.inactive.vec < date.of.extraction - ddays(364*2))
 
 
@@ -325,7 +317,7 @@ diskusage.per.project.df <- filter(projects,
 
 dump(c('date.of.extraction',
        'users.dim', 
-       'projects.df',
+       'projects',
        'user.activity.df',
        'suffix.sag.df', 
        'suffix.external.df',

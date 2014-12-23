@@ -16,12 +16,12 @@ source('../processedData/processedDataDump.R')
 options(scipen = 1, digits = 2)
 
 # Create project frequency table grouped by country
-proj.created.by.country.df <- as.data.frame.table(sort(table(projects.df$country,
+proj.created.by.country.df <- as.data.frame.table(sort(table(projects$country,
                                                              useNA = 'ifany'), 
                                                        decreasing = TRUE))
 
 # Create project frequency table grouped by department
-proj.created.by.department.df <- as.data.frame.table(sort(table(projects.df$business_line,
+proj.created.by.department.df <- as.data.frame.table(sort(table(projects$business_line,
                                                                 useNA = 'ifany'), 
                                                           decreasing=TRUE))
 
@@ -34,18 +34,18 @@ Data as of  **`r as.character(date.of.extraction)`**
 
 This section provides information in terms of absolute numbers of certain key variables. Additionally, summary statistics for some variables are shown.
 
-* **Total** number of **projects**: **`r dim(projects.df)[1]`**
+* **Total** number of **projects**: **`r dim(projects)[1]`**
 * **Total** number of **users**: **`r users.dim[1]`**
-* **Total** number of **issues** created in projects: **`r sum(projects.df$issue_count, na.rm=TRUE)`**
+* **Total** number of **issues** created in projects: **`r sum(projects$issue_count, na.rm=TRUE)`**
 
 **Users per project** summary statistics:
 ```{r echo=FALSE, comment=NA}
-summary(projects.df$member_count, digits = 3)
+summary(projects$member_count, digits = 3)
 ```
 
 **Issues per project** summary statistics: 
 ```{r echo=FALSE, comment=NA}
-summary(projects.df$issue_count, digits = 2)
+summary(projects$issue_count, digits = 2)
 ```
 
 
@@ -112,7 +112,7 @@ print(g.departments, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
 ## Project growth
 
 This section gives you an overview about projects created within different time spans. 
-Our main focus lies on the following three periods:
+Our main focus lies on the following four periods:
 
 * The last seven days
 * Months of the current year
@@ -170,7 +170,7 @@ g.last.7.days <- ggplot(proj.created.in.last.7.days.df, aes(created_on, numb_of_
   ylim(0, max(proj.created.in.last.7.days.df$label_y) * 1.05)
 
 
-proj.by.month <- filter(projects.df, 
+proj.by.month <- filter(projects, 
                       year(created_on) == year(date.of.extraction)) %>%
   mutate(
   month = month(created_on, TRUE)
@@ -212,7 +212,7 @@ g.months <- ggplot(proj.by.month, aes(month, numb_of_proj)) +
   labs(fill = 'Business line')
 
 
-proj.by.quarter <- filter(projects.df, year(created_on) == year(date.of.extraction)) %>%
+proj.by.quarter <- filter(projects, year(created_on) == year(date.of.extraction)) %>%
   select(created_on, business_line) %>%
   mutate(
     quarter = quarters(created_on)
@@ -288,7 +288,7 @@ print(g.years, vp = viewport(layout.pos.row = 2, layout.pos.col = 2))
 
 ## Project activity 
 
-This section shows the activity of the **`r dim(projects.df)[1]` registered projects** within several defined time intervals based on the activity of the respective project members.
+This section shows the activity of the **`r dim(projects)[1]` registered projects** within several defined time intervals based on the activity of the respective project members.
 
 * Projects active **in last 7 days:** **`r proj.activity.df$active.obs[proj.activity.df$interval.type == '7.day.interval']`**
 * Projects active **in last 14 days:** **`r proj.activity.df$active.obs[proj.activity.df$interval.type == '14.days.interval']`**
@@ -298,7 +298,7 @@ This section shows the activity of the **`r dim(projects.df)[1]` registered proj
 
 ```{r echo=FALSE}
 
-inactive.projects <- projects.df$last_updated_on[!is.na(projects.df$last_updated_on)]
+inactive.projects <- projects$last_updated_on[!is.na(projects$last_updated_on)]
 inactive.projects <- sum(inactive.projects < date.of.extraction - ddays(364*2))
 
 ```
@@ -391,18 +391,18 @@ This section provides information about the current disk space usage of projects
 
 The current **overall disk space usage** breakdown is as follows:
 
-* **Total** disk space usage: **`r round(sum(projects.df$project_size, projects.df$repo_diskspace, na.rm=TRUE)/1024, digits=2)`** GB
-* Total **Alfresco** disk space usage: **`r round(sum(projects.df$project_size, na.rm=TRUE)/1024, digits=2)`** GB
-* Total **repository** disk space usage: **`r round(sum(projects.df$repo_diskspace, na.rm=TRUE)/1024, digits=2)`** GB
+* **Total** disk space usage: **`r round(sum(projects$project_size, projects$repo_diskspace, na.rm=TRUE)/1024, digits=2)`** GB
+* Total **Alfresco** disk space usage: **`r round(sum(projects$project_size, na.rm=TRUE)/1024, digits=2)`** GB
+* Total **repository** disk space usage: **`r round(sum(projects$repo_diskspace, na.rm=TRUE)/1024, digits=2)`** GB
 
 
 **Alfresco disk space usage per project** summary statistics (in MB): 
 ```{r echo=FALSE, comment=NA}
-summary(projects.df$project_size)
+summary(projects$project_size)
 ```
 **Repository disk space usage per project** summary statistics (in MB):
 ```{r echo=FALSE, comment=NA}
-summary(projects.df$repo_diskspace)
+summary(projects$repo_diskspace)
 ```
 
 ```{r echo=FALSE, fig.height=10, fig.width=8}

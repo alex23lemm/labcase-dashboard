@@ -42,19 +42,19 @@ shinyServer(function(input,output){
 # Project information tab ------------------------------------------------------  
   
   output$numbOfProjectsOverall <- renderText({
-    dim(projects.df)[1]
+    dim(projects)[1]
   })
   
   output$numbOfIssues <- renderText({
-    sum(projects.df$issue_count, na.rm=TRUE)
+    sum(projects$issue_count, na.rm=TRUE)
   })
 
   output$summaryIssuesPerProject <- renderPrint({
-    summary(projects.df$issue_count, digits=2)
+    summary(projects$issue_count, digits=2)
   })
 
   output$summaryUsersPerProject <- renderPrint({
-    summary(projects.df$member_count, digits=3)
+    summary(projects$member_count, digits=3)
   })
 
   output$projectActivityToday <- renderText({
@@ -108,24 +108,24 @@ shinyServer(function(input,output){
   # country)
   selectedProjects <- reactive({
     
-    # If missing input, return sourced projects.df to avoid error later in 
+    # If missing input, return sourced projects to avoid error later in 
     # function. Due to the fact that the input list for the selectInput elements 
     # on the UI side is generated on the server side , this reactive expression 
     # has to cope with the 'delay' when reading the reactive values at the start
     # of each new user session (see also https://gist.github.com/wch/4211337)
     if(is.null(input$selectedDepartment)|| is.null(input$selectedCountry)) {
       
-      return(select(projects.df, country, business_line))
+      return(select(projects, country, business_line))
     }
     
     if (input$selectedDepartment != 'All') {
-      projects.df <- filter(projects.df,
+      projects <- filter(projects,
                             business_line == input$selectedDepartment)
     }
     if (input$selectedCountry != 'All') {
-      projects.df <- filter(projects.df, country == input$selectedCountry)
+      projects <- filter(projects, country == input$selectedCountry)
     }
-    select(projects.df, country, business_line)
+    select(projects, country, business_line)
   })
 
 
@@ -410,31 +410,31 @@ shinyServer(function(input,output){
 
   # Total disk space usage
   output$totalDiskSpaceUsage <- renderText({
-    paste(round(sum(projects.df$project_size, projects.df$repo_diskspace, 
+    paste(round(sum(projects$project_size, projects$repo_diskspace, 
                     na.rm=TRUE)/1024, digits=2), ' GB', sep='')
   })
   
   # Total Alfresco disk space usage
   output$totalAlfrescoDiskSpaceUsage <- renderText({
-    paste(round(sum(projects.df$project_size, na.rm=TRUE)/1024, digits=2),
+    paste(round(sum(projects$project_size, na.rm=TRUE)/1024, digits=2),
           ' GB', sep='')
   })
   
   # Total repository disk space usage
   output$totalRepoDiskSpaceUsage <- renderText({
-    paste(round(sum(projects.df$repo_diskspace, na.rm=TRUE)/1024, digits=2), 
+    paste(round(sum(projects$repo_diskspace, na.rm=TRUE)/1024, digits=2), 
           ' GB', sep='')
   })
   
     
   # Alfresco disk space usage summary
   output$alfrescoSummary <- renderPrint({
-    summary(projects.df$project_size, na.rm=TRUE)
+    summary(projects$project_size, na.rm=TRUE)
   })
   
   # Repository disk space usage summary
   output$repositorySummary <- renderPrint({
-    summary(projects.df$repo_diskspace, na.rm=TRUE)
+    summary(projects$repo_diskspace, na.rm=TRUE)
   })
     
   
