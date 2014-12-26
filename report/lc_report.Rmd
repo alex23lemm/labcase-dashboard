@@ -8,6 +8,7 @@ library(grid)
 library(RColorBrewer)
 library(scales)
 library(dplyr)
+library(magrittr)
 
 
 source('../processedData/processedDataDump.R')
@@ -59,13 +60,12 @@ This section provides information about the project distribution among countries
 
 ```{r echo=FALSE, fig.height=10, fig.width=10}
 # Create country ~ projects bar chart plot
-# Exclude NAs
-proj.created.by.country.df <- subset(proj.created.by.country.df,
-                                     Var1 != '<NA>')
-
-# Reorder so that the order in the barchart is flipped
-proj.created.by.country.df <- transform(proj.created.by.country.df,
-                                        Var1 = reorder(Var1,Freq))
+# Exclude NAs and reorder so that the order in the barchart is flipped
+proj.created.by.country.df %<>% filter(Var1 != '<NA>') %>%
+  mutate(
+    Var1 = reorder(Var1, Freq)
+      )
+                                       
 g.countries <- ggplot(proj.created.by.country.df, aes(x = Var1, y = Freq)) +
   geom_bar(stat = 'identity', fill = '#3182BD') +
   geom_text(aes(label = Freq), hjust = -0.1, size = 4) +
@@ -80,12 +80,11 @@ g.countries <- ggplot(proj.created.by.country.df, aes(x = Var1, y = Freq)) +
 
 
 # Create 'Department ~ projects bar chart plot
-# Exclude NAs
-proj.created.by.department.df <- subset(proj.created.by.department.df,
-                                        Var1 != '<NA>')
-# Reorder so that the order in the barchart is flipped
-proj.created.by.department.df <- transform(proj.created.by.department.df,
-                                           Var1 = reorder(Var1, Freq))
+# Exclude NAs and reorder so that the order in the barchart is flipped
+proj.created.by.department.df %<>% filter(Var1 != '<NA>') %>% 
+  mutate(
+    Var1 = reorder(Var1, Freq)
+    )
     
 g.departments <- ggplot(proj.created.by.department.df, aes(x = Var1, y = Freq)) +
   geom_bar(stat = 'identity', fill = '#3182BD') +
@@ -122,8 +121,8 @@ Our main focus lies on the following four periods:
 
 ```{r echo=FALSE, warning = FALSE, fig.width=14, fig.height=10}
 
-proj.created.in.last.7.days.df <- mutate(proj.created.in.last.7.days.df,
-                                         created_on = as.Date(created_on)
+proj.created.in.last.7.days.df %<>% mutate(
+  created_on = as.Date(created_on)
 ) %>%
   group_by(created_on, business_line) %>%
   summarise(
