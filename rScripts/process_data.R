@@ -29,7 +29,6 @@ create_sag_email_suffix_regex <- function(vec) {
     regex <- paste0(regex, vec[i], '|')
   }
   regex <- paste0(regex, vec[length(vec)], ').*')
- # regex <- paste0(regex, ').*')
   return (regex)
 }
 
@@ -172,19 +171,21 @@ users$mail %<>% tolower
 # 3. Processing ----------------------------------------------------------------
 
 #  Generate smaller data frames which serve as the input for the Shiny
-#  application
+#  application and the Rmarkdown report
 
 # Create interger vector which includes dimension of users data frame
 users.dim <- dim(users)
 
-# Extract email suffix from mail column from users data frame
+# Extract email suffix from mail column from users data frame for each entry
 # regexec returns the indices for parenthesized sub-expression 
-regm.suffix.list <- regmatches(users$mail, regexec('.*@(.*)', users$mail))
-# Extract the email suffix for each entry
-suffix <- sapply(regm.suffix.list, function(x)x[2])
-
+suffix <- users$mail %>% regexec('.*@(.*)', .) %>% 
+  regmatches(users$mail, .) %>% sapply(., function(x)x[2])
 
 # Extract email suffix of SAG users from suffix vector
+# suffix.sag.df2 <- suffix %>% regexpr(create_sag_email_suffix_regex(
+#   config$sagEmailSuffixes), .) %>% regmatches(suffix, .) %>% table %>% 
+#   sort(decreasing = TRUE) %>% as.data.frame.table
+
 suffix.sag <- regmatches(suffix, 
                          regexpr(create_sag_email_suffix_regex(config$sagEmailSuffixes),
                                  suffix))
@@ -205,9 +206,8 @@ user.activity.df <- calculate_activity(users$last_login_on, date.of.extraction)
 
 
 # Extract list of departments ordered by frequency of created projects
-departments.vec <- as.character(as.data.frame.table(sort(table(projects$business_line,
-                                                  useNA = 'ifany'), 
-                                                         decreasing=TRUE))$Var1)
+departments.vec <- projects %$% table(business_line, useNA = 'ifany') %>% 
+  as.data.frame.table %>% arrange(desc(Freq)) %$% as.character(business_line)
 
 
 # Extract list of countries ordered by freqency of created projects
@@ -277,9 +277,7 @@ proj.inactive.vec <- sum(proj.inactive.vec < date.of.extraction - ddays(364*2))
 
 
 # Create project template usage distribution table
-templates <- filter(projects, template == 1) %>%
-  select(id, name) %>%
-  droplevels
+templates <- filter(projects, template == 1) %>% select(id, name) %>% droplevels
 counted.template.instances <- plyr::count(projects, vars ='template_project_id')
 template.usage.df <- left_join(templates, counted.template.instances, 
                                c("id" = "template_project_id"))
