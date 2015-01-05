@@ -11,10 +11,12 @@ library(RODBC)
 library(lubridate)
 library(yaml)
 
+library(magrittr)
 library(plyr)
 library(dplyr)
 library(tidyr)
 library(stringr)
+
 
 library(knitr)
 library(knitrBootstrap)
