@@ -1,0 +1,156 @@
+---
+title: "LabCase: projects by customer analysis"
+output: html_document
+---
+
+## Overview
+
+This report shows the number of created LabCase projects grouped by project type. For this analysis project type is either `internal` or `external`. 
+
+We visualize the grouped projects within several different time spans using bar plots.
+
+
+## Data extraction and pre-processing
+
+```{r warning=FALSE, message=FALSE}
+
+# Load libraries
+library(dplyr)
+library(xtable)
+library(magrittr)
+library(ggplot2)
+library(lubridate)
+library(RColorBrewer
+
+
+```
+
+
+```{r}
+
+projects <- dget(file="./rawData/projectsRaw.R")
+custom.fields <- dget(file="./rawData/customFields.R")
+
+projects <- filter(custom.fields, cf_id == 12) %>%
+  select(id, cf_value) %>%
+  droplevels %>%
+  rename(template = cf_value) %>%
+  left_join(projects, ., by = 'id')
+
+# Extract project id and customer information from custom.fields data frame
+#  id:       project id
+#  cf_value: customer name
+# In the LC database this is the relevant id - custom fields mapping:
+#   13: Customer
+projects <- filter(custom.fields, cf_id == 13) %>%
+  select(id, cf_value) %>%
+  droplevels %>%
+  rename(customer = cf_value) %>%
+  left_join(projects, ., by = 'id')
+
+# Extract project id and country information from custom.fields data frame
+#  id:       project id
+#  cf_value: country name
+# In the LC database this is the relevant id - custom fields mapping:
+#   14: Country
+projects <- filter(custom.fields, cf_id == 14) %>%
+  select(id, cf_value) %>%
+  droplevels %>%
+  rename(country = cf_value) %>%
+  left_join(projects, ., by = "id")
+  
+
+# Extract project id and business line information from custom.fields data frame
+#  id:       project id
+#  cf_value: business line
+# In the LC database this is the relevant id - custom fields mapping:
+#   15: Business line
+projects <- filter(custom.fields, cf_id == 15) %>%
+  select(id, cf_value) %>%
+  droplevels %>%
+  rename(business_line = cf_value) %>%
+  left_join(projects, ., by = "id")
+
+projects %<>% left_join(issues, by = c("id" = "project_id")) %>%
+  left_join(repos, by = c("id" = "project_id"))
+
+
+```
+
+First, we need to identify customer names which indicate internal projects.
+
+```{r, echo=FALSE, results='asis'}
+
+proj_per_cust <- projects %>% count(customer) %>% arrange(customer)
+
+print(xtable(proj_per_cust, 
+             caption = "<b>Table 1:</b> Number of projects per customer"), type = 'html', include.rownames = FALSE)
+
+```
+
+Based on the anylsis of the table above we construct a regular expression which is used to flag internal projects accordingly. 
+
+
+```{r}
+
+reg_ex <- '^all$|^ALL$|^All$|All Clients|Annesh|Annika|^Any$|ARIS Internal|ARIS User Group DACH|
+Corporate Marketing|CustomerTemplate|Customer Name|^GCS|^gcs|^IBO|^IDS|^[iI]n-[Hh]ouse|
+^[iI]nternal|itCampus|^Mathias|[Pp]lanio|^P[p]resales|^Product Marketing|RnD|
+rnd|^SAG|^Self$|^Software AG|software ag|^SoftwareAG|^Solution Book|^test|^Test|various'
+
+projects %<>% mutate(
+  type = ifelse(grepl(reg_ex, customer), 'internal', 'external')
+  )
+
+
+```
+
+This classification gives us the following intermediate result for all `r dim(projects)[1]` LabCase projects:
+
+```{r}
+
+table(projects$type)
+
+```
+
+
+## Results
+
+
+```{r}
+
+projects %<>% mutate(
+  year = year(created_on),
+  quarter = quarters(created_on),
+  month = month(created_on)
+  ) %>% group_by(year, quarter, month, type) %>% 
+  summarize(
+    n = n()
+    ) %>% ungroup
+
+ggplot(projects, aes(quarter, n, fill = type)) + 
+  geom_bar(stat = 'identity', position = 'dodge') +
+  facet_wrap(~ year ) +
+  ggtitle('Number of created projects per year (quarterly focus)') +
+  xlab('Number of projects') +
+  ylab('Quarter of generation') +
+  scale_fill_brewer(palette = 'Set1') +
+  theme(plot.title = element_text(size = rel(1.3)),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10)) +
+  labs(fill = "Project type")
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
