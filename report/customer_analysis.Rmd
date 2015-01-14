@@ -120,32 +120,36 @@ with(projects, table(business_line, type))
 
 In this section we will summarize the pre-processed data to create the desired bar plots.
 
-
-```{r message=FALSE}
-
+```{r message=FALSE, fig.width=8, fig.height=6}
 proj_by_year <- projects %>% mutate(
   year = year(created_on)
   ) %>% group_by(year, type) %>%
   summarize(
     n = n()
-    ) %>% group_by(year, type) %>%
-  mutate(
-    cum_n = cumsum(n)
-    )
+    ) 
 
-ggplot(proj_by_year, aes(year, n, fill = type)) +
+ggplot(proj_by_year, aes(as.character(year), n, fill = type)) +
   geom_bar(stat = 'identity', position = position_dodge()) +
-  geom_text(aes(label = n), position = position_dodge(.9), size = 2.5, 
+  geom_text(aes(label = n), position = position_dodge(.9), size = 4, 
             vjust = -0.3) +
   ggtitle('Number of created projects per year') +
   xlab('Year of creation') +
   ylab('Number of projects') +
    scale_fill_brewer(palette = 'Set1') +
-  theme(plot.title = element_text(size = rel(1.1)),
-        axis.title = element_text(size = 11),
-        axis.text = element_text(size = 10)) +
+  
+  theme(plot.title = element_text(size = 15),
+        axis.title = element_text(size = 13),
+        axis.text = element_text(size = 11)) +
   labs(fill = "Project type") +
-   ylim(0, max(proj_by_year$cum_n) * 1.05) 
+   ylim(0, max(proj_by_year$n) * 1.05) 
+
+```
+
+
+```{r message=FALSE, fig.width=10, fig.height=7}
+
+
+
 
 proj_by_year_qrt <- projects %>% mutate(
   year = year(created_on),
@@ -153,24 +157,22 @@ proj_by_year_qrt <- projects %>% mutate(
   ) %>% group_by(year, quarter, type) %>% 
   summarize(
     n = n()
-    ) %>% group_by(year, quarter, type) %>%
-   mutate(
-      cum_n = cumsum(n)
-      )
+    ) 
   
 ggplot(proj_by_year_qrt, aes(quarter, n, fill = type)) + 
   geom_bar(stat = 'identity', position = position_dodge()) +
-  geom_text(aes(label = n), position = position_dodge(.9), size = 2.5, vjust = -0.3) +
+  geom_text(aes(label = n), position = position_dodge(.9), size = 4, vjust = -0.3) +
   facet_wrap(~ year ) +
   ggtitle('Number of created projects per year\n(quarterly focus)') +
-  xlab('Number of projects') +
-  ylab('Quarter of creation') +
+  xlab('Quarter of creation') +
+  ylab('Number of projects') +
   scale_fill_brewer(palette = 'Set1') +
-  theme(plot.title = element_text(size = rel(1.1)),
-        axis.title = element_text(size = 11),
-        axis.text = element_text(size = 10)) +
+  theme(plot.title = element_text(size = 15),
+        axis.title = element_text(size = 13),
+        axis.text = element_text(size = 11),
+        strip.text = element_text(size = 13)) +
   labs(fill = "Project type") +
-   ylim(0, max(proj_by_year_qrt$cum_n) * 1.05) 
+   ylim(0, max(proj_by_year_qrt$n) * 1.05) 
 
 
 ```
