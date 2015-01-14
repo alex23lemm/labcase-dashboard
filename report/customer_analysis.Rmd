@@ -1,16 +1,4 @@
----
-title: "LabCase: projects by customer analysis"
-output: html_document
----
-
-## Overview
-
-This report shows the number of created LabCase projects grouped by project type. For this analysis project type is either `internal` or `external`. 
-
-We visualize the grouped projects within several different time spans using bar plots.
-
-
-## Data extraction and pre-processing
+# LabCase projects per project type analysis
 
 ```{r warning=FALSE, message=FALSE}
 
@@ -24,6 +12,20 @@ library(RColorBrewer)
 
 
 ```
+
+Data as of  **`r as.character(now())`**
+
+
+## Overview
+
+This report shows the number of created LabCase projects grouped by project type. For this analysis project type is either `internal` or `external`. 
+
+We visualize the grouped projects within several different time spans using bar plots.
+
+
+## Data extraction and pre-processing
+
+
 
 
 ```{r}
@@ -77,7 +79,7 @@ projects <- filter(custom.fields, cf_id == 15) %>%
 
 First, we need to identify customer names which indicate internal projects.
 
-```{r, echo=FALSE, results='asis'}
+```{r, results='asis'}
 
 proj_per_cust <- projects %>% count(customer) %>% arrange(customer)
 
@@ -86,7 +88,7 @@ print(xtable(proj_per_cust,
 
 ```
 
-Based on the anylsis of the table above we construct a regular expression which is used to flag internal projects accordingly. 
+Based on the analysis of the table above we construct a regular expression which is used to flag internal projects accordingly. 
 
 
 ```{r}
@@ -116,10 +118,36 @@ with(projects, table(business_line, type))
 
 ## Results
 
+In this section we will summarize the pre-processed data to create the desired bar plots.
+
 
 ```{r message=FALSE}
 
-projects %<>% mutate(
+proj_by_year <- projects %>% mutate(
+  year = year(created_on)
+  ) %>% group_by(year, type) %>%
+  summarize(
+    n = n()
+    ) %>% group_by(year, type) %>%
+  mutate(
+    cum_n = cumsum(n)
+    )
+
+ggplot(proj_by_year, aes(year, n, fill = type)) +
+  geom_bar(stat = 'identity', position = position_dodge()) +
+  geom_text(aes(label = n), position = position_dodge(.9), size = 2.5, 
+            vjust = -0.3) +
+  ggtitle('Number of created projects per year') +
+  xlab('Year of creation') +
+  ylab('Number of projects') +
+   scale_fill_brewer(palette = 'Set1') +
+  theme(plot.title = element_text(size = rel(1.1)),
+        axis.title = element_text(size = 11),
+        axis.text = element_text(size = 10)) +
+  labs(fill = "Project type") +
+   ylim(0, max(proj_by_year$cum_n) * 1.05) 
+
+proj_by_year_qrt <- projects %>% mutate(
   year = year(created_on),
   quarter = quarters(created_on)
   ) %>% group_by(year, quarter, type) %>% 
@@ -129,23 +157,20 @@ projects %<>% mutate(
    mutate(
       cum_n = cumsum(n)
       )
-
-
-ggplot(projects, aes(quarter, n, fill = type)) + 
-  stat_summary(fun.y = sum, geom="bar", position = 'dodge') +
+  
+ggplot(proj_by_year_qrt, aes(quarter, n, fill = type)) + 
+  geom_bar(stat = 'identity', position = position_dodge()) +
   geom_text(aes(label = n), position = position_dodge(.9), size = 2.5, vjust = -0.3) +
   facet_wrap(~ year ) +
-  ggtitle('Number of created projects per year (quarterly focus)') +
+  ggtitle('Number of created projects per year\n(quarterly focus)') +
   xlab('Number of projects') +
-  ylab('Quarter of generation') +
+  ylab('Quarter of creation') +
   scale_fill_brewer(palette = 'Set1') +
   theme(plot.title = element_text(size = rel(1.1)),
         axis.title = element_text(size = 11),
         axis.text = element_text(size = 10)) +
   labs(fill = "Project type") +
-   ylim(0, max(projects$cum_n) * 1.05) 
-  
-
+   ylim(0, max(proj_by_year_qrt$cum_n) * 1.05) 
 
 
 ```
