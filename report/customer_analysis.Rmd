@@ -20,7 +20,7 @@ library(xtable)
 library(magrittr)
 library(ggplot2)
 library(lubridate)
-library(RColorBrewer
+library(RColorBrewer)
 
 
 ```
@@ -28,8 +28,8 @@ library(RColorBrewer
 
 ```{r}
 
-projects <- dget(file="./rawData/projectsRaw.R")
-custom.fields <- dget(file="./rawData/customFields.R")
+projects <- dget(file="../rawData/projectsRaw.R")
+custom.fields <- dget(file="../rawData/customFields.R")
 
 projects <- filter(custom.fields, cf_id == 12) %>%
   select(id, cf_value) %>%
@@ -71,8 +71,6 @@ projects <- filter(custom.fields, cf_id == 15) %>%
   rename(business_line = cf_value) %>%
   left_join(projects, ., by = "id")
 
-projects %<>% left_join(issues, by = c("id" = "project_id")) %>%
-  left_join(repos, by = c("id" = "project_id"))
 
 
 ```
@@ -111,34 +109,42 @@ This classification gives us the following intermediate result for all `r dim(pr
 
 table(projects$type)
 
+with(projects, table(business_line, type))
+
 ```
 
 
 ## Results
 
 
-```{r}
+```{r message=FALSE}
 
 projects %<>% mutate(
   year = year(created_on),
-  quarter = quarters(created_on),
-  month = month(created_on)
-  ) %>% group_by(year, quarter, month, type) %>% 
+  quarter = quarters(created_on)
+  ) %>% group_by(year, quarter, type) %>% 
   summarize(
     n = n()
-    ) %>% ungroup
+    ) %>% group_by(year, quarter, type) %>%
+   mutate(
+      cum_n = cumsum(n)
+      )
+
 
 ggplot(projects, aes(quarter, n, fill = type)) + 
-  geom_bar(stat = 'identity', position = 'dodge') +
+  stat_summary(fun.y = sum, geom="bar", position = 'dodge') +
+  geom_text(aes(label = n), position = position_dodge(.9), size = 2.5, vjust = -0.3) +
   facet_wrap(~ year ) +
   ggtitle('Number of created projects per year (quarterly focus)') +
   xlab('Number of projects') +
   ylab('Quarter of generation') +
   scale_fill_brewer(palette = 'Set1') +
-  theme(plot.title = element_text(size = rel(1.3)),
-        axis.title = element_text(size = 12),
+  theme(plot.title = element_text(size = rel(1.1)),
+        axis.title = element_text(size = 11),
         axis.text = element_text(size = 10)) +
-  labs(fill = "Project type")
+  labs(fill = "Project type") +
+   ylim(0, max(projects$cum_n) * 1.05) 
+  
 
 
 
