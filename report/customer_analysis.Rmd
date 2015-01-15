@@ -4,11 +4,20 @@
 
 # Load libraries
 library(dplyr)
-library(xtable)
 library(magrittr)
-library(ggplot2)
 library(lubridate)
+
+library(xtable)
+library(yaml)
+library(RODBC)
+
+library(ggplot2)
 library(RColorBrewer)
+library(grid)
+
+
+config <- yaml.load_file('../config.yml')
+
 
 
 ```
@@ -30,44 +39,73 @@ We visualize the grouped projects within several different time spans using bar 
 
 ```{r}
 
-projects <- dget(file="../rawData/projectsRaw.R")
-custom.fields <- dget(file="../rawData/customFields.R")
 
-projects <- filter(custom.fields, cf_id == 12) %>%
+connect <- odbcConnect('LabCase', uid=config$odbc$uid, pwd=config$odbc$pwd)
+
+query <- 'SELECT p.id, p.identifier, p.name, p.created_on, 
+            p.is_public, p.project_size, p.template_project_id, 
+            p.last_updated_on, COUNT(m.user_id) AS member_count
+            FROM projects AS p
+            LEFT OUTER JOIN members AS m
+            ON p.id = m.project_id
+            GROUP BY p.id;'
+projects <- sqlQuery(connect, query=query)
+
+# Extract custom field information
+# In the LC database this is the relevant id - custom fields mapping:
+# 12: Use as template
+# 13: Customer
+# 14: Country
+# 15: Business Line
+query <- 'SELECT p.id, c.custom_field_id AS cf_id, c.value AS cf_value
+            FROM projects AS p
+            INNER JOIN custom_values AS c
+            ON
+            p.id = c.customized_id
+            WHERE 
+            c.custom_field_id IN (12,13,14,15) 
+            AND c.customized_type = \"Project\"'
+custom_fields <- sqlQuery(connect, query=query)
+
+close(connect)
+
+
+
+projects <- filter(custom_fields, cf_id == 12) %>%
   select(id, cf_value) %>%
   droplevels %>%
   rename(template = cf_value) %>%
   left_join(projects, ., by = 'id')
 
-# Extract project id and customer information from custom.fields data frame
+# Extract project id and customer information from custom_fields data frame
 #  id:       project id
 #  cf_value: customer name
 # In the LC database this is the relevant id - custom fields mapping:
 #   13: Customer
-projects <- filter(custom.fields, cf_id == 13) %>%
+projects <- filter(custom_fields, cf_id == 13) %>%
   select(id, cf_value) %>%
   droplevels %>%
   rename(customer = cf_value) %>%
   left_join(projects, ., by = 'id')
 
-# Extract project id and country information from custom.fields data frame
+# Extract project id and country information from custom_fields data frame
 #  id:       project id
 #  cf_value: country name
 # In the LC database this is the relevant id - custom fields mapping:
 #   14: Country
-projects <- filter(custom.fields, cf_id == 14) %>%
+projects <- filter(custom_fields, cf_id == 14) %>%
   select(id, cf_value) %>%
   droplevels %>%
   rename(country = cf_value) %>%
   left_join(projects, ., by = "id")
   
 
-# Extract project id and business line information from custom.fields data frame
+# Extract project id and business line information from custom_fields data frame
 #  id:       project id
 #  cf_value: business line
 # In the LC database this is the relevant id - custom fields mapping:
 #   15: Business line
-projects <- filter(custom.fields, cf_id == 15) %>%
+projects <- filter(custom_fields, cf_id == 15) %>%
   select(id, cf_value) %>%
   droplevels %>%
   rename(business_line = cf_value) %>%
@@ -118,9 +156,9 @@ with(projects, table(business_line, type))
 
 ## Results
 
-In this section we will summarize the pre-processed data to create the desired bar plots.
+In this section we will summarize the pre-processed data to create the desired bar plots. First, we will process the data and use the results as input for creating the plotting objecs before we acutally plot them.
 
-```{r message=FALSE, fig.width=8, fig.height=6}
+```{r}
 proj_by_year <- projects %>% mutate(
   year = year(created_on)
   ) %>% group_by(year, type) %>%
@@ -128,11 +166,37 @@ proj_by_year <- projects %>% mutate(
     n = n()
     ) 
 
-ggplot(proj_by_year, aes(as.character(year), n, fill = type)) +
+g_proj_by_year <- ggplot(proj_by_year, aes(as.character(year), n, fill = type)) +
   geom_bar(stat = 'identity', position = position_dodge()) +
   geom_text(aes(label = n), position = position_dodge(.9), size = 4, 
             vjust = -0.3) +
-  ggtitle('Number of created projects per year') +
+  ggtitle('Number of created LabCase projects per year\n(focus on all business lines)') +
+  xlab('Year of creation') +
+  ylab('Number of projects') +
+   scale_fill_brewer(palette = 'Set1') +
+  
+  theme(plot.title = element_text(size = 15),
+        axis.title = element_text(size = 13),
+        axis.text = element_text(size = 11)) +
+  labs(fill = "Project type") +
+   ylim(0, max(proj_by_year$n) * 1.05) 
+
+```
+
+```{r}
+
+proj_by_year_gcs <- projects %>% filter(business_line %in% c('GCS', 'itCampus', 'IDS')) %>% mutate(
+  year = year(created_on)
+  ) %>% group_by(year, type) %>%
+  summarize(
+    n = n()
+    ) 
+
+g_proj_by_year_gcs <- ggplot(proj_by_year_gcs, aes(as.character(year), n, fill = type)) +
+  geom_bar(stat = 'identity', position = position_dodge()) +
+  geom_text(aes(label = n), position = position_dodge(.9), size = 4, 
+            vjust = -0.3) +
+  ggtitle('Number of created LabCase projects per year\n(focus on GCS including IDS and itCampus)') +
   xlab('Year of creation') +
   ylab('Number of projects') +
    scale_fill_brewer(palette = 'Set1') +
@@ -146,7 +210,9 @@ ggplot(proj_by_year, aes(as.character(year), n, fill = type)) +
 ```
 
 
-```{r message=FALSE, fig.width=10, fig.height=7}
+
+
+```{r}
 
 
 
@@ -159,11 +225,11 @@ proj_by_year_qrt <- projects %>% mutate(
     n = n()
     ) 
   
-ggplot(proj_by_year_qrt, aes(quarter, n, fill = type)) + 
+g_proj_by_year_qrt <- ggplot(proj_by_year_qrt, aes(quarter, n, fill = type)) + 
   geom_bar(stat = 'identity', position = position_dodge()) +
   geom_text(aes(label = n), position = position_dodge(.9), size = 4, vjust = -0.3) +
   facet_wrap(~ year ) +
-  ggtitle('Number of created projects per year\n(quarterly focus)') +
+  ggtitle('Number of created LabCase projects per year\n(quarterly focus on all business lines)') +
   xlab('Quarter of creation') +
   ylab('Number of projects') +
   scale_fill_brewer(palette = 'Set1') +
@@ -175,9 +241,63 @@ ggplot(proj_by_year_qrt, aes(quarter, n, fill = type)) +
    ylim(0, max(proj_by_year_qrt$n) * 1.05) 
 
 
+
+
+
+```
+
+```{r}
+
+
+proj_by_year_qrt_gcs <- projects %>% filter(business_line %in% c('GCS', 'IDS', 'itCampus')) %>% mutate(
+  year = year(created_on),
+  quarter = quarters(created_on)
+  ) %>% group_by(year, quarter, type) %>% 
+  summarize(
+    n = n()
+    ) 
+  
+g_proj_by_year_qrt_gcs <- ggplot(proj_by_year_qrt_gcs, aes(quarter, n, fill = type)) + 
+  geom_bar(stat = 'identity', position = position_dodge()) +
+  geom_text(aes(label = n), position = position_dodge(.9), size = 4, vjust = -0.3) +
+  facet_wrap(~ year ) +
+  ggtitle('Number of created LabCase projects per year\n(quarterly focus on GCS including IDS and itCampus)') +
+  xlab('Quarter of creation') +
+  ylab('Number of projects') +
+  scale_fill_brewer(palette = 'Set1') +
+  theme(plot.title = element_text(size = 15),
+        axis.title = element_text(size = 13),
+        axis.text = element_text(size = 11),
+        strip.text = element_text(size = 13)) +
+  labs(fill = "Project type") +
+   ylim(0, max(proj_by_year_qrt_gcs$n) * 1.05) 
+
 ```
 
 
+```{r fig.width=8, fig.height=6, warning=FALSE, message=FALSE}
+
+g_proj_by_year
+
+```
+
+```{r fig.width=8, fig.height=6, warning=FALSE, message=FALSE}
+
+g_proj_by_year_gcs
+
+```
+
+```{r fig.width=10, fig.height=7, warning=FALSE, message=FALSE}
+
+g_proj_by_year_qrt
+
+```
+
+```{r fig.width=10, fig.height=7, warning=FALSE, message=FALSE}
+
+g_proj_by_year_qrt_gcs
+
+```
 
 
 
