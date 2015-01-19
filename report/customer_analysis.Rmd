@@ -1,6 +1,6 @@
 # LabCase projects per project type analysis
 
-```{r warning=FALSE, message=FALSE}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
 # Load libraries
 library(dplyr)
@@ -22,7 +22,7 @@ config <- yaml.load_file('../config.yml')
 
 ```
 
-Data as of  **`r as.character(now())`**
+**Data as of  `r as.character(now())`**
 
 
 ## Overview
@@ -30,6 +30,8 @@ Data as of  **`r as.character(now())`**
 This report shows the number of created LabCase projects grouped by project type. For this analysis project type is either `internal` or `external`. 
 
 We visualize the grouped projects within several different time spans using bar plots.
+
+For reproducibility we provide the entire code used for extracting, processing and plotting the data.
 
 
 ## Data extraction and pre-processing
@@ -115,7 +117,7 @@ projects <- filter(custom_fields, cf_id == 15) %>%
 
 ```
 
-First, we need to identify customer names which indicate internal projects.
+First, we need to identify customer names which indicate internal projects. We will check out all entries in the `Customer` metadata field and their occurrences. 
 
 ```{r, results='asis'}
 
@@ -127,7 +129,6 @@ print(xtable(proj_per_cust,
 ```
 
 Based on the analysis of the table above we construct a regular expression which is used to flag internal projects accordingly. 
-
 
 ```{r}
 
@@ -156,7 +157,13 @@ with(projects, table(business_line, type))
 
 ## Results
 
-In this section we will summarize the pre-processed data to create the desired bar plots. First, we will process the data and use the results as input for creating the plotting objecs before we acutally plot them.
+
+In this section we will summarize the pre-processed data to create the desired bar plots. 
+
+We will process the data and use the results as input for creating the final plotting objecs.
+
+
+### Simple bar plots with yearly focus
 
 ```{r}
 proj_by_year <- projects %>% mutate(
@@ -183,6 +190,7 @@ g_proj_by_year <- ggplot(proj_by_year, aes(as.character(year), n, fill = type)) 
 
 ```
 
+
 ```{r}
 
 proj_by_year_gcs <- projects %>% filter(business_line %in% c('GCS', 'itCampus', 'IDS')) %>% mutate(
@@ -205,17 +213,25 @@ g_proj_by_year_gcs <- ggplot(proj_by_year_gcs, aes(as.character(year), n, fill =
         axis.title = element_text(size = 13),
         axis.text = element_text(size = 11)) +
   labs(fill = "Project type") +
-   ylim(0, max(proj_by_year$n) * 1.05) 
+   ylim(0, max(proj_by_year_gcs$n) * 1.05) 
 
 ```
 
+```{r echo=FALSE, fig.width=8, fig.height=6, warning=FALSE, message=FALSE}
 
+g_proj_by_year
 
+```
+
+```{r echo=FALSE, fig.width=8, fig.height=6, warning=FALSE, message=FALSE}
+
+g_proj_by_year_gcs
+
+```
+
+### Trellis bar plots with quarterly focus
 
 ```{r}
-
-
-
 
 proj_by_year_qrt <- projects %>% mutate(
   year = year(created_on),
@@ -274,33 +290,52 @@ g_proj_by_year_qrt_gcs <- ggplot(proj_by_year_qrt_gcs, aes(quarter, n, fill = ty
 
 ```
 
+```{r}
 
-```{r fig.width=8, fig.height=6, warning=FALSE, message=FALSE}
 
-g_proj_by_year
+proj_by_year_qrt_gcs_only <- projects %>% filter(business_line %in% c('GCS', 'itCampus')) %>% mutate(
+  year = year(created_on),
+  quarter = quarters(created_on)
+  ) %>% group_by(year, quarter, type) %>% 
+  summarize(
+    n = n()
+    ) 
+  
+g_proj_by_year_qrt_gcs_only <- ggplot(proj_by_year_qrt_gcs_only, aes(quarter, n, fill = type)) + 
+  geom_bar(stat = 'identity', position = position_dodge()) +
+  geom_text(aes(label = n), position = position_dodge(.9), size = 4, vjust = -0.3) +
+  facet_wrap(~ year ) +
+  ggtitle('Number of created LabCase projects per year\n(quarterly focus on GCS including itCampus)') +
+  xlab('Quarter of creation') +
+  ylab('Number of projects') +
+  scale_fill_brewer(palette = 'Set1') +
+  theme(plot.title = element_text(size = 15),
+        axis.title = element_text(size = 13),
+        axis.text = element_text(size = 11),
+        strip.text = element_text(size = 13)) +
+  labs(fill = "Project type") +
+   ylim(0, max(proj_by_year_qrt_gcs_only$n) * 1.05) 
 
 ```
 
-```{r fig.width=8, fig.height=6, warning=FALSE, message=FALSE}
 
-g_proj_by_year_gcs
-
-```
-
-```{r fig.width=10, fig.height=7, warning=FALSE, message=FALSE}
+```{r echo=FALSE, fig.width=10, fig.height=7, warning=FALSE, message=FALSE}
 
 g_proj_by_year_qrt
 
 ```
 
-```{r fig.width=10, fig.height=7, warning=FALSE, message=FALSE}
+```{r echo=FALSE, fig.width=10, fig.height=7, warning=FALSE, message=FALSE}
 
 g_proj_by_year_qrt_gcs
 
 ```
 
+```{r echo=FALSE, fig.width=10, fig.height=7, warning=FALSE, message=FALSE}
 
+g_proj_by_year_qrt_gcs_only
 
+```
 
 
 
