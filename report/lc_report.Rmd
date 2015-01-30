@@ -121,7 +121,7 @@ Our main focus lies on the following four periods:
 * Years since LabCase started its service
 
 
-```{r echo=FALSE, warning = FALSE, fig.width=14, fig.height=10}
+```{r echo=FALSE, warning = FALSE, fig.width=13, fig.height=9}
 
 proj.created.in.last.7.days.df %<>% mutate(
   created_on = as.Date(created_on)
@@ -311,7 +311,7 @@ projects %<>% mutate(
 
 ```
 
-```{r echo=FALSE, fig.width=10, fig.height=7, warning=FALSE, message=FALSE}
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=5}
 
 proj_by_year <- projects %>% mutate(
   year = year(created_on)
@@ -339,7 +339,7 @@ g_proj_by_year
 
 ```
 
-```{r echo=FALSE, fig.width=10, fig.height=7, warning=FALSE, message=FALSE}
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width=10, fig.height=7}
 
 proj_by_year_qrt_gcs_only <- projects %>% filter(business_line %in% c('GCS', 'itCampus')) %>% mutate(
   year = year(created_on),
@@ -367,6 +367,7 @@ g_proj_by_year_qrt_gcs_only <- ggplot(proj_by_year_qrt_gcs_only, aes(quarter, n,
 g_proj_by_year_qrt_gcs_only
 
 ```
+
 
 
 
