@@ -110,6 +110,8 @@ print(g.departments, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
 
 ## Project growth
 
+### General
+
 This section gives you an overview about projects created within different time spans. 
 Our main focus lies on the following four periods:
 
@@ -284,6 +286,89 @@ print(g.months, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
 print(g.quarters, vp = viewport(layout.pos.row = 2, layout.pos.col = 1))
 print(g.years, vp = viewport(layout.pos.row = 2, layout.pos.col = 2))
 ```
+
+### Growth by project type
+
+This section gives you an overview about projects created within different time spans grouped by project type whereas we differ between `internal` and `external` projects.
+
+Our main focus lies on the following two views:
+
+* Number of created projects grouped by year and type for all business lines 
+* Number of created GCS projects grouped by year, quarter and type
+
+_Note: The grouping into `internal` and `external` projects is accompished by applying a regular expression on the `Customer` metadata field of each project._
+
+```{r echo=FALSE}
+
+reg_ex <- '^all$|^ALL$|^All$|All Clients|Annesh|Annika|^Any$|ARIS Internal|ARIS User Group DACH|
+Corporate Marketing|CustomerTemplate|Customer Name|^GCS|^gcs|^IBO|^IDS|^[iI]n-[Hh]ouse|
+^[iI]nternal|itCampus|^Mathias|[Pp]lanio|^P[p]resales|^Product Marketing|RnD|
+rnd|^SAG|^Self$|^Software AG|software ag|^SoftwareAG|^Solution Book|^test|^Test|various'
+
+projects %<>% mutate(
+  type = ifelse(grepl(reg_ex, customer), 'internal', 'external')
+  )
+
+```
+
+```{r echo=FALSE, fig.width=10, fig.height=7, warning=FALSE, message=FALSE}
+
+proj_by_year <- projects %>% mutate(
+  year = year(created_on)
+  ) %>% group_by(year, type) %>%
+  summarize(
+    n = n()
+    ) 
+
+g_proj_by_year <- ggplot(proj_by_year, aes(as.character(year), n, fill = type)) +
+  geom_bar(stat = 'identity', position = position_dodge()) +
+  geom_text(aes(label = n), position = position_dodge(.9), size = 4, 
+            vjust = -0.3) +
+  ggtitle('Number of created LabCase projects per year\n(focus on all business lines)') +
+  xlab('Year of creation') +
+  ylab('Number of projects') +
+   scale_fill_brewer(palette = 'Set1') +
+  
+  theme(plot.title = element_text(size = 15),
+        axis.title = element_text(size = 13),
+        axis.text = element_text(size = 11)) +
+  labs(fill = "Project type") +
+   ylim(0, max(proj_by_year$n) * 1.05) 
+
+g_proj_by_year
+
+```
+
+```{r echo=FALSE, fig.width=10, fig.height=7, warning=FALSE, message=FALSE}
+
+proj_by_year_qrt_gcs_only <- projects %>% filter(business_line %in% c('GCS', 'itCampus')) %>% mutate(
+  year = year(created_on),
+  quarter = quarters(created_on)
+  ) %>% group_by(year, quarter, type) %>% 
+  summarize(
+    n = n()
+    ) 
+  
+g_proj_by_year_qrt_gcs_only <- ggplot(proj_by_year_qrt_gcs_only, aes(quarter, n, fill = type)) + 
+  geom_bar(stat = 'identity', position = position_dodge()) +
+  geom_text(aes(label = n), position = position_dodge(.9), size = 4, vjust = -0.3) +
+  facet_wrap(~ year ) +
+  ggtitle('Number of created LabCase projects per year\n(quarterly focus on GCS including itCampus)') +
+  xlab('Quarter of creation') +
+  ylab('Number of projects') +
+  scale_fill_brewer(palette = 'Set1') +
+  theme(plot.title = element_text(size = 15),
+        axis.title = element_text(size = 13),
+        axis.text = element_text(size = 11),
+        strip.text = element_text(size = 13)) +
+  labs(fill = "Project type") +
+   ylim(0, max(proj_by_year_qrt_gcs_only$n) * 1.05) 
+
+g_proj_by_year_qrt_gcs_only
+
+```
+
+
 
 ## Project activity 
 
