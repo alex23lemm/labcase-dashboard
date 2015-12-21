@@ -24,7 +24,7 @@ library(knitrBootstrap)
 
 # Set working directory
 # This the specified path needs to be changed according to your setup
-#setwd('~/Documents/projects/lc_dashboard')
+setwd('/srv/shiny-server/labcase-dashboard')
 
 
 # Load config data
