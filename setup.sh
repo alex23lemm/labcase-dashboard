@@ -32,7 +32,8 @@ sudo su - -c "R -e \"devtools::install_github('ramnathv/rCharts')\""
 
 
 # Install CRAN R packages
-sudo su - -c "R -e \"install.packages(c('RODBC','lubridate','yaml','plyr','dplyr', 'scales','reshape2','stringr', 'knitr', 'knitrBootstrap', 'markdown', 'ggplot2', 'RColorBrewer'), repos='https://cran.rstudio.com/')\""
+sudo apt-get install r-cran-rodbc
+sudo su - -c "R -e \"install.packages(c('lubridate','yaml','plyr','dplyr', 'scales','tidyr','stringr', 'knitr', 'knitrBootstrap', 'markdown', 'ggplot2', 'RColorBrewer', 'magrittr'), repos='https://cran.rstudio.com/')\""
 
 
 # Install shiny app
