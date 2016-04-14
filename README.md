@@ -69,7 +69,8 @@ Assuming that the new folder will be your R working directory, use the `runApp` 
 
 If you would like to install the application together with Shiny Server on a fresh Ubuntu server (e.g. a T2.micro Amazon EC2 instance) you can excute the bash script `setup.sh` that is part of this repo. The script will install the following:
 
-* Create and enable swap file: necessary when running on a T2.mirco EC2 instance. You won't be able to install certain R packages (e.g. `dplyr`, `tidyr`) without the additional allocated memory from the swap file
+* MySQL ODBC driver 
+Create and enable swap file: necessary when running on a T2.mirco EC2 instance. You won't be able to install certain R packages (e.g. `dplyr`, `tidyr`) without the additional allocated memory from the swap file
 * The latest R distribution for Ubuntu Trusty
 * Git
 * Shiny server

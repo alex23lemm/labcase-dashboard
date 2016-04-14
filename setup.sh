@@ -4,6 +4,9 @@
 sudo apt-get upgrade
 sudo apt-get -y install git
 
+# Installing MySQL ODBC driver
+sudo apt-get install libmyodbc
+
 # Create and enable swap file
 sudo fallocate -l 1G /swapfile
 sudo chmod 600 /swapfile
