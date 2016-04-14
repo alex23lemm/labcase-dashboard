@@ -24,7 +24,8 @@ library(knitrBootstrap)
 
 # Set working directory
 # This the specified path needs to be changed according to your setup
-setwd('/srv/shiny-server/labcase-dashboard')
+#setwd('/srv/shiny-server/labcase-dashboard')
+#setwd('~/Documents/projects/lc_dashboard')
 
 
 # Load config data
@@ -34,5 +35,5 @@ source('./rScripts/load_data.R')
 source('./rScripts/process_data.R')
 source('./rScripts/create_report.R')
 
-rm(list=ls())
+rm(list = ls())
 
