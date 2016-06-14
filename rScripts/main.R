@@ -7,7 +7,7 @@
 # Scheduled Task.
 
 
-library(RODBC)
+library(DBI)
 library(lubridate)
 library(yaml)
 
@@ -24,9 +24,7 @@ library(knitrBootstrap)
 
 # Set working directory
 # This the specified path needs to be changed according to your setup
-#setwd('/srv/shiny-server/labcase-dashboard')
-#setwd('~/Documents/projects/lc_dashboard')
-
+setwd('/srv/shiny-server/labcase-dashboard')
 
 # Load config data
 config <- yaml.load_file('config.yml')

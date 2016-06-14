@@ -92,8 +92,15 @@ calculate_activity <- function(last.updates, date) {
 
 # 1. Load raw data into memory -------------------------------------------------
  
-projects <- dget(file="./rawData/projectsRaw.R")
-users <- dget(file="./rawData/usersRaw.R")
+projects <- dget(file="./rawData/projectsRaw.R") %>%
+  mutate(
+    created_on = ymd_hms(created_on),
+    last_updated_on = ymd_hms(last_updated_on)
+  )
+users <- dget(file="./rawData/usersRaw.R") %>%
+  mutate(
+    last_login_on = ymd_hms(last_login_on)
+  )
 issues <- dget(file="./rawData/issuesRaw.R")
 repos <- dget(file="./rawData/reposRaw.R")
 custom.fields <- dget(file="./rawData/customFields.R")
