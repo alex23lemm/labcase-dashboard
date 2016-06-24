@@ -1,12 +1,24 @@
+---
+output:
+  knitrBootstrap::bootstrap_document:
+    theme: cerulean
+    highlight: github
+    theme.chooser: FALSE
+    highlight.chooser: FALSE
+---
+
 <img src="figure/lc_logo.png" style="float: right;" />
 &nbsp;
-
 
 
 # LabCase Global Report
 
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
+
+library(knitr)
+opts_chunk$set(bootstrap.thumbnail=FALSE)
+
 library(lubridate)
 library(ggplot2)
 library(grid)
@@ -128,7 +140,7 @@ Our main focus lies on the following four periods:
 * Years since LabCase started its service
 
 
-```{r echo=FALSE, warning = FALSE, fig.width=13, fig.height=9}
+```{r echo=FALSE, warning = FALSE, fig.width=13, fig.height=9, eval=FALSE}
 
 proj.created.in.last.7.days.df %<>% mutate(
   created_on = as.Date(created_on)

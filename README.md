@@ -28,9 +28,8 @@ R libraries:
 * scales
 * reshape2
 * stringr
-* knitr
+* rmarkdown
 * knitrBootstrap
-* markdown
 * ggplot2
 * RColorBrewer
 * shiny

@@ -17,8 +17,7 @@ library(dplyr)
 library(tidyr)
 library(stringr)
 
-
-library(knitr)
+library(rmarkdown)
 library(knitrBootstrap)
 
 
