@@ -1,13 +1,10 @@
 
 # Purpose: The load_data.R script extracts the relevant raw data from the LC 
-# database using ODBC. Each extracted table is stored in a seperate .R file at 
+# database using RMySQL. Each extracted table is stored in a seperate .R file at 
 # the end.
 # In total 5 tables are read but only saved as a whole when the entire data
 # retrieval was successful. The script aborts without saving anything should an 
 # error occur in between.
-#
-# Google's R Style Guide (http://bit.ly/12ZBd1J) was applied while writing 
-# the code below.
 
 
 connect <- try(dbConnect(RMySQL::MySQL(), 
@@ -52,10 +49,10 @@ if (class(projects.raw) == 'try-error') {
 #   STATUS_REGISTERED = 2
 #   STATUS_LOCKED     = 3
 query <- 'SELECT id, login, last_login_on, status, mail FROM users
-            WHERE 
-            status = 1
-            AND
-            last_login_on IS NOT NULL'
+          WHERE 
+          status = 1
+          AND
+          last_login_on IS NOT NULL'
 users.raw <- try(dbGetQuery(connect, statement = query), silent = TRUE)
   
 if (class(users.raw) == 'try-error') {

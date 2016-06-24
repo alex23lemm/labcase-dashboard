@@ -1,9 +1,9 @@
 
-# Purpose: main.R sources load_data.R, process_data.R and create_report.
+# Purpose: main.R sources load_data.R, process_data.R and create_report.R.
 # The uploaded, processed and saved data of that workflow serves as the input 
 # for the Shiny app 'LabCase Dashboard'. The created report can later be 
-# downloaded as a HTML file the the Shiny Web UI. Depending on the desired use 
-# case and your operating system main.R is either set up as a Cronjob your as a 
+# downloaded as a HTML file via the Shiny Web UI. Depending on the desired use 
+# case and your operating system main.R is either set up as a Cron Job or as a 
 # Scheduled Task.
 
 

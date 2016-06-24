@@ -2,7 +2,7 @@
 # Purpose: This script creates a HTML report based on the processed data.
 # 'lc_report.Rmd' serves as the report template. Note that for reproducibility
 # purposes, the knit runs in a separate process and environment
-# (rather than using the current workspace). Therefore the processed data needs
+# (rather than using the current workspace). Therefore, the processed data needs
 # to get sourced in the lc_report.Rmd file.
 
 
@@ -16,7 +16,7 @@
 # resides), the figure folder gets created in the working directory of the 
 # overall R session the knit command was started in.
 #
-# Therefore the relative paths of the figures in the created .md file would point
+# Therefore, the relative paths of the figures in the created .md file would point
 # to figure/ instead to report/figure/ should we not switch the working directory.
 # In the next step markdownToHTML could not reference the figures because a 
 # figure/ folder would not exist in /report.

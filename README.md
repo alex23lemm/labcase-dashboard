@@ -19,7 +19,8 @@ You need to install the following prerequisites:
 
 R libraries:
 
-* RODBC
+* DBI
+* RMySQL
 * lubridate
 * yaml
 * plyr
@@ -50,7 +51,7 @@ Simply git clone this repo which will set up the following folder app structure:
 **Configuration**
 	  
 * Change the path in the `setwd()` command in `lc-dashboard/rScripts/main.R`  accordingly
-* Add the LabCase database as an ODBC data source on your operating system and add the necessary credentials to the `config.yml` file
+* Add the necessary credentials to `config.yml`
 
 **Cron Job or Scheduled Task**
 
@@ -69,7 +70,6 @@ Assuming that the new folder will be your R working directory, use the `runApp` 
 
 If you would like to install the application together with Shiny Server on a fresh Ubuntu server (e.g. a T2.micro Amazon EC2 instance) you can excute the bash script `setup.sh` that is part of this repo. The script will install the following:
 
-* MySQL ODBC driver 
 Create and enable swap file: necessary when running on a T2.mirco EC2 instance. You won't be able to install certain R packages (e.g. `dplyr`, `tidyr`) without the additional allocated memory from the swap file
 * The latest R distribution for Ubuntu Trusty
 * Git
