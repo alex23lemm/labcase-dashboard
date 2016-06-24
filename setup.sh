@@ -4,8 +4,8 @@
 sudo apt-get upgrade
 sudo apt-get -y install git
 
-# Installing MySQL ODBC driver
-sudo apt-get install libmyodbc
+# Installing MySQL driver
+sudo apt-get install -y libmariadb-client-lgpl-dev
 
 # Create and enable swap file
 sudo fallocate -l 1G /swapfile
@@ -30,14 +30,13 @@ sudo apt-get -y install libcurl4-gnutls-dev libxml2-dev libssl-dev
 sudo su - -c "R -e \"install.packages('devtools', repos='http://cran.rstudio.com/')\""
 
 # Install GitHub R packages
-sudo su - -c "R -e \"devtools::install_github('rstudio/shiny@v0.10.2.2')\""
 sudo su - -c "R -e \"devtools::install_github('ramnathv/rCharts')\""
 
 
 # Install CRAN R packages
-sudo apt-get install r-cran-rodbc
-sudo su - -c "R -e \"install.packages(c('lubridate','yaml','plyr','dplyr', 'scales','tidyr','stringr', 'knitr', 'knitrBootstrap', 'markdown', 'ggplot2', 'RColorBrewer', 'magrittr'), repos='https://cran.rstudio.com/')\""
-
+sudo apt-get install r-cran-dbi
+sudo apt-get install r-cran-rmysql
+sudo su - -c "R -e \"install.packages(c('lubridate','yaml','plyr','dplyr', 'scales','tidyr','stringr', 'knitrBootstrap', 'rmarkdown', 'ggplot2', 'RColorBrewer', 'magrittr'), repos='https://cran.rstudio.com/')\""
 
 # Install shiny app
 sudo git clone https://github.com/alex23lemm/labcase-dashboard.git
