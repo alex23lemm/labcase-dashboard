@@ -1,15 +1,5 @@
----
-output:
-  knitrBootstrap::bootstrap_document:
-    theme: cerulean
-    highlight: github
-    theme.chooser: FALSE
-    highlight.chooser: FALSE
----
-
 <img src="figure/lc_logo.png" style="float: right;" />
 &nbsp;
-
 
 # LabCase Global Report
 
@@ -140,7 +130,7 @@ Our main focus lies on the following four periods:
 * Years since LabCase started its service
 
 
-```{r echo=FALSE, warning = FALSE, fig.width=13, fig.height=9, eval=FALSE}
+```{r echo=FALSE, warning = FALSE, fig.width=13, fig.height=9}
 
 proj.created.in.last.7.days.df %<>% mutate(
   created_on = as.Date(created_on)
@@ -156,10 +146,10 @@ proj.created.in.last.7.days.df %<>% mutate(
 # Order factor levels according to the number of created projects and reverse
 # their order to reflect a descending order
 proj.created.in.last.7.days.df$business_line <- reorder(proj.created.in.last.7.days.df$business_line,
-                                             proj.created.in.last.7.days.df$numb_of_proj, 
-                                             sum)
-proj.created.in.last.7.days.df$business_line <- factor(proj.created.in.last.7.days.df$business_line, 
-                                            levels=rev(levels(proj.created.in.last.7.days.df$business_line)))
+                                                        proj.created.in.last.7.days.df$numb_of_proj, 
+                                                        sum)
+proj.created.in.last.7.days.df$business_line <- factor(proj.created.in.last.7.days.df$business_line,
+                                                       levels = rev(levels(proj.created.in.last.7.days.df$business_line)))
 
 
 g.last.7.days <- ggplot(proj.created.in.last.7.days.df, aes(created_on, numb_of_proj)) +
@@ -181,8 +171,9 @@ g.last.7.days <- ggplot(proj.created.in.last.7.days.df, aes(created_on, numb_of_
         axis.text.x = element_text(angle = 30, hjust = 1, 
                                    vjust = 1)) +
   scale_x_date(
-    breaks = '1 day', 
-    limits = c(as.Date(date.of.extraction) - days(6), as.Date(date.of.extraction)), 
+    date_breaks = '1 day', 
+    limits = c(as.Date(date.of.extraction) - days(6),
+               as.Date(date.of.extraction)), 
     labels = date_format("%d-%b"),
     expand = c(0, 0.6)
   ) + 
