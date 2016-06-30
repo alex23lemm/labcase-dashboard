@@ -5,21 +5,8 @@
 # (rather than using the current workspace). Therefore, the processed data needs
 # to get sourced in the lc_report.Rmd file.
 
-#render('./report/lc_report.Rmd')
+render('./report/lc_report.Rmd')
 
-render('./report/lc_report.Rmd', bootstrap_document(theme = "cerulean",
-                                                    highlight = "github"))
-
-
-
-
-# 
-# ---
-#   output:
-#   knitrBootstrap::bootstrap_document:
-#   theme: cerulean
-# highlight: github
-# ---
 
 
 

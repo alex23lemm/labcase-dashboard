@@ -1,3 +1,12 @@
+---
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: cerulean
+    highlight: haddock
+---
+
 <img src="figure/lc_logo.png" style="float: right;" />
 &nbsp;
 
@@ -6,8 +15,7 @@
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 
-library(knitr)
-opts_chunk$set(bootstrap.thumbnail=FALSE)
+
 
 library(lubridate)
 library(ggplot2)
@@ -31,7 +39,7 @@ proj.created.by.country.df <- as.data.frame.table(sort(table(projects$country,
 # Create project frequency table grouped by department
 proj.created.by.department.df <- as.data.frame.table(sort(table(projects$business_line,
                                                                 useNA = 'ifany'), 
-                                                          decreasing=TRUE))
+                                                          decreasing = TRUE))
 
 ```
 
@@ -130,7 +138,7 @@ Our main focus lies on the following four periods:
 * Years since LabCase started its service
 
 
-```{r echo=FALSE, warning = FALSE, fig.width=13, fig.height=9}
+```{r echo=FALSE, warning=FALSE, fig.width=13, fig.height=9}
 
 proj.created.in.last.7.days.df %<>% mutate(
   created_on = as.Date(created_on)
@@ -172,8 +180,8 @@ g.last.7.days <- ggplot(proj.created.in.last.7.days.df, aes(created_on, numb_of_
                                    vjust = 1)) +
   scale_x_date(
     date_breaks = '1 day', 
-    limits = c(as.Date(date.of.extraction) - days(6),
-               as.Date(date.of.extraction)), 
+   limits = c(as.Date(date.of.extraction) - days(6),
+              as.Date(date.of.extraction) + 1), 
     labels = date_format("%d-%b"),
     expand = c(0, 0.6)
   ) + 
@@ -242,7 +250,7 @@ proj.by.quarter$business_line <- reorder(proj.by.quarter$business_line,
                                              proj.by.quarter$numb_of_proj, 
                                              sum)
 proj.by.quarter$business_line <- factor(proj.by.quarter$business_line, 
-                                            levels=rev(levels(proj.by.quarter$business_line)))
+                                            levels = rev(levels(proj.by.quarter$business_line)))
 
 # Calculate upper bound for the y-axis based on quarter in which most projects
 # were created
@@ -277,8 +285,8 @@ g.quarters <- ggplot(proj.by.quarter, aes(quarter, numb_of_proj)) +
 proj.created.by.year.df <- proj.created.by.year.df[order(proj.created.by.year.df$Var1),]
 
 g.years <- ggplot(proj.created.by.year.df, aes(x = Var1, y = Freq)) + 
-                     geom_bar(width = .6, stat  ='identity', fill = "#0899CC") +
-                     geom_text(aes(label  =Freq), vjust = -0.3, size = 4) +
+                     geom_bar(width = .6, stat = 'identity', fill = "#0899CC") +
+                     geom_text(aes(label = Freq), vjust = -0.3, size = 4) +
                      ggtitle('Number of created projects\n per year') +
                      ylim(0, max(proj.created.by.year.df$Freq) * 1.03) +
                      xlab('Year of creation') +
@@ -286,7 +294,7 @@ g.years <- ggplot(proj.created.by.year.df, aes(x = Var1, y = Freq)) +
                      theme_bw() + 
                      theme(plot.title = element_text(size = rel(1.1)),
                            axis.title = element_text(size = 12),
-                           axis.text = element_text(size  =10))
+                           axis.text = element_text(size  = 10))
                     
   
 
@@ -425,7 +433,7 @@ This section shows the distribution of LabCase users clustered by Software AG em
 suffix.sag.df <- transform(suffix.sag.df, 
                            suffix.sag = reorder(suffix.sag, Freq))
 
-g.sag.users <- ggplot(suffix.sag.df, aes(x = suffix.sag, y  =Freq)) + 
+g.sag.users <- ggplot(suffix.sag.df, aes(x = suffix.sag, y = Freq)) + 
                  geom_bar(stat = 'identity', fill = "#0899CC") +
                  geom_text(aes(label = Freq), hjust = -0.2, color = 'black', 
                            size = 4) +
@@ -520,7 +528,7 @@ diskusage.per.project.df$origin <- factor(diskusage.per.project.df$origin,
       scale_fill_manual(values = c("#04B2E0", "#666666")) +
       ggtitle(paste('Projects consuming more than 1GB of total disk space ',
                     '(', dim(diskusage.per.project.df)[1]/2, ' overall)',
-                    sep='')) +
+                    sep = '')) +
       ylim(0, max(diskusage.per.project.df$diskspace) * 1.02) +
       xlab('Project identifier') +
       ylab('Total disk space usage (MB)') +
@@ -546,11 +554,11 @@ This section is dedicated to the project template feature. Below you will see:
 ```{r echo=FALSE, fig.height=6}
 
 # Reorder so that the order in the barchart is flipped
-template.usage.df <- transform(template.usage.df, name=reorder(name, freq))
+template.usage.df <- transform(template.usage.df, name = reorder(name, freq))
     
 g <- ggplot(template.usage.df, aes(x = name, y = freq)) +
       geom_bar(stat = 'identity', fill = "#0899CC") +
-      geom_text(aes(label = freq), hjust = -0.1, size  =4) +
+      geom_text(aes(label = freq), hjust = -0.1, size = 4) +
       ylim(0, max(template.usage.df$freq) * 1.02) +
       xlab('Template name') +
       ylab('Number of instances') +

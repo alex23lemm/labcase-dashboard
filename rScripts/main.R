@@ -18,7 +18,6 @@ library(tidyr)
 library(stringr)
 
 library(rmarkdown)
-library(knitrBootstrap)
 
 
 # Set working directory

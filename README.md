@@ -29,7 +29,6 @@ R libraries:
 * reshape2
 * stringr
 * rmarkdown
-* knitrBootstrap
 * ggplot2
 * RColorBrewer
 * shiny
