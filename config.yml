@@ -1,4 +1,8 @@
-odbc:
-  uid: yourID
-  pwd: yourPassword
+db:
+  uid: 
+  pwd: 
+  host: 
+  port: 
+  dbname: 
 sagEmailSuffixes: [your,list,of,email,suffix,strings]
+
