@@ -101,7 +101,7 @@ shinyServer(function(input,output){
 
   output$distributionCaption <- renderText({
     paste('Chosen Departments/Countries with',  input$numbOfProjects,
-          'or more LabCase projects', sep=' ')
+          'or more LabCase projects', sep = ' ')
   })
 
   # Reactive expression for subsetting projects based on user input (department, 
@@ -113,18 +113,18 @@ shinyServer(function(input,output){
     # on the UI side is generated on the server side , this reactive expression 
     # has to cope with the 'delay' when reading the reactive values at the start
     # of each new user session (see also https://gist.github.com/wch/4211337)
-    if(is.null(input$selectedDepartment)|| is.null(input$selectedCountry)) {
+    if (is.null(input$selectedDepartment) || is.null(input$selectedCountry)) {
       
       return(select(projects, country, business_line))
     }
     
     if (input$selectedDepartment != 'All') {
-      projects <- filter(projects,
-                            business_line == input$selectedDepartment)
+      projects <- filter(projects, business_line == input$selectedDepartment)
     }
     if (input$selectedCountry != 'All') {
       projects <- filter(projects, country == input$selectedCountry)
     }
+    
     select(projects, country, business_line)
   })
 
@@ -136,27 +136,33 @@ shinyServer(function(input,output){
     projects <- selectedProjects()
     
     # Create project frequency table grouped by department
-    proj.created.by.department.df <- as.data.frame.table(sort(table(projects$business_line,
-                                                                    useNA = 'ifany'), 
-                                                              decreasing=TRUE))
+    proj.created.by.department.df <- projects %>% 
+      count(business_line) %>%
+      arrange(desc(n)) %>%
+      mutate(
+        business_line = factor(business_line, 
+                               levels = business_line[order(n, decreasing = TRUE)])
+      )
+    
+    
     
     # Subset according to reactive value and exclude NAs
     proj.created.by.department.df <- filter(proj.created.by.department.df,
-                                            Freq >= input$numbOfProjects, Var1 != '<NA>')
+                                            n >= input$numbOfProjects)
     # If user input is NULL (max will return -Inf in this case) assign 0 to 
     # avoid empty plot later
-    max <- suppressWarnings(max(proj.created.by.department.df$Freq))
+    max <- suppressWarnings(max(proj.created.by.department.df$n))
     if (max == -Inf) {
       max <- 0
     }
     
-    hc <- hPlot(Freq ~ Var1,
+    hc <- hPlot(n ~ business_line,
                 data = proj.created.by.department.df,
                 type = 'bar')
     # Add margin to the right to avoid data label cutting
     hc$chart(marginRight = 30)
     # X-axis text lables added via categories again
-    hc$xAxis(categories = proj.created.by.department.df$Var1,
+    hc$xAxis(categories = proj.created.by.department.df$business_line,
              title = list(text = 'Departments'))
     hc$yAxis(title = list(text = 'Number of projects'),
              max = max)
@@ -174,27 +180,33 @@ shinyServer(function(input,output){
     projects <- selectedProjects()
     
     # Create project frequency table grouped by country
-    proj.created.by.country.df <- as.data.frame.table(sort(table(projects$country,
-                                                                 useNA = 'ifany'), 
-                                                           decreasing = TRUE))
+    #p#roj.created.by.country.df <- as.data.frame.table(sort(table(projects$country,
+       #                                                          useNA = 'ifany'), 
+        #                                                   decreasing = TRUE))
+    proj.created.by.country.df <- projects %>% 
+      count(country) %>%
+      arrange(desc(n)) %>%
+      mutate(
+        country = factor(country, levels = country[order(n, decreasing = TRUE)])
+      )
     
     # Create project frequency table grouped by country
     proj.created.by.country.df <- filter(proj.created.by.country.df, 
-                                         Freq >= input$numbOfProjects, Var1 != '<NA>')
+                                         n >= input$numbOfProjects)
     # If user input is NULL (max will return -Inf in this case) assign 0 to 
     # avoid empty plot later
-    max <- suppressWarnings(max(proj.created.by.country.df$Freq))
+    max <- suppressWarnings(max(proj.created.by.country.df$n))
     if (max == -Inf) {
       max <- 0
     }
     
-    hc <- hPlot(Freq ~ Var1, 
+    hc <- hPlot(n ~ country, 
                 data=proj.created.by.country.df,
                 type='bar')
     # Add margin to the right to avoid data label cutting
     hc$chart(marginRight = 25, height = 550)
     # X-axis text labels added via categories again
-    hc$xAxis(categories = proj.created.by.country.df$Var1,
+    hc$xAxis(categories = proj.created.by.country.df$country,
              title = list(text = 'Countries'))
     hc$yAxis(title = list(text = 'Number of projects'),
              max = max)

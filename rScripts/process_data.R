@@ -165,7 +165,9 @@ projects %<>% left_join(issues, by = c("id" = "project_id")) %>%
 
 projects$issue_count[is.na(projects$issue_count)] <- 0
 projects$repo_diskspace[is.na(projects$repo_diskspace)] <- 0
-projects$project_size[is.na(projects$project_size)] <-0
+projects$project_size[is.na(projects$project_size)] <- 0
+projects$business_line[is.na(projects$business_line)] <- "Unknown"
+projects$country[is.na(projects$country)] <- "Unknown"
 
 # Transfrom bytes into MB
 projects %<>% mutate(repo_diskspace = repo_diskspace/1024/1024)
@@ -249,7 +251,7 @@ proj.created.by.quarter.df <- as.data.frame.table(table(proj.of.current.year))
 # Create project creation table and project creation data frame for the last 7 
 # days
 # Construct interval for last 7 days
-last.7.days.interval <- new_interval(date.of.extraction - days(6), 
+last.7.days.interval <- interval(date.of.extraction - days(6), 
                                      date.of.extraction)
 
 # Extract projects which were created in last 7 days
