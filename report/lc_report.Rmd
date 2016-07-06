@@ -320,7 +320,7 @@ Our main focus lies on the following two views:
 
 _Note: The grouping into `internal` and `external` projects is accompished by applying a regular expression on the `Customer` metadata field of each project._
 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 
 reg_ex <- '^all$|^ALL$|^All$|All Clients|Annesh|Annika|^Any$|ARIS Internal|ARIS User Group DACH|
 Corporate Marketing|CustomerTemplate|Customer Name|^GCS|^gcs|^IBO|^IDS|^[iI]n-[Hh]ouse|
