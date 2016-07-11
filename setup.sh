@@ -36,7 +36,7 @@ sudo su - -c "R -e \"devtools::install_github('ramnathv/rCharts')\""
 # Install CRAN R packages
 sudo apt-get install r-cran-dbi
 sudo apt-get install r-cran-rmysql
-sudo su - -c "R -e \"install.packages(c('lubridate','yaml','plyr','dplyr', 'scales','tidyr','stringr', 'rmarkdown', 'ggplot2', 'RColorBrewer', 'magrittr'), repos='https://cran.rstudio.com/')\""
+sudo su - -c "R -e \"install.packages(c('lubridate','yaml','plyr','dplyr', 'scales','tidyr','stringr', 'ggplot2', 'RColorBrewer', 'magrittr'), repos='https://cran.rstudio.com/')\""
 
 # Install shiny app
 sudo git clone https://github.com/alex23lemm/labcase-dashboard.git
