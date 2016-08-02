@@ -48,11 +48,21 @@ if (class(projects.raw) == 'try-error') {
 #   STATUS_ACTIVE     = 1
 #   STATUS_REGISTERED = 2
 #   STATUS_LOCKED     = 3
-query <- 'SELECT id, login, last_login_on, status, mail FROM users
+query <- "SELECT 
+            users.id, users.login, users.last_login_on, users.status, 
+            email_addresses.address AS mail 
+          FROM
+            users, 
+            email_addresses
           WHERE 
-          status = 1
-          AND
-          last_login_on IS NOT NULL'
+            email_addresses.user_id = users.id 
+            AND
+            email_addresses.is_default = 1
+            AND
+            users.status = 1
+            AND
+            users.last_login_on IS NOT NULL;"
+
 users.raw <- try(dbGetQuery(connect, statement = query), silent = TRUE)
   
 if (class(users.raw) == 'try-error') {
